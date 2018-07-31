@@ -1,6 +1,6 @@
 [package]
 name = "the_next_generation"
 version = "0.1.0"
-authors = ["Josh Morrow <josh@jcmorrow.com>"]
+authors = ["Josh Morrow <josh@jcmorrow.com>", "Cameron McCallie <mccallie.cameron@gmail.com>"]
 
 [dependencies]
