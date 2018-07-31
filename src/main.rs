@@ -1,11 +1,8 @@
+use card::Card;
+use player::Player;
 
 mod card;
-
 mod player;
-
-use card::Card;
-
-use player::Player;
 
 fn main() {
     let player_1 = Player::new("Cameron");
@@ -18,12 +15,13 @@ fn main() {
     let barter_world = Card::barter_world();
     let war_world = Card::war_world();
 
-    print!("{:?}", player_1);
-    print!("{:?}", player_2);
-    print!("{:?}", scout);
-    print!("{:?}", viper);
-    print!("{:?}", trade_bot);
-    print!("{:?}", blob_fighter);
-    print!("{:?}", barter_world);
-    print!("{:?}", war_world);
+    print!("{:#}", player_1);
+    print!("{:#}", player_2);
+
+    print!("{:#}", scout);
+    print!("{:#}", viper);
+    print!("{:#}", trade_bot);
+    print!("{:#}", blob_fighter);
+    print!("{:#}", barter_world);
+    print!("{:#}", war_world);
 }
