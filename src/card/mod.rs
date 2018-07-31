@@ -1,20 +1,22 @@
 // NOTE: enum vals are commented, as they throw warnings when not used
+pub mod base;
 pub mod ship;
+pub mod outpost;
 
 #[derive(Debug)]
 pub enum Faction {
-    // Blob,
-    // MachineCult,
-    // TradeFederation,
-    // StarEmpire,
+    Blob,
+    MachineCult,
+    TradeFederation,
+    StarEmpire,
     Unaligned,
 }
 
 #[derive(Debug)]
 pub enum CardType {
     Ship,
-    // Base,
-    // Outpost,
+    Base,
+    Outpost,
 }
 
 #[derive(Debug)]

@@ -24,4 +24,26 @@ impl Card {
             faction: Faction::Unaligned
         }
     }
+
+    pub fn trade_bot() -> Card {
+        Card{
+            name: String::from("Trade Bot"),
+            cost: 1,
+            combat: 0,
+            trade: 1,
+            card_type: CardType::Ship,
+            faction: Faction::MachineCult
+        }
+    }
+
+    pub fn blob_fighter() -> Card {
+        Card{
+            name: String::from("Blob Fighter"),
+            cost: 1,
+            combat: 3,
+            trade: 0,
+            card_type: CardType::Ship,
+            faction: Faction::Blob
+        }
+    }
 }
