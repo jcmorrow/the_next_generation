@@ -1,12 +1,13 @@
 // NOTE: enum vals are commented, as they throw warnings when not used
+pub mod ship;
 
 #[derive(Debug)]
 pub enum Faction {
     // Blob,
     // MachineCult,
-    TradeFederation,
+    // TradeFederation,
     // StarEmpire,
-    // Unaligned,
+    Unaligned,
 }
 
 #[derive(Debug)]
@@ -21,4 +22,7 @@ pub struct Card {
     pub card_type: CardType,
     pub faction: Faction,
     pub name: String,
+    pub cost: i32,
+    pub combat: i32,
+    pub trade: i32
 }
