@@ -31,11 +31,11 @@ impl Player {
 
 impl fmt::Display for Player {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let mut deck_string = String::new();
-        write!(f, "Name: {}\n", self.name);
-        write!(f, "Deck:\n");
+        let deck_string = String::new();
+        write!(f, "Name: {}\n", self.name).unwrap();
+        write!(f, "Deck:\n").unwrap();
         for card in self.deck.iter() {
-            write!(f, "  {}", card);
+            write!(f, "  {}", card).unwrap();
         }
         write!(f, "\n")
     }
