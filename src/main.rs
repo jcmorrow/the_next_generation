@@ -1,3 +1,4 @@
+use std::iter;
 use card::Card;
 use player::Player;
 
@@ -24,4 +25,22 @@ fn main() {
     print!("{:#}", blob_fighter);
     print!("{:#}", barter_world);
     print!("{:#}", war_world);
+}
+
+fn play() {
+    let players: Vec<Player> = Vec::new();
+
+    for n in 0..2 {
+        players.push(Player::new(format!("Player {}", n.to_string())));
+    }
+    let mut i = 0;
+    {
+        let next_player = || if i < players.len() {
+            players[i]
+        } else {
+            i = 0;
+            players[0]
+        };
+        iter::repeat_with(next_player)
+    }
 }
