@@ -16,7 +16,7 @@ pub enum CardType {
 
 
 pub trait Card {
-    fn play(&self, player: &mut Player) -> Player;
+    fn play(&self, player: &Player) -> Player;
     // TODO: implement these
     // fn discard(&self, player: &Player) -> Player;
     // fn scrap(&self, player: &Player) -> Player;
