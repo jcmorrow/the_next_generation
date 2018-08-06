@@ -11,6 +11,6 @@ fn main() {
     let scout = Scout::new();
 
     print!("{:#}", player_1);
-    player_1 = scout.play(&mut player_1);
+    player_1 = scout.play(&player_1);
     print!("{:#}", player_1);
 }

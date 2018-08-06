@@ -28,7 +28,7 @@ impl Scout {
 }
 
 impl Card for Scout {
-    fn play(&self, player: &mut Player) -> Player {
+    fn play(&self, player: &Player) -> Player {
         let mut p = Player::new(&player.name);
         p.trade += 1;
         p
