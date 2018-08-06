@@ -1,45 +1,32 @@
 use std::fmt;
 
+use player::Player;
+
 pub mod base;
 pub mod ship;
 pub mod outpost;
 
 pub enum Faction {
-    Blob,
-    MachineCult,
-    TradeFederation,
-    StarEmpire,
-    Unaligned,
+    Unaligned
 }
 
 pub enum CardType {
-    Ship,
-    Base,
-    Outpost,
+    Ship
 }
 
-pub struct Card {
-    pub card_type: CardType,
-    pub faction: Faction,
-    pub name: String,
-    pub cost: i32,
-    pub combat: i32,
-    pub trade: i32,
+
+pub trait Card {
+    fn play(&self, player: &mut Player) -> Player;
+    // TODO: implement these
+    // fn discard(&self, player: &Player) -> Player;
+    // fn scrap(&self, player: &Player) -> Player;
 }
 
 impl fmt::Display for CardType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let name = match *self {
-            CardType::Ship => "Ship",
-            CardType::Base => "Base",
-            CardType::Outpost => "Outpost",
+            CardType::Ship => "Ship"
         };
         write!(f, "{}", name)
-    }
-}
-
-impl fmt::Display for Card {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "<{}: {}>\n", self.card_type, self.name)
     }
 }
