@@ -13,4 +13,6 @@ fn main() {
     print!("{:#}", player_1);
     player_1 = scout.play(&player_1);
     print!("{:#}", player_1);
+    player_1 = scout.play(&player_1);
+    print!("{:#}", player_1);
 }

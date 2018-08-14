@@ -25,12 +25,16 @@ impl Scout {
             faction: Faction::Unaligned
         }
     }
+
+    pub fn display(&self) -> String {
+        format!("<{}: {}>\n", self.card_type, self.name)
+    }
 }
 
 impl Card for Scout {
     fn play(&self, player: &Player) -> Player {
         let mut p = Player::new(&player.name);
-        p.trade += 1;
+        p.trade = player.trade + 1;
         p
     }
 }
