@@ -15,7 +15,7 @@ pub enum CardType {
 }
 
 
-pub trait Card {
+pub trait Card: fmt::Display {
     fn play(&self, player: &Player) -> Player;
     // TODO: implement these
     // fn discard(&self, player: &Player) -> Player;

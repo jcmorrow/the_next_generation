@@ -38,13 +38,12 @@ impl Player {
 impl fmt::Display for Player {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Name: {}\n", self.name).unwrap();
-        write!(f, "Trade: {}\n", self.trade)
-        // TODO: fix deck logging
-        // write!(f, "Name: {}\n", self.name).unwrap();
-        // write!(f, "Deck:\n").unwrap();
-        // for card in self.deck.iter() {
-        //     write!(f, "  {}", card).unwrap();
-        // }
-        // write!(f, "\n")
+        write!(f, "Trade: {}\n", self.trade);
+        write!(f, "Name: {}\n", self.name).unwrap();
+        write!(f, "Deck:\n").unwrap();
+        for card in self.deck.iter() {
+            write!(f, "  {}", card);
+        }
+        write!(f, "\n")
     }
 }
