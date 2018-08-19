@@ -25,10 +25,6 @@ impl Scout {
             faction: Faction::Unaligned
         }
     }
-
-    pub fn display(&self) -> String {
-        format!("<{}: {}>\n", self.card_type, self.name)
-    }
 }
 
 impl Card for Scout {
@@ -40,6 +36,42 @@ impl Card for Scout {
 }
 
 impl fmt::Display for Scout {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "<{}: {}>\n", self.card_type, self.name)
+    }
+}
+
+pub struct Viper {
+    pub card_type: CardType,
+    pub faction: Faction,
+    pub name: String,
+    pub cost: i32,
+    pub combat: i32,
+    pub trade: i32,
+}
+
+impl Viper {
+    pub fn new() -> Viper {
+        Viper{
+            name: String::from("Viper"),
+            cost: 0,
+            combat: 1,
+            trade: 0,
+            card_type: CardType::Ship,
+            faction: Faction::Unaligned
+        }
+    }
+}
+
+impl Card for Viper {
+    fn play(&self, player: &Player) -> Player {
+        let mut p = Player::new(&player.name);
+        p.combat = player.combat + 1;
+        p
+    }
+}
+
+impl fmt::Display for Viper {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "<{}: {}>\n", self.card_type, self.name)
     }
