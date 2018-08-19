@@ -1,5 +1,6 @@
 use card::Card;
 use card::ship::Scout;
+use card::ship::Viper;
 
 use std::fmt;
 
@@ -12,7 +13,7 @@ pub struct Player {
     pub combat: i32,
     pub discard: Vec<Box<Card>>,
     pub deck: Vec<Box<Card>>,
-    pub played: Vec<Box<Card>>,
+    pub in_play: Vec<Box<Card>>
 }
 
 impl Player {
@@ -24,11 +25,15 @@ impl Player {
             combat: 0,
             discard: Vec::new(),
             deck: Vec::new(),
-            played: Vec::new(),
+            in_play: Vec::new()
         };
 
         for _n in 0..8 {
             player.deck.push(Box::new(Scout::new()));
+        }
+
+        for _n in 0..2 {
+            player.deck.push(Box::new(Viper::new()));
         }
 
         return player;
@@ -39,6 +44,7 @@ impl fmt::Display for Player {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Name: {}\n", self.name).unwrap();
         write!(f, "Trade: {}\n", self.trade);
+        write!(f, "Combat: {}\n", self.combat);
         write!(f, "Name: {}\n", self.name).unwrap();
         write!(f, "Deck:\n").unwrap();
         for card in self.deck.iter() {
