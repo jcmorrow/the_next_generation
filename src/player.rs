@@ -2,6 +2,8 @@ use card::Card;
 use card::ship::Scout;
 use card::ship::Viper;
 
+use card::targetable::Targetable;
+
 use std::fmt;
 
 const STARTING_AUTHORITY: i32 = 50;
@@ -40,9 +42,24 @@ impl Player {
     }
 }
 
+impl Targetable for Player {
+    fn is_targetable(&self) -> bool {
+        // TODO: player is not targetable when outposts are in play
+        true
+    }
+
+    fn process_attack(&self, mut player: Player, combat: i32) -> Player {
+        if player.is_targetable() {
+            player.authority -= combat;
+        }
+        player
+    }
+}
+
 impl fmt::Display for Player {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Name: {}\n", self.name).unwrap();
+        write!(f, "Authority: {}\n", self.authority);
         write!(f, "Trade: {}\n", self.trade);
         write!(f, "Combat: {}\n", self.combat);
         write!(f, "Name: {}\n", self.name).unwrap();
