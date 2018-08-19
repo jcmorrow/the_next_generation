@@ -8,11 +8,13 @@ pub mod outpost;
 pub mod targetable;
 
 pub enum Faction {
-    Unaligned
+    Unaligned,
+    MachineCult
 }
 
 pub enum CardType {
-    Ship
+    Ship,
+    Outpost
 }
 
 
@@ -26,7 +28,8 @@ pub trait Card: fmt::Display {
 impl fmt::Display for CardType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let name = match *self {
-            CardType::Ship => "Ship"
+            CardType::Ship => "Ship",
+            CardType::Outpost => "Outpost"
         };
         write!(f, "{}", name)
     }
