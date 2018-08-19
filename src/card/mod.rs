@@ -5,6 +5,7 @@ use player::Player;
 pub mod base;
 pub mod ship;
 pub mod outpost;
+pub mod targetable;
 
 pub enum Faction {
     Unaligned
