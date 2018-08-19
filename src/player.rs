@@ -15,7 +15,9 @@ pub struct Player {
     pub combat: i32,
     pub discard: Vec<Box<Card>>,
     pub deck: Vec<Box<Card>>,
-    pub in_play: Vec<Box<Card>>
+    pub in_play: Vec<Box<Card>>,
+    // TODO: Box of cards of a certain ship type
+    pub bases: Vec<Box<Card>>
 }
 
 impl Player {
@@ -27,7 +29,8 @@ impl Player {
             combat: 0,
             discard: Vec::new(),
             deck: Vec::new(),
-            in_play: Vec::new()
+            in_play: Vec::new(),
+            bases: Vec::new()
         };
 
         for _n in 0..8 {
@@ -44,8 +47,7 @@ impl Player {
 
 impl Targetable for Player {
     fn is_targetable(&self) -> bool {
-        // TODO: player is not targetable when outposts are in play
-        true
+        self.bases.len() <= 0
     }
 
     fn process_attack(&self, mut player: Player, combat: i32) -> Player {
@@ -63,10 +65,14 @@ impl fmt::Display for Player {
         write!(f, "Trade: {}\n", self.trade);
         write!(f, "Combat: {}\n", self.combat);
         write!(f, "Name: {}\n", self.name).unwrap();
-        write!(f, "Deck:\n").unwrap();
-        for card in self.deck.iter() {
-            write!(f, "  {}", card);
+        write!(f, "Bases:\n").unwrap();
+        for base in self.bases.iter() {
+            write!(f, " {}", base);
         }
+        // write!(f, "Deck:\n").unwrap();
+        // for card in self.deck.iter() {
+        //     write!(f, "  {}", card);
+        // }
         write!(f, "\n")
     }
 }
