@@ -28,10 +28,9 @@ impl Scout {
 }
 
 impl Card for Scout {
-    fn play(&self, player: &Player) -> Player {
-        let mut p = Player::new(&player.name);
-        p.trade = player.trade + 1;
-        p
+    fn play(&self, mut player: Player) -> Player {
+        player.trade += 1;
+        player
     }
 }
 
@@ -64,10 +63,9 @@ impl Viper {
 }
 
 impl Card for Viper {
-    fn play(&self, player: &Player) -> Player {
-        let mut p = Player::new(&player.name);
-        p.combat = player.combat + 1;
-        p
+    fn play(&self, mut player: Player) -> Player {
+        player.combat += 1;
+        player
     }
 }
 
