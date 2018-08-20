@@ -7,22 +7,22 @@ use player::Player;
 
 pub struct Scout {
     pub card_type: CardType,
+    pub combat: i32,
+    pub cost: i32,
     pub faction: Faction,
     pub name: String,
-    pub cost: i32,
-    pub combat: i32,
     pub trade: i32,
 }
 
 impl Scout {
     pub fn new() -> Scout {
         Scout{
-            name: String::from("Scout"),
-            cost: 0,
-            combat: 0,
-            trade: 1,
             card_type: CardType::Ship,
-            faction: Faction::Unaligned
+            combat: 0,
+            cost: 0,
+            faction: Faction::Unaligned,
+            name: String::from("Scout"),
+            trade: 1,
         }
     }
 }
@@ -42,22 +42,22 @@ impl fmt::Display for Scout {
 
 pub struct Viper {
     pub card_type: CardType,
+    pub combat: i32,
+    pub cost: i32,
     pub faction: Faction,
     pub name: String,
-    pub cost: i32,
-    pub combat: i32,
     pub trade: i32,
 }
 
 impl Viper {
     pub fn new() -> Viper {
         Viper{
-            name: String::from("Viper"),
-            cost: 0,
-            combat: 1,
-            trade: 0,
             card_type: CardType::Ship,
-            faction: Faction::Unaligned
+            combat: 1,
+            cost: 0,
+            faction: Faction::Unaligned,
+            name: String::from("Viper"),
+            trade: 0,
         }
     }
 }

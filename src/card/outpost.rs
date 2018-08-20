@@ -9,30 +9,31 @@ use player::Player;
 
 pub struct BattleStation {
     pub card_type: CardType,
-    pub faction: Faction,
-    pub name: String,
-    pub cost: i32,
     pub combat: i32,
-    pub trade: i32,
-    pub health: i32
+    pub cost: i32,
+    pub faction: Faction,
+    pub health: i32,
+    pub name: String,
+    pub trade: i32
 }
 
 impl BattleStation {
     pub fn new() -> BattleStation {
         BattleStation{
-            name: String::from("Battle Station"),
-            cost: 3,
-            combat: 0,
-            trade: 0,
-            health: 5,
             card_type: CardType::Outpost,
-            faction: Faction::MachineCult
+            combat: 0,
+            cost: 3,
+            faction: Faction::MachineCult,
+            health: 5,
+            name: String::from("Battle Station"),
+            trade: 0,
         }
     }
 }
 
 impl Card for BattleStation {
     fn play(&self, mut player: Player) -> Player {
+        // TODO: figure out how to push self onto player's bases list
         player.bases.push(Box::new(BattleStation::new()));
         player
     }
@@ -43,7 +44,7 @@ impl Targetable for BattleStation {
         true
     }
 
-    fn process_attack(&self, player: Player, combat: i32) -> Player {
+    fn receive_combat(&self, player: Player, combat: i32) -> Player {
         if combat >= self.health {
             // TODO: move from player.bases to player.discard
         }

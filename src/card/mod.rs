@@ -8,13 +8,13 @@ pub mod outpost;
 pub mod targetable;
 
 pub enum Faction {
-    Unaligned,
-    MachineCult
+    MachineCult,
+    Unaligned
 }
 
 pub enum CardType {
-    Ship,
-    Outpost
+    Outpost,
+    Ship
 }
 
 
