@@ -9,28 +9,27 @@ use std::fmt;
 const STARTING_AUTHORITY: i32 = 50;
 
 pub struct Player {
-    pub name: String,
     pub authority: i32,
-    pub trade:  i32,
+    pub bases: Vec<Box<Card>>,
     pub combat: i32,
     pub discard: Vec<Box<Card>>,
     pub deck: Vec<Box<Card>>,
     pub in_play: Vec<Box<Card>>,
-    // TODO: Box of cards of a certain ship type
-    pub bases: Vec<Box<Card>>
+    pub name: String,
+    pub trade:  i32,
 }
 
 impl Player {
     pub fn new(name: &str) -> Player {
         let mut player = Player{
-            name: name.to_string(),
             authority: STARTING_AUTHORITY,
-            trade: 0,
+            bases: Vec::new(),
             combat: 0,
             discard: Vec::new(),
             deck: Vec::new(),
             in_play: Vec::new(),
-            bases: Vec::new()
+            name: name.to_string(),
+            trade: 0,
         };
 
         for _n in 0..8 {
@@ -50,7 +49,7 @@ impl Targetable for Player {
         self.bases.len() <= 0
     }
 
-    fn process_attack(&self, mut player: Player, combat: i32) -> Player {
+    fn receive_combat(&self, mut player: Player, combat: i32) -> Player {
         if player.is_targetable() {
             player.authority -= combat;
         }

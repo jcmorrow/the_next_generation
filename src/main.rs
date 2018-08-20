@@ -24,6 +24,6 @@ fn main() {
     player_1 = viper.play(player_1);
     print!("{:#}", player_1);
     player_2 = battle_station.play(player_2);
-    player_2 = player_1.process_attack(player_2, player_1.combat);
+    player_2 = player_1.receive_combat(player_2, player_1.combat);
     print!("{:#}", player_2);
 }
