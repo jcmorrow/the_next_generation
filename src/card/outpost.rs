@@ -43,11 +43,10 @@ impl Targetable for BattleStation {
         true
     }
 
-    fn receive_combat(&self, player: Player, combat: i32) -> Player {
+    fn receive_combat(&mut self, combat: i32) {
         if combat >= self.health {
             // TODO: move from player.bases to player.discard
         }
-        player
     }
 }
 

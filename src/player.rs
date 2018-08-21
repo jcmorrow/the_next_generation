@@ -1,3 +1,4 @@
+use rand::prelude::*;
 use card::Card;
 use card::ship::Scout;
 use card::ship::Viper;
@@ -48,6 +49,12 @@ impl Player {
         card.play(self);
         self.discard.push(card);
     }
+
+    pub fn attack(&mut self, opponents: &mut [&mut Player]) {
+        let mut rng = thread_rng();
+        let target = &mut opponents[rng.gen_range(0, opponents.len())];
+        target.receive_combat(self.combat);
+    }
 }
 
 impl Targetable for Player {
@@ -55,11 +62,10 @@ impl Targetable for Player {
         self.bases.len() <= 0
     }
 
-    fn receive_combat(&self, mut player: Player, combat: i32) -> Player {
-        if player.is_targetable() {
-            player.authority -= combat;
+    fn receive_combat(&mut self, combat: i32) {
+        if self.is_targetable() {
+            self.authority -= combat;
         }
-        player
     }
 }
 
@@ -69,7 +75,6 @@ impl fmt::Display for Player {
         write!(f, "Authority: {}\n", self.authority);
         write!(f, "Trade: {}\n", self.trade);
         write!(f, "Combat: {}\n", self.combat);
-        write!(f, "Name: {}\n", self.name).unwrap();
         write!(f, "Bases:\n").unwrap();
         for base in self.bases.iter() {
             write!(f, " {}", base);
