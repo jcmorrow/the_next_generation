@@ -42,6 +42,12 @@ impl Player {
 
         return player;
     }
+
+    pub fn play(&mut self) {
+        let card = self.deck.pop().expect("EMPTY DECK!");
+        card.play(self);
+        self.discard.push(card);
+    }
 }
 
 impl Targetable for Player {
