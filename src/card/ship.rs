@@ -28,9 +28,8 @@ impl Scout {
 }
 
 impl Card for Scout {
-    fn play(&self, mut player: Player) -> Player {
+    fn play(&self, player: &mut Player) {
         player.trade += 1;
-        player
     }
 }
 
@@ -63,9 +62,8 @@ impl Viper {
 }
 
 impl Card for Viper {
-    fn play(&self, mut player: Player) -> Player {
+    fn play(&self, player: &mut Player) {
         player.combat += 1;
-        player
     }
 }
 

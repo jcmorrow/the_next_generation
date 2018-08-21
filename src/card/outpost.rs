@@ -32,10 +32,9 @@ impl BattleStation {
 }
 
 impl Card for BattleStation {
-    fn play(&self, mut player: Player) -> Player {
+    fn play(&self, player: &mut Player) {
         // TODO: figure out how to push self onto player's bases list
         player.bases.push(Box::new(BattleStation::new()));
-        player
     }
 }
 
