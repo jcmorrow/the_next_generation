@@ -15,25 +15,19 @@ fn main() {
     let mut player_1 = Player::new("Cameron");
     let mut player_2 = Player::new("Josh");
 
-    print!("{:#}", player_1);
-    player_1.play();
-    player_1.play();
-    player_1.play();
-    player_1.play();
-    player_1.play();
+    let mut players = Vec::new();
+    let mut turn_count = 0;
+    players.push(&mut player_1);
+    players.push(&mut player_2);
 
-    while player_2.authority > 0 {
-        let mut opponents = Vec::new();
-        opponents.push(&mut player_2);
-        player_1.attack(opponents.as_mut_slice());
+
+    while !players.iter().any(|ref p| p.authority < 1)
+    {
+        print!("Turn {}\n", turn_count);
+        players.rotate_left(1);
+        let (current_player, opponents)  = &mut players.split_at_mut(1);
+        print!("{:#}", current_player[0]);
+        current_player[0].take_turn(opponents);
+        turn_count = turn_count + 1;
     }
-    print!("{:#}", player_1);
-
-    print!("{:#}", player_2);
-    player_2.play();
-    player_2.play();
-    player_2.play();
-    player_2.play();
-    player_2.play();
-    print!("{:#}", player_2);
 }

@@ -8,6 +8,7 @@ use card::targetable::Targetable;
 use std::fmt;
 
 const STARTING_AUTHORITY: i32 = 50;
+const HAND_SIZE: usize = 5;
 
 pub struct Player {
     pub authority: i32,
@@ -15,6 +16,7 @@ pub struct Player {
     pub combat: i32,
     pub discard: Vec<Box<Card>>,
     pub deck: Vec<Box<Card>>,
+    pub hand: Vec<Box<Card>>,
     pub in_play: Vec<Box<Card>>,
     pub name: String,
     pub trade:  i32,
@@ -28,6 +30,7 @@ impl Player {
             combat: 0,
             discard: Vec::new(),
             deck: Vec::new(),
+            hand: Vec::new(),
             in_play: Vec::new(),
             name: name.to_string(),
             trade: 0,
@@ -44,10 +47,25 @@ impl Player {
         return player;
     }
 
-    pub fn play(&mut self) {
+    pub fn take_turn(&mut self, opponents: &mut [&mut Player]) {
+        for _i in 0..HAND_SIZE {
+            self.draw();
+        }
+
+        while self.hand.len() > 0 {
+            let card_to_play = self.hand.pop().unwrap();
+            card_to_play.play(self);
+            self.discard.push(card_to_play);
+        }
+
+        self.attack(opponents);
+
+        self.deck.extend(self.discard.drain(0..));
+    }
+
+    pub fn draw(&mut self) {
         let card = self.deck.pop().expect("EMPTY DECK!");
-        card.play(self);
-        self.discard.push(card);
+        self.hand.push(card);
     }
 
     pub fn attack(&mut self, opponents: &mut [&mut Player]) {
@@ -72,12 +90,12 @@ impl Targetable for Player {
 impl fmt::Display for Player {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Name: {}\n", self.name).unwrap();
-        write!(f, "Authority: {}\n", self.authority);
-        write!(f, "Trade: {}\n", self.trade);
-        write!(f, "Combat: {}\n", self.combat);
+        write!(f, "Authority: {}\n", self.authority).unwrap();
+        write!(f, "Trade: {}\n", self.trade).unwrap();
+        write!(f, "Combat: {}\n", self.combat).unwrap();
         write!(f, "Bases:\n").unwrap();
         for base in self.bases.iter() {
-            write!(f, " {}", base);
+            write!(f, " {}", base).unwrap();
         }
         // write!(f, "Deck:\n").unwrap();
         // for card in self.deck.iter() {
