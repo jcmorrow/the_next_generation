@@ -1,13 +1,13 @@
-use rand::prelude::*;
 use card::Card;
 use card::ship::Scout;
 use card::ship::Viper;
-use trade_row;
 
 use card::targetable::Targetable;
 use trade_row::TradeRow;
 
 use std::fmt;
+
+use rand::{thread_rng, Rng};
 
 const STARTING_AUTHORITY: i32 = 50;
 const HAND_SIZE: usize = 5;
@@ -46,18 +46,15 @@ impl Player {
             player.deck.push(Box::new(Viper::new()));
         }
 
+        thread_rng().shuffle(&mut player.deck);
+
         return player;
     }
 
-    pub fn take_turn(&mut self,
-                     opponents: &mut [&mut Player],
-                     trade_row: &mut TradeRow) {
+    pub fn take_turn(&mut self, opponents: &mut [&mut Player], trade_row: &mut TradeRow) {
         self.combat = 0;
         self.trade = 0;
-
-        for _i in 0..HAND_SIZE {
-            self.draw();
-        }
+        self.draw_hand();
 
         while self.hand.len() > 0 {
             let card_to_play = self.hand.pop().unwrap();
@@ -77,15 +74,31 @@ impl Player {
         self.deck.push(trade_row.buy(index));
     }
 
-    pub fn draw(&mut self) {
-        let card = self.deck.pop().expect("EMPTY DECK!");
-        self.hand.push(card);
-    }
-
     pub fn attack(&mut self, opponents: &mut [&mut Player]) {
         let mut rng = thread_rng();
         let target = &mut opponents[rng.gen_range(0, opponents.len())];
         target.receive_combat(self.combat);
+    }
+
+    pub fn draw(&mut self) {
+        self.hand.push(self.deck.pop().expect("Empty deck"));
+    }
+
+    pub fn draw_hand(&mut self) {
+        let mut num_to_draw = HAND_SIZE;
+        let total_cards = self.deck.len() + self.discard.len();
+
+        if total_cards < HAND_SIZE {
+            num_to_draw = total_cards;
+        }
+
+        for _i in 0..num_to_draw {
+            if self.deck.len() < 1 {
+                self.deck.extend(self.discard.drain(0..));
+                thread_rng().shuffle(&mut self.deck);
+            }
+            self.draw();
+        }
     }
 }
 
@@ -112,8 +125,11 @@ impl fmt::Display for Player {
             write!(f, " {}", base).unwrap();
         }
         write!(f, "Deck:\n").unwrap();
+        for card in self.hand.iter() {
+            write!(f, "Hand:  {}", card).unwrap();
+        }
         for card in self.deck.iter() {
-            write!(f, "  {}", card).unwrap();
+            write!(f, "Deck:  {}", card).unwrap();
         }
         write!(f, "\n")
     }
