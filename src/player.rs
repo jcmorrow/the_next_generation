@@ -2,8 +2,10 @@ use rand::prelude::*;
 use card::Card;
 use card::ship::Scout;
 use card::ship::Viper;
+use trade_row;
 
 use card::targetable::Targetable;
+use trade_row::TradeRow;
 
 use std::fmt;
 
@@ -47,7 +49,12 @@ impl Player {
         return player;
     }
 
-    pub fn take_turn(&mut self, opponents: &mut [&mut Player]) {
+    pub fn take_turn(&mut self,
+                     opponents: &mut [&mut Player],
+                     trade_row: &mut TradeRow) {
+        self.combat = 0;
+        self.trade = 0;
+
         for _i in 0..HAND_SIZE {
             self.draw();
         }
@@ -58,9 +65,16 @@ impl Player {
             self.discard.push(card_to_play);
         }
 
+        self.buy(trade_row);
         self.attack(opponents);
 
         self.deck.extend(self.discard.drain(0..));
+    }
+
+    pub fn buy(&mut self, trade_row: &mut TradeRow) {
+        let mut rng = thread_rng();
+        let index = rng.gen_range(0, trade_row.face_up.len());
+        self.deck.push(trade_row.buy(index));
     }
 
     pub fn draw(&mut self) {
@@ -97,10 +111,10 @@ impl fmt::Display for Player {
         for base in self.bases.iter() {
             write!(f, " {}", base).unwrap();
         }
-        // write!(f, "Deck:\n").unwrap();
-        // for card in self.deck.iter() {
-        //     write!(f, "  {}", card);
-        // }
+        write!(f, "Deck:\n").unwrap();
+        for card in self.deck.iter() {
+            write!(f, "  {}", card).unwrap();
+        }
         write!(f, "\n")
     }
 }

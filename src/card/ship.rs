@@ -72,3 +72,37 @@ impl fmt::Display for Viper {
         write!(f, "<{}: {}>\n", self.card_type, self.name)
     }
 }
+
+pub struct Explorer {
+    pub card_type: CardType,
+    pub combat: i32,
+    pub cost: i32,
+    pub faction: Faction,
+    pub name: String,
+    pub trade: i32,
+}
+
+impl Explorer {
+    pub fn new() -> Explorer {
+        Explorer{
+            card_type: CardType::Ship,
+            combat: 0,
+            cost: 2,
+            faction: Faction::Unaligned,
+            name: String::from("Explorer"),
+            trade: 2,
+        }
+    }
+}
+
+impl Card for Explorer {
+    fn play(&self, player: &mut Player) {
+        player.trade += self.trade;
+    }
+}
+
+impl fmt::Display for Explorer {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "<{}: {}>\n", self.card_type, self.name)
+    }
+}
