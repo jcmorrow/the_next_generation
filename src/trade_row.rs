@@ -1,6 +1,4 @@
-use std::slice;
 use card::Card;
-use card::ship::Scout;
 use card::ship::Viper;
 use card::ship::Explorer;
 
@@ -45,7 +43,7 @@ impl fmt::Display for TradeRow {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Trade Row:\n").unwrap();
         for card in self.face_up.iter() {
-            write!(f, "  {}", card);
+            write!(f, "  {}", card).unwrap();
         }
         write!(f, "\n")
     }

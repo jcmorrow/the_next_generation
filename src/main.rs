@@ -3,13 +3,6 @@ extern crate rand;
 use player::Player;
 use trade_row::TradeRow;
 
-use card::ship::Scout;
-use card::ship::Viper;
-use card::ship::Explorer;
-use card::outpost::BattleStation;
-use card::targetable::Targetable;
-use card::Card;
-
 mod card;
 mod player;
 mod trade_row;

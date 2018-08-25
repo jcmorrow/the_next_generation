@@ -1,5 +1,3 @@
-use player::Player;
-
 pub trait Targetable {
     fn is_targetable(&self) -> bool;
 
