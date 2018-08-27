@@ -30,7 +30,7 @@ impl Card {
 }
 
 pub struct PlayEvent<'a> {
-    player: &'a Player,
+    player: &'a mut Player,
     card: &'a Card,
 }
 
@@ -42,10 +42,11 @@ impl<'a> PlayEvent<'a> {
         }
     }
 
-    pub fn play(&self) {
-        // match card.ship_type {
-        //     ShipType::Scout => { player.trade += 1; }
-        // }
+    pub fn play(&mut self) {
+        print!("Playing {}", self.card);
+        match self.card.ship_type {
+            ShipType::Scout => { self.player.trade += 1; }
+        }
     }
 }
 
