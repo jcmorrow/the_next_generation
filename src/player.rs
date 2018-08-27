@@ -1,9 +1,7 @@
-use card::Card;
-use card::ship::Scout;
-use card::ship::Viper;
+use card::ship::PlayEvent;
+use card::ship::Card;
 
 use card::targetable::Targetable;
-use trade_row::TradeRow;
 
 use std::fmt;
 
@@ -14,12 +12,12 @@ const HAND_SIZE: usize = 5;
 
 pub struct Player {
     pub authority: i32,
-    pub bases: Vec<Box<Card>>,
+    pub bases: Vec<Card>,
     pub combat: i32,
-    pub discard: Vec<Box<Card>>,
-    pub deck: Vec<Box<Card>>,
-    pub hand: Vec<Box<Card>>,
-    pub in_play: Vec<Box<Card>>,
+    pub discard: Vec<Card>,
+    pub deck: Vec<Card>,
+    pub hand: Vec<Card>,
+    pub in_play: Vec<Card>,
     pub name: String,
     pub trade:  i32,
 }
@@ -39,40 +37,48 @@ impl Player {
         };
 
         for _n in 0..8 {
-            player.deck.push(Box::new(Scout::new()));
+            player.deck.push(Card::scout());
         }
 
-        for _n in 0..2 {
-            player.deck.push(Box::new(Viper::new()));
-        }
+        // for _n in 0..2 {
+        //     player.deck.push(Box::new(Viper::new()));
+        // }
 
         thread_rng().shuffle(&mut player.deck);
 
         return player;
     }
 
-    pub fn take_turn(&mut self, opponents: &mut [&mut Player], trade_row: &mut TradeRow) {
-        self.combat = 0;
-        self.trade = 0;
+    pub fn take_turn(&mut self) {
         self.draw_hand();
-
-        while self.hand.len() > 0 {
-            let card_to_play = self.hand.pop().unwrap();
-            card_to_play.play(self);
-            self.discard.push(card_to_play);
+        for card in self.hand {
+            let event = PlayEvent::new(&card, self);
+            event.play();
         }
-
-        self.buy(trade_row);
-        self.attack(opponents);
-
-        self.deck.extend(self.discard.drain(0..));
     }
 
-    pub fn buy(&mut self, trade_row: &mut TradeRow) {
-        let mut rng = thread_rng();
-        let index = rng.gen_range(0, trade_row.face_up.len());
-        self.deck.push(trade_row.buy(index));
-    }
+    // pub fn take_turn(&mut self, opponents: &mut [&mut Player], trade_row: &mut TradeRow) {
+    //     self.combat = 0;
+    //     self.trade = 0;
+    //     self.draw_hand();
+
+    //     while self.hand.len() > 0 {
+    //         let card_to_play = self.hand.pop().unwrap();
+    //         card_to_play.play(self);
+    //         self.discard.push(card_to_play);
+    //     }
+
+    //     self.buy(trade_row);
+    //     self.attack(opponents);
+
+    //     self.deck.extend(self.discard.drain(0..));
+    // }
+
+    // pub fn buy(&mut self, trade_row: &mut TradeRow) {
+    //     let mut rng = thread_rng();
+    //     let index = rng.gen_range(0, trade_row.face_up.len());
+    //     self.deck.push(trade_row.buy(index));
+    // }
 
     pub fn attack(&mut self, opponents: &mut [&mut Player]) {
         let mut rng = thread_rng();

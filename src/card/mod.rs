@@ -1,7 +1,5 @@
 use std::fmt;
 
-use player::Player;
-
 pub mod base;
 pub mod ship;
 pub mod outpost;
@@ -17,13 +15,17 @@ pub enum CardType {
     Ship
 }
 
-
-pub trait Card: fmt::Display {
-    fn play(&self, player: &mut Player);
-    // TODO: implement these
-    // fn discard(&self, player: &Player) -> Player;
-    // fn scrap(&self, player: &Player) -> Player;
+pub enum ShipType {
+    Scout
 }
+
+
+// pub trait Card: fmt::Display {
+//     fn play(&self, player: &mut Player);
+//     // TODO: implement these
+//     // fn discard(&self, player: &Player) -> Player;
+//     // fn scrap(&self, player: &Player) -> Player;
+// }
 
 impl fmt::Display for CardType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
