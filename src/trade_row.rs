@@ -1,18 +1,16 @@
 use card::Card;
-use card::ship::Viper;
-use card::ship::Explorer;
 
 use std::fmt;
 
 pub struct TradeRow {
-    pub deck: Vec<Box<Card>>,
-    pub face_up: Vec<Box<Card>>,
+    pub deck: Vec<Card>,
+    pub face_up: Vec<Card>,
 }
 
 impl TradeRow {
-    pub fn buy(&mut self, index: usize) -> Box<Card> {
+    pub fn buy(&mut self, index: usize) -> (Card) {
         if index == 0 {
-            self.face_up.insert(0, Box::new(Explorer::new()));
+            self.face_up.insert(0, Card::explorer());
         } else {
             match self.deck.pop() {
                 Some(card) => self.face_up.insert(5, card),
@@ -29,9 +27,9 @@ impl TradeRow {
         };
 
         for _n in 0..50 {
-            trade_row.deck.push(Box::new(Viper::new()));
+            trade_row.deck.push(Card::battle_blob());
         }
-        trade_row.face_up.push(Box::new(Explorer::new()));
+        trade_row.face_up.push(Card::explorer());
         for _n in 0..5 {
             trade_row.face_up.push(trade_row.deck.pop().unwrap());
         }

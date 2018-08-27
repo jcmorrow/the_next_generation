@@ -1,9 +1,13 @@
 extern crate rand;
 
+use attack_event::AttackEvent;
+use play_event::PlayEvent;
 use player::Player;
 use trade_row::TradeRow;
 
+mod attack_event;
 mod card;
+mod play_event;
 mod player;
 mod trade_row;
 
@@ -11,12 +15,11 @@ fn main() {
     let mut player_1 = Player::new("Cameron");
     let mut player_2 = Player::new("Josh");
     let mut trade_row = TradeRow::new();
-
     let mut players = Vec::new();
     let mut turn_count = 0;
+
     players.push(&mut player_1);
     players.push(&mut player_2);
-
 
     while !players.iter().any(|ref p| p.authority < 1)
     {
