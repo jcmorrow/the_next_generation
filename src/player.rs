@@ -51,9 +51,10 @@ impl Player {
 
     pub fn take_turn(&mut self) {
         self.draw_hand();
-        for card in self.hand {
-            let event = PlayEvent::new(&card, self);
-            event.play();
+        while self.hand.len() > 0 {
+            let card_to_play = self.hand.pop().unwrap();
+            PlayEvent::new(&card_to_play, self).play();
+            self.discard.push(card_to_play);
         }
     }
 
