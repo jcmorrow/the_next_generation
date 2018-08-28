@@ -1,11 +1,13 @@
 extern crate rand;
 
 use player::Player;
+use play_event::PlayEvent;
 use trade_row::TradeRow;
 
 mod card;
 mod player;
 mod trade_row;
+mod play_event;
 
 fn main() {
     let mut player_1 = Player::new("Cameron");
