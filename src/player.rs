@@ -1,6 +1,6 @@
 use PlayEvent;
 use card::Card;
-use card::OutpostType;
+use card::CardType;
 use trade_row::TradeRow;
 
 use card::targetable::Targetable;
@@ -62,9 +62,10 @@ impl Player {
         while self.hand.len() > 0 {
             let card_to_play = self.hand.pop().unwrap();
             PlayEvent::new(&card_to_play, self).play();
-            match card_to_play.outpost_type {
-                OutpostType::NoOutpostType => { (self.in_play.push(card_to_play)) }
-                _ => { self.bases.push(card_to_play) }
+            match card_to_play.card_type {
+                CardType::Ship => { (self.in_play.push(card_to_play)) },
+                CardType::Outpost => { self.bases.push(card_to_play) },
+                _ => { panic!("Oh noes!") }
             }
         }
 
