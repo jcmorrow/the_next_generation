@@ -1,5 +1,6 @@
 use card::ship::PlayEvent;
-use card::ship::Card;
+use card::Card;
+use trade_row::TradeRow;
 
 use card::targetable::Targetable;
 
@@ -40,22 +41,28 @@ impl Player {
             player.deck.push(Card::scout());
         }
 
-        // for _n in 0..2 {
-        //     player.deck.push(Box::new(Viper::new()));
-        // }
+        for _n in 0..2 {
+            player.deck.push(Card::viper());
+        }
 
         thread_rng().shuffle(&mut player.deck);
 
         return player;
     }
 
-    pub fn take_turn(&mut self) {
+    pub fn take_turn(&mut self, trade_row: &mut TradeRow) {
+        self.combat = 0;
+        self.trade = 0;
+
         self.draw_hand();
+
         while self.hand.len() > 0 {
             let card_to_play = self.hand.pop().unwrap();
             PlayEvent::new(&card_to_play, self).play();
             self.discard.push(card_to_play);
         }
+
+        self.buy(trade_row);
     }
 
     // pub fn take_turn(&mut self, opponents: &mut [&mut Player], trade_row: &mut TradeRow) {
@@ -75,11 +82,11 @@ impl Player {
     //     self.deck.extend(self.discard.drain(0..));
     // }
 
-    // pub fn buy(&mut self, trade_row: &mut TradeRow) {
-    //     let mut rng = thread_rng();
-    //     let index = rng.gen_range(0, trade_row.face_up.len());
-    //     self.deck.push(trade_row.buy(index));
-    // }
+    pub fn buy(&mut self, trade_row: &mut TradeRow) {
+        let mut rng = thread_rng();
+        let index = rng.gen_range(0, trade_row.face_up.len());
+        self.deck.push(trade_row.buy(index));
+    }
 
     pub fn attack(&mut self, opponents: &mut [&mut Player]) {
         let mut rng = thread_rng();
