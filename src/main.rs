@@ -14,4 +14,6 @@ fn main() {
     player_1.take_turn(&mut trade_row);
     player_1.take_turn(&mut trade_row);
     player_1.take_turn(&mut trade_row);
+    player_1.take_turn(&mut trade_row);
+    print!("{}", player_1);
 }

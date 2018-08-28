@@ -138,12 +138,14 @@ impl fmt::Display for Player {
         for base in self.bases.iter() {
             write!(f, " {}", base).unwrap();
         }
-        write!(f, "Deck:\n").unwrap();
         for card in self.hand.iter() {
             write!(f, "Hand:  {}", card).unwrap();
         }
         for card in self.deck.iter() {
             write!(f, "Deck:  {}", card).unwrap();
+        }
+        for card in self.discard.iter() {
+            write!(f, "Discard:  {}", card).unwrap();
         }
         write!(f, "\n")
     }
