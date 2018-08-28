@@ -50,7 +50,9 @@ impl Player {
         return player;
     }
 
-    pub fn take_turn(&mut self, trade_row: &mut TradeRow) {
+    pub fn take_turn(&mut self,
+                     opponents: &mut [&mut Player],
+                     trade_row: &mut TradeRow) {
         self.combat = 0;
         self.trade = 0;
 
@@ -63,9 +65,10 @@ impl Player {
         }
 
         self.buy(trade_row);
+        self.attack(opponents);
     }
 
-    // pub fn take_turn(&mut self, opponents: &mut [&mut Player], trade_row: &mut TradeRow) {
+    // pub fn take_turn(&mut self, , trade_row: &mut TradeRow) {
     //     self.combat = 0;
     //     self.trade = 0;
     //     self.draw_hand();
