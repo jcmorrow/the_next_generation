@@ -1,4 +1,4 @@
-use card::ship::PlayEvent;
+use PlayEvent;
 use card::Card;
 use trade_row::TradeRow;
 
@@ -15,8 +15,8 @@ pub struct Player {
     pub authority: i32,
     pub bases: Vec<Card>,
     pub combat: i32,
-    pub discard: Vec<Card>,
     pub deck: Vec<Card>,
+    pub discard: Vec<Card>,
     pub hand: Vec<Card>,
     pub in_play: Vec<Card>,
     pub name: String,
@@ -61,29 +61,14 @@ impl Player {
         while self.hand.len() > 0 {
             let card_to_play = self.hand.pop().unwrap();
             PlayEvent::new(&card_to_play, self).play();
-            self.discard.push(card_to_play);
+            self.in_play.push(card_to_play);
         }
 
         self.buy(trade_row);
         self.attack(opponents);
+
+        self.discard.extend(self.in_play.drain(0..));
     }
-
-    // pub fn take_turn(&mut self, , trade_row: &mut TradeRow) {
-    //     self.combat = 0;
-    //     self.trade = 0;
-    //     self.draw_hand();
-
-    //     while self.hand.len() > 0 {
-    //         let card_to_play = self.hand.pop().unwrap();
-    //         card_to_play.play(self);
-    //         self.discard.push(card_to_play);
-    //     }
-
-    //     self.buy(trade_row);
-    //     self.attack(opponents);
-
-    //     self.deck.extend(self.discard.drain(0..));
-    // }
 
     pub fn buy(&mut self, trade_row: &mut TradeRow) {
         let mut rng = thread_rng();
@@ -137,19 +122,18 @@ impl fmt::Display for Player {
         write!(f, "Authority: {}\n", self.authority).unwrap();
         write!(f, "Trade: {}\n", self.trade).unwrap();
         write!(f, "Combat: {}\n", self.combat).unwrap();
-        write!(f, "Bases:\n").unwrap();
         for base in self.bases.iter() {
-            write!(f, " {}", base).unwrap();
+            write!(f, "Base: {}", base).unwrap();
         }
-        for card in self.hand.iter() {
-            write!(f, "Hand:  {}", card).unwrap();
-        }
-        for card in self.deck.iter() {
-            write!(f, "Deck:  {}", card).unwrap();
-        }
-        for card in self.discard.iter() {
-            write!(f, "Discard:  {}", card).unwrap();
-        }
+        // for card in self.hand.iter() {
+        //     write!(f, "Hand:  {}", card).unwrap();
+        // }
+        // for card in self.deck.iter() {
+        //     write!(f, "Deck:  {}", card).unwrap();
+        // }
+        // for card in self.discard.iter() {
+        //     write!(f, "Discard:  {}", card).unwrap();
+        // }
         write!(f, "\n")
     }
 }
