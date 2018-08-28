@@ -27,7 +27,7 @@ impl TradeRow {
         };
 
         for _n in 0..50 {
-            trade_row.deck.push(Card::battle_station());
+            trade_row.deck.push(Card::battle_blob());
         }
         trade_row.face_up.push(Card::explorer());
         for _n in 0..5 {

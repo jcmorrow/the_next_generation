@@ -6,6 +6,7 @@ pub mod outpost;
 pub mod targetable;
 
 pub enum Faction {
+    Blob,
     MachineCult,
     Unaligned,
 }
@@ -25,6 +26,7 @@ impl Default for CardType {
 }
 
 pub enum ShipType {
+    BattleBlob,
     Explorer,
     NoShipType,
     Scout,
@@ -71,6 +73,16 @@ pub struct Card {
 }
 
 impl Card {
+    pub fn battle_blob() -> Card {
+        Card {
+            card_type: CardType::Ship,
+            combat: 8,
+            name: String::from("BattleBlob"),
+            ship_type: ShipType::BattleBlob,
+            ..Default::default()
+        }
+    }
+
     pub fn scout() -> Card {
         Card {
             card_type: CardType::Ship,
