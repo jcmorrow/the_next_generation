@@ -1,5 +1,6 @@
 use PlayEvent;
 use card::Card;
+use card::OutpostType;
 use trade_row::TradeRow;
 
 use card::targetable::Targetable;
@@ -61,8 +62,12 @@ impl Player {
         while self.hand.len() > 0 {
             let card_to_play = self.hand.pop().unwrap();
             PlayEvent::new(&card_to_play, self).play();
-            self.in_play.push(card_to_play);
+            match card_to_play.outpost_type {
+                OutpostType::NoOutpostType => { (self.in_play.push(card_to_play)) }
+                _ => { self.bases.push(card_to_play) }
+            }
         }
+
 
         self.buy(trade_row);
         self.attack(opponents);
@@ -125,15 +130,15 @@ impl fmt::Display for Player {
         for base in self.bases.iter() {
             write!(f, "Base: {}", base).unwrap();
         }
-        // for card in self.hand.iter() {
-        //     write!(f, "Hand:  {}", card).unwrap();
-        // }
-        // for card in self.deck.iter() {
-        //     write!(f, "Deck:  {}", card).unwrap();
-        // }
-        // for card in self.discard.iter() {
-        //     write!(f, "Discard:  {}", card).unwrap();
-        // }
+        for card in self.hand.iter() {
+            write!(f, "Hand:  {}", card).unwrap();
+        }
+        for card in self.deck.iter() {
+            write!(f, "Deck:  {}", card).unwrap();
+        }
+        for card in self.discard.iter() {
+            write!(f, "Discard:  {}", card).unwrap();
+        }
         write!(f, "\n")
     }
 }
