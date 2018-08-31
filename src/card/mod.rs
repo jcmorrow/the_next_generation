@@ -5,6 +5,7 @@ pub mod ship;
 pub mod outpost;
 pub mod targetable;
 
+#[derive(Clone)]
 pub enum Faction {
     Blob,
     MachineCult,
@@ -15,6 +16,7 @@ impl Default for Faction {
     fn default() -> Faction { Faction::Unaligned }
 }
 
+#[derive(Clone)]
 pub enum CardType {
     NoCardType,
     Outpost,
@@ -25,6 +27,7 @@ impl Default for CardType {
     fn default() ->  CardType { CardType::NoCardType }
 }
 
+#[derive(Clone)]
 pub enum ShipType {
     BattleBlob,
     Explorer,
@@ -37,6 +40,7 @@ impl Default for ShipType {
     fn default() ->  ShipType { ShipType::NoShipType }
 }
 
+#[derive(Clone)]
 pub enum OutpostType {
     BattleStation,
     NoOutpostType,
@@ -59,6 +63,7 @@ impl fmt::Display for CardType {
 }
 
 
+#[derive(Clone)]
 #[derive(Default)]
 pub struct Card {
     pub card_type: CardType,
@@ -73,6 +78,10 @@ pub struct Card {
 }
 
 impl Card {
+    pub fn none() -> Card { 
+        Card{ ..Default::default() }
+    }
+
     pub fn battle_blob() -> Card {
         Card {
             card_type: CardType::Ship,

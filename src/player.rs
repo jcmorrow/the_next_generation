@@ -77,9 +77,21 @@ impl Player {
     }
 
     pub fn buy(&mut self, trade_row: &mut TradeRow) {
-        let mut rng = thread_rng();
-        let index = rng.gen_range(0, trade_row.face_up.len());
-        self.deck.push(trade_row.buy(index));
+        // look at cards by most expensive to least expensive
+        // If you can buy an expensive card, do so
+        // If you can't buy any cards, stop buying
+        let mut options = trade_row.face_up.clone();
+        options.sort_unstable_by(|a, b| a.cost.cmp(&b.cost));
+        let card_to_buy: &Card = match options.iter()
+            .find(|card| card.cost < self.trade) {
+            Some(card) => card,
+            None => return (),
+        };
+        match trade_row.face_up.iter().find(
+            |card| card.name == card_to_buy.name) {
+            Some(card) => self.deck.push(card),
+            None => return (),
+        }
     }
 
     pub fn attack(&mut self, opponents: &mut [&mut Player]) {
