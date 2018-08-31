@@ -80,20 +80,24 @@ impl Player {
         // look at cards by most expensive to least expensive
         // If you can buy an expensive card, do so
         // If you can't buy any cards, stop buying
-        let mut options = trade_row.face_up.clone();
-        options.sort_unstable_by(|a, b| a.cost.cmp(&b.cost));
-        let card_to_buy: &Card = match options.iter()
-            .find(|card| card.cost < self.trade) {
-            Some(card) => card,
-            None => return (),
-        };
-        let index_of_card_to_buy = match trade_row.face_up.iter()
-            .enumerate()
-            .find(|(_index, card)| card.name == card_to_buy.name) {
-            Some((index, _card)) => index,
-            None => return (),
-        };
-        self.deck.push(trade_row.buy(index_of_card_to_buy));
+         while self.trade > 0 {
+            let mut options = trade_row.face_up.clone();
+            options.sort_unstable_by(|a, b| b.cost.cmp(&a.cost));
+            let card_to_buy: &Card = match options.iter()
+                .find(|card| card.cost < self.trade) {
+                Some(card) => card,
+                None => return (),
+            };
+            let index_of_card_to_buy = match trade_row.face_up.iter()
+                .enumerate()
+                .find(|(_index, card)| card.name == card_to_buy.name) {
+                Some((index, _card)) => index,
+                None => panic!("Couldn't find card in trade row!"),
+            };
+            let card = trade_row.buy(index_of_card_to_buy);
+            self.trade -= card.cost;
+            self.discard.push(card);
+         }
     }
 
     pub fn attack(&mut self, opponents: &mut [&mut Player]) {

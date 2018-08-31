@@ -85,6 +85,7 @@ impl Card {
     pub fn battle_blob() -> Card {
         Card {
             card_type: CardType::Ship,
+            cost: 6,
             combat: 8,
             name: String::from("BattleBlob"),
             ship_type: ShipType::BattleBlob,

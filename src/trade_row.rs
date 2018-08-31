@@ -8,7 +8,7 @@ pub struct TradeRow {
 }
 
 impl TradeRow {
-    pub fn buy(&mut self, index: usize) -> Card {
+    pub fn buy(&mut self, index: usize) -> (Card) {
         if index == 0 {
             self.face_up.insert(0, Card::explorer());
         } else {
