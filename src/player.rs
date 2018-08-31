@@ -87,11 +87,13 @@ impl Player {
             Some(card) => card,
             None => return (),
         };
-        match trade_row.face_up.iter().find(
-            |card| card.name == card_to_buy.name) {
-            Some(card) => self.deck.push(card),
+        let index_of_card_to_buy = match trade_row.face_up.iter()
+            .enumerate()
+            .find(|(_index, card)| card.name == card_to_buy.name) {
+            Some((index, _card)) => index,
             None => return (),
-        }
+        };
+        self.deck.push(trade_row.buy(index_of_card_to_buy));
     }
 
     pub fn attack(&mut self, opponents: &mut [&mut Player]) {
