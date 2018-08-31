@@ -1,4 +1,5 @@
 use PlayEvent;
+use AttackEvent;
 use card::Card;
 use card::CardType;
 use trade_row::TradeRow;
@@ -77,9 +78,6 @@ impl Player {
     }
 
     pub fn buy(&mut self, trade_row: &mut TradeRow) {
-        // look at cards by most expensive to least expensive
-        // If you can buy an expensive card, do so
-        // If you can't buy any cards, stop buying
          while self.trade > 0 {
             let mut options = trade_row.face_up.clone();
             options.sort_unstable_by(|a, b| b.cost.cmp(&a.cost));
@@ -103,6 +101,7 @@ impl Player {
     pub fn attack(&mut self, opponents: &mut [&mut Player]) {
         let mut rng = thread_rng();
         let target = &mut opponents[rng.gen_range(0, opponents.len())];
+        AttackEvent::new(self.combat, self, target).log();
         target.receive_combat(self.combat);
     }
 
