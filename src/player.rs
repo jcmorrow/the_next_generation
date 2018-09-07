@@ -2,6 +2,7 @@ use PlayEvent;
 use AttackEvent;
 use card::Card;
 use card::CardType;
+use card::ShipType;
 use trade_row::TradeRow;
 
 use card::targetable::Targetable;
@@ -21,6 +22,7 @@ pub struct Player {
     pub discard: Vec<Card>,
     pub hand: Vec<Card>,
     pub in_play: Vec<Card>,
+    pub scrapped: Vec<Card>,
     pub name: String,
     pub trade:  i32,
 }
@@ -35,6 +37,7 @@ impl Player {
             deck: Vec::new(),
             hand: Vec::new(),
             in_play: Vec::new(),
+            scrapped: Vec::new(),
             name: name.to_string(),
             trade: 0,
         };
@@ -63,6 +66,7 @@ impl Player {
         while self.hand.len() > 0 {
             let card_to_play = self.hand.pop().unwrap();
             PlayEvent::new(&card_to_play, self).play();
+
             match card_to_play.card_type {
                 CardType::Ship => { (self.in_play.push(card_to_play)) },
                 CardType::Outpost => { self.bases.push(card_to_play) },
@@ -70,11 +74,24 @@ impl Player {
             }
         }
 
-
+        self.scrap_played_cards();
         self.buy(trade_row);
         self.attack(opponents);
 
         self.discard.extend(self.in_play.drain(0..));
+    }
+
+    pub fn scrap_played_cards(&mut self) {
+        for iter in self.in_play.iter().enumerate() {
+            if iter.1.scrappable {
+                match iter.1.ship_type {
+                    ShipType::Explorer => { self.combat += 2;},
+                    _ => { print!("Tried to scrap non-scrappable card {}\n", iter.1.name)}
+                }
+                // TODO: move card from in_play to scrapped
+                print!("{} scraps {}", self.name, iter.1.name);
+            }
+        }
     }
 
     pub fn buy(&mut self, trade_row: &mut TradeRow) {

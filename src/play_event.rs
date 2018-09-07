@@ -14,7 +14,7 @@ impl<'a> PlayEvent<'a> {
         }
     }
 
-    pub fn play(&mut self) {
+    pub fn play(&mut self)  {
         self.player.trade += self.card.trade;
         self.player.combat += self.card.combat;
         print!("{} plays {}\n", self.player.name, self.card);
