@@ -1,5 +1,4 @@
 use player::Player;
-use card::targetable::Targetable;
 
 pub struct AttackEvent<'a> {
     combat: i32,
