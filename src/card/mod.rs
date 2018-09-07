@@ -75,10 +75,11 @@ pub struct Card {
     pub ship_type: ShipType,
     pub outpost_type: OutpostType,
     pub trade: i32,
+    pub scrappable: bool
 }
 
 impl Card {
-    pub fn none() -> Card { 
+    pub fn none() -> Card {
         Card{ ..Default::default() }
     }
 
@@ -110,6 +111,7 @@ impl Card {
             name: String::from("Explorer"),
             ship_type: ShipType::Explorer,
             trade: 2,
+            scrappable: true,
             ..Default::default()
         }
     }
@@ -132,6 +134,7 @@ impl Card {
             health: 5,
             name: String::from("Battle Station"),
             outpost_type: OutpostType::BattleStation,
+            scrappable: true,
             ..Default::default()
         }
     }

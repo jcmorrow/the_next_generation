@@ -1,5 +1,6 @@
-use PlayEvent;
 use AttackEvent;
+use PlayEvent;
+use ScrapEvent;
 use card::Card;
 use card::CardType;
 use trade_row::TradeRow;
@@ -21,6 +22,7 @@ pub struct Player {
     pub discard: Vec<Card>,
     pub hand: Vec<Card>,
     pub in_play: Vec<Card>,
+    pub scrapped: Vec<Card>,
     pub name: String,
     pub trade:  i32,
 }
@@ -35,6 +37,7 @@ impl Player {
             deck: Vec::new(),
             hand: Vec::new(),
             in_play: Vec::new(),
+            scrapped: Vec::new(),
             name: name.to_string(),
             trade: 0,
         };
@@ -63,6 +66,7 @@ impl Player {
         while self.hand.len() > 0 {
             let card_to_play = self.hand.pop().unwrap();
             PlayEvent::new(&card_to_play, self).play();
+
             match card_to_play.card_type {
                 CardType::Ship => { (self.in_play.push(card_to_play)) },
                 CardType::Outpost => { self.bases.push(card_to_play) },
@@ -70,11 +74,39 @@ impl Player {
             }
         }
 
-
+        self.scrap_played_cards();
+        self.scrap_bases();
         self.buy(trade_row);
         self.attack(opponents);
+    }
 
-        self.discard.extend(self.in_play.drain(0..));
+    pub fn scrap_bases(&mut self) {
+        let mut indices: Vec<usize> = Vec::new();
+
+        for (i, base) in self.bases.iter().enumerate() {
+            if base.scrappable {
+                indices.push(i);
+            }
+        }
+
+        for index in indices.iter().rev() {
+            let base = self.bases.remove(*index);
+            ScrapEvent::new(&base, self).scrap();
+            self.scrapped.push(base);
+        }
+    }
+
+    pub fn scrap_played_cards(&mut self) {
+        while self.in_play.len() > 0 {
+            let card_in_play = self.in_play.pop().unwrap();
+
+            if card_in_play.scrappable {
+                ScrapEvent::new(&card_in_play, self).scrap();
+                self.scrapped.push(card_in_play);
+            } else {
+                self.discard.push(card_in_play);
+            }
+        }
     }
 
     pub fn buy(&mut self, trade_row: &mut TradeRow) {

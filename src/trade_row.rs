@@ -26,8 +26,11 @@ impl TradeRow {
             face_up: Vec::new(),
         };
 
-        for _n in 0..50 {
+        for _n in 0..25 {
             trade_row.deck.push(Card::battle_blob());
+        }
+        for _n in 0..25 {
+            trade_row.deck.push(Card::battle_station());
         }
         trade_row.face_up.push(Card::explorer());
         for _n in 0..5 {

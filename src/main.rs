@@ -2,6 +2,7 @@ extern crate rand;
 
 use attack_event::AttackEvent;
 use play_event::PlayEvent;
+use scrap_event::ScrapEvent;
 use player::Player;
 use trade_row::TradeRow;
 
@@ -9,6 +10,7 @@ mod attack_event;
 mod card;
 mod play_event;
 mod player;
+mod scrap_event;
 mod trade_row;
 
 fn main() {
@@ -29,6 +31,6 @@ fn main() {
         print!("{:#}", current_player[0]);
         current_player[0].take_turn(opponents, &mut trade_row);
         turn_count = turn_count + 1;
-        print!("{:#}", trade_row);
+        print!("\n{:#}", trade_row);
     }
 }

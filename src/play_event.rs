@@ -17,7 +17,7 @@ impl<'a> PlayEvent<'a> {
     pub fn play(&mut self) {
         self.player.trade += self.card.trade;
         self.player.combat += self.card.combat;
-        print!("{} plays {}\n", self.player.name, self.card);
+        print!("{} plays {}\n", self.player.name, self.card.name);
 
         // We can do special abilities this way
         // match self.card.ship_type {
