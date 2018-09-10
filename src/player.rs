@@ -1,8 +1,8 @@
-use PlayEvent;
 use AttackEvent;
+use PlayEvent;
+use ScrapEvent;
 use card::Card;
 use card::CardType;
-use card::ShipType;
 use trade_row::TradeRow;
 
 use card::targetable::Targetable;
@@ -82,14 +82,9 @@ impl Player {
     pub fn scrap_played_cards(&mut self) {
         while self.in_play.len() > 0 {
             let card_in_play = self.in_play.pop().unwrap();
-            // ScrapEvent??
 
             if card_in_play.scrappable {
-                match card_in_play.ship_type {
-                    ShipType::Explorer => { self.combat += 2;},
-                    _ => { print!("Tried to scrap non-scrappable card {}\n", card_in_play.name)}
-                }
-                println!("{} scraps {}", self.name, card_in_play.name);
+                ScrapEvent::new(&card_in_play, self).scrap();
                 self.scrapped.push(card_in_play);
             } else {
                 self.discard.push(card_in_play);
