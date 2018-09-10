@@ -77,19 +77,22 @@ impl Player {
         self.scrap_played_cards();
         self.buy(trade_row);
         self.attack(opponents);
-
-        self.discard.extend(self.in_play.drain(0..));
     }
 
     pub fn scrap_played_cards(&mut self) {
-        for iter in self.in_play.iter().enumerate() {
-            if iter.1.scrappable {
-                match iter.1.ship_type {
+        while self.in_play.len() > 0 {
+            let card_in_play = self.in_play.pop().unwrap();
+            // ScrapEvent??
+
+            if card_in_play.scrappable {
+                match card_in_play.ship_type {
                     ShipType::Explorer => { self.combat += 2;},
-                    _ => { print!("Tried to scrap non-scrappable card {}\n", iter.1.name)}
+                    _ => { print!("Tried to scrap non-scrappable card {}\n", card_in_play.name)}
                 }
-                // TODO: move card from in_play to scrapped
-                print!("{} scraps {}", self.name, iter.1.name);
+                println!("{} scraps {}", self.name, card_in_play.name);
+                self.scrapped.push(card_in_play);
+            } else {
+                self.discard.push(card_in_play);
             }
         }
     }
