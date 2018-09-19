@@ -29,12 +29,12 @@ impl TradeRow {
         for _n in 0..15 {
             trade_row.deck.push(Card::the_hive());
         }
-        // for _n in 0..15 {
-        //     trade_row.deck.push(Card::battle_blob());
-        // }
-        // for _n in 0..15 {
-        //     trade_row.deck.push(Card::battle_station());
-        // }
+        for _n in 0..15 {
+            trade_row.deck.push(Card::battle_blob());
+        }
+        for _n in 0..15 {
+            trade_row.deck.push(Card::battle_station());
+        }
         trade_row.face_up.push(Card::explorer());
         for _n in 0..5 {
             trade_row.face_up.push(trade_row.deck.pop().unwrap());

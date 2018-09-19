@@ -104,10 +104,6 @@ pub struct Card {
 }
 
 impl Card {
-    pub fn none() -> Card {
-        Card{ ..Default::default() }
-    }
-
     pub fn battle_blob() -> Card {
         Card {
             card_type: CardType::Ship,
