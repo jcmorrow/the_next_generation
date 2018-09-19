@@ -1,11 +1,13 @@
 extern crate rand;
 
+use ally_ability_event::AllyAbilityEvent;
 use attack_event::AttackEvent;
 use play_event::PlayEvent;
 use scrap_event::ScrapEvent;
 use player::Player;
 use trade_row::TradeRow;
 
+mod ally_ability_event;
 mod attack_event;
 mod card;
 mod play_event;

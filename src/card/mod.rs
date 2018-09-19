@@ -6,6 +6,7 @@ pub mod outpost;
 pub mod targetable;
 
 #[derive(Clone)]
+#[derive(PartialEq)]
 pub enum Faction {
     Blob,
     MachineCult,
@@ -21,6 +22,7 @@ pub enum CardType {
     NoCardType,
     Outpost,
     Ship,
+    Base
 }
 
 impl Default for CardType {
@@ -50,12 +52,33 @@ impl Default for OutpostType {
     fn default() ->  OutpostType { OutpostType::NoOutpostType }
 }
 
+#[derive(Clone)]
+pub enum BaseType {
+    TheHive,
+    NoBaseType,
+}
+
+impl Default for BaseType {
+    fn default() ->  BaseType { BaseType::NoBaseType }
+}
+
+impl fmt::Display for Faction {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let name = match *self {
+            Faction::Blob => "Blob",
+            Faction::MachineCult => "Machine Cult",
+            Faction::Unaligned => "Unaligned",
+        };
+        write!(f, "{}", name)
+    }
+}
 
 impl fmt::Display for CardType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let name = match *self {
             CardType::Ship => "Ship",
             CardType::Outpost => "Outpost",
+            CardType::Base => "Base",
             CardType::NoCardType => "NoCardType",
         };
         write!(f, "{}", name)
@@ -66,6 +89,7 @@ impl fmt::Display for CardType {
 #[derive(Clone)]
 #[derive(Default)]
 pub struct Card {
+    pub base_type: BaseType,
     pub card_type: CardType,
     pub combat: i32,
     pub cost: i32,
@@ -75,7 +99,8 @@ pub struct Card {
     pub ship_type: ShipType,
     pub outpost_type: OutpostType,
     pub trade: i32,
-    pub scrappable: bool
+    pub scrappable: bool,
+    pub has_used_ally_ability: bool
 }
 
 impl Card {
@@ -88,6 +113,7 @@ impl Card {
             card_type: CardType::Ship,
             cost: 6,
             combat: 8,
+            faction: Faction::Blob,
             name: String::from("BattleBlob"),
             ship_type: ShipType::BattleBlob,
             ..Default::default()
@@ -135,6 +161,18 @@ impl Card {
             name: String::from("Battle Station"),
             outpost_type: OutpostType::BattleStation,
             scrappable: true,
+            ..Default::default()
+        }
+    }
+
+    pub fn the_hive() -> Card {
+        Card {
+            card_type: CardType::Base,
+            cost: 5,
+            faction: Faction::Blob,
+            health: 5,
+            name: String::from("The Hive"),
+            base_type: BaseType::TheHive,
             ..Default::default()
         }
     }
