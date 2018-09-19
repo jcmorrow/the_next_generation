@@ -72,7 +72,8 @@ impl Player {
             match card_to_play.card_type {
                 CardType::Ship => { (self.in_play.push(card_to_play)) },
                 CardType::Outpost => { self.bases.push(card_to_play) },
-                _ => { panic!("Oh noes!") }
+                CardType::Base => { self.bases.push(card_to_play) },
+                _ => { panic!("I don't know how to play this card type!") }
             }
         }
 
@@ -140,7 +141,15 @@ impl Player {
     }
 
     pub fn draw(&mut self) {
-        self.hand.push(self.deck.pop().expect("Empty deck"));
+        let to_draw = match self.deck.pop() {
+            Some(x) => x,
+            None => {
+                self.deck.extend(self.discard.drain(0..));
+                thread_rng().shuffle(&mut self.deck);
+                self.deck.pop().unwrap()
+            }
+        };
+        self.hand.push(to_draw);
     }
 
     pub fn draw_hand(&mut self) {
@@ -152,10 +161,6 @@ impl Player {
         }
 
         for _i in 0..num_to_draw {
-            if self.deck.len() < 1 {
-                self.deck.extend(self.discard.drain(0..));
-                thread_rng().shuffle(&mut self.deck);
-            }
             self.draw();
         }
     }
@@ -175,9 +180,10 @@ impl Player {
     }
 
     pub fn trigger_base_ally_abilities(&mut self) {
-        for base in self.bases.iter() {
+        let bases = self.bases.clone();
+        for base in bases {
             if self.has_factions_in_play(&base.faction) {
-                AllyAbilityEvent::new(&base, &mut self).trigger_ability();
+                AllyAbilityEvent::new(&base, self).trigger_ability();
             }
         }
     }
@@ -240,5 +246,22 @@ use card::Faction;
         player.in_play.push(Card::battle_blob());
         print!("{}", player);
         assert!(player.has_factions_in_play(&Faction::Blob));
+    }
+
+    #[test]
+    fn battle_blobs_draw() {
+        let mut player: Player = Player::new("Testy");
+
+        assert_eq!(player.hand.len(), 0);
+
+        player.bases.push(Card::the_hive());
+        player.trigger_base_ally_abilities();
+
+        assert_eq!(player.hand.len(), 0);
+
+        player.bases.push(Card::the_hive());
+        player.trigger_base_ally_abilities();
+
+        assert_eq!(player.hand.len(), 2);
     }
 }
