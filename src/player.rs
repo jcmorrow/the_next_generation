@@ -1,14 +1,14 @@
+use AllyAbilityEvent;
 use AttackEvent;
 use PlayEvent;
 use ScrapEvent;
 use card::Card;
 use card::CardType;
+use card::Faction;
 use trade_row::TradeRow;
 
 use card::targetable::Targetable;
-
 use std::fmt;
-
 use rand::{thread_rng, Rng};
 
 const STARTING_AUTHORITY: i32 = 50;
@@ -62,6 +62,8 @@ impl Player {
         self.trade = 0;
 
         self.draw_hand();
+
+        self.trigger_base_ally_abilities();
 
         while self.hand.len() > 0 {
             let card_to_play = self.hand.pop().unwrap();
@@ -157,6 +159,28 @@ impl Player {
             self.draw();
         }
     }
+
+    pub fn has_factions_in_play(&self, faction: &Faction) -> bool {
+        let mut count = 0;
+
+        for card in &[&self.bases[..], &self.in_play[..]].concat() {
+            if card.faction == *faction {
+                count += 1;
+            }
+            if count > 1 {
+                return true
+            }
+        }
+        false
+    }
+
+    pub fn trigger_base_ally_abilities(&mut self) {
+        for base in self.bases.iter() {
+            if self.has_factions_in_play(&base.faction) {
+                AllyAbilityEvent::new(&base, &mut self).trigger_ability();
+            }
+        }
+    }
 }
 
 impl Targetable for Player {
@@ -180,6 +204,9 @@ impl fmt::Display for Player {
         for base in self.bases.iter() {
             write!(f, "Base: {}", base).unwrap();
         }
+        for card in self.in_play.iter() {
+            write!(f, "In play: {}", card).unwrap();
+        }
         for card in self.hand.iter() {
             write!(f, "Hand:  {}", card).unwrap();
         }
@@ -190,5 +217,28 @@ impl fmt::Display for Player {
             write!(f, "Discard:  {}", card).unwrap();
         }
         write!(f, "\n")
+    }
+}
+
+#[cfg(test)]
+mod tests {
+use player::Player;
+use card::Card;
+use card::Faction;
+
+    #[test]
+    fn has_no_factions_in_play() {
+        let mut player: Player = Player::new("Testy");
+        player.in_play.push(Card::battle_blob());
+        assert!(!player.has_factions_in_play(&Faction::Blob));
+    }
+
+    #[test]
+    fn has_factions_in_play() {
+        let mut player: Player = Player::new("Testy");
+        player.in_play.push(Card::battle_blob());
+        player.in_play.push(Card::battle_blob());
+        print!("{}", player);
+        assert!(player.has_factions_in_play(&Faction::Blob));
     }
 }
