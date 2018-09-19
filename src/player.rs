@@ -68,6 +68,7 @@ impl Player {
         while self.hand.len() > 0 {
             let card_to_play = self.hand.pop().unwrap();
             PlayEvent::new(&card_to_play, self).play();
+            AllyAbilityEvent::new(&card_to_play, self).trigger_ability();
 
             match card_to_play.card_type {
                 CardType::Ship => { (self.in_play.push(card_to_play)) },
@@ -141,15 +142,17 @@ impl Player {
     }
 
     pub fn draw(&mut self) {
-        let to_draw = match self.deck.pop() {
-            Some(x) => x,
+        match self.deck.pop() {
+            Some(x) => self.hand.push(x),
             None => {
                 self.deck.extend(self.discard.drain(0..));
                 thread_rng().shuffle(&mut self.deck);
-                self.deck.pop().unwrap()
+                match self.deck.pop() {
+                    Some(x) => self.hand.push(x),
+                    None => (),
+                };
             }
         };
-        self.hand.push(to_draw);
     }
 
     pub fn draw_hand(&mut self) {
@@ -182,16 +185,14 @@ impl Player {
     pub fn trigger_base_ally_abilities(&mut self) {
         let bases = self.bases.clone();
         for base in bases {
-            if self.has_factions_in_play(&base.faction) {
-                AllyAbilityEvent::new(&base, self).trigger_ability();
-            }
+            AllyAbilityEvent::new(&base, self).trigger_ability();
         }
     }
 }
 
 impl Targetable for Player {
     fn is_targetable(&self) -> bool {
-        self.bases.len() <= 0
+        !self.bases.iter().any(|ref base| base.card_type == CardType::Outpost)
     }
 
     fn receive_combat(&mut self, combat: i32) {
@@ -263,5 +264,18 @@ use card::Faction;
         player.trigger_base_ally_abilities();
 
         assert_eq!(player.hand.len(), 2);
+    }
+
+    #[test]
+    fn overdraw() {
+        let mut player: Player = Player::new("Testy");
+
+        for _ in 0..12 {
+            // Attempt to draw 11 times
+            player.draw();
+        }
+        assert_eq!(player.hand.len(), 10);
+        assert_eq!(player.deck.len(), 0);
+        assert_eq!(player.discard.len(), 0);
     }
 }
