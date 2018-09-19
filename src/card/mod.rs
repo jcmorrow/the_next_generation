@@ -18,6 +18,7 @@ impl Default for Faction {
 }
 
 #[derive(Clone)]
+#[derive(PartialEq)]
 pub enum CardType {
     NoCardType,
     Outpost,
