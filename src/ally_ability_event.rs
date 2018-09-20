@@ -15,19 +15,17 @@ impl<'a> AllyAbilityEvent<'a> {
     }
 
     pub fn trigger_ability(&mut self) {
-        if self.card.faction != Faction::Unaligned &&
-            self.player.has_factions_in_play(&self.card.faction) {
-                print!("{} uses the ally ability of {}\n",
-                       self.player.name,
-                       self.card.name);
+        
+        print!("{} uses the ally ability of {}\n",
+               self.player.name,
+               self.card.name);
 
-                match self.card.base_type {
-                    BaseType::TheHive => { self.player.draw(); }
-                    _ => {
-                        println!("{} does not have an ally ability.",
-                                 self.card.name)
-                    }
-                }
+        match self.card.base_type {
+            BaseType::TheHive => { self.player.draw(); }
+            _ => {
+                println!("{} does not have an ally ability.",
+                         self.card.name)
+            }
         }
     }
 }

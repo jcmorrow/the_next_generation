@@ -63,7 +63,9 @@ impl Player {
 
         self.draw_hand();
 
-        self.trigger_base_ally_abilities();
+        // Appease the borrow checking gods
+        let cards = self.bases.clone();
+        self.trigger_ally_abilities(cards);
 
         while self.hand.len() > 0 {
             let card_to_play = self.hand.pop().unwrap();
@@ -182,10 +184,11 @@ impl Player {
         false
     }
 
-    pub fn trigger_base_ally_abilities(&mut self) {
-        let bases = self.bases.clone();
-        for base in bases {
-            AllyAbilityEvent::new(&base, self).trigger_ability();
+    pub fn trigger_ally_abilities(&mut self, cards: Vec<Card>) {
+        for card in cards {
+            if card.faction != Faction::Unaligned && self.has_factions_in_play(&card.faction) {
+                AllyAbilityEvent::new(&card, self).trigger_ability();
+            }
         }
     }
 }
@@ -256,12 +259,14 @@ use card::Faction;
         assert_eq!(player.hand.len(), 0);
 
         player.bases.push(Card::the_hive());
-        player.trigger_base_ally_abilities();
+        let cards = player.bases.clone();
+        player.trigger_ally_abilities(cards);
 
         assert_eq!(player.hand.len(), 0);
 
         player.bases.push(Card::the_hive());
-        player.trigger_base_ally_abilities();
+        let cards = player.bases.clone();
+        player.trigger_ally_abilities(cards);
 
         assert_eq!(player.hand.len(), 2);
     }
