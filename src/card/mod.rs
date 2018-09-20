@@ -101,6 +101,7 @@ pub struct Card {
     pub outpost_type: OutpostType,
     pub trade: i32,
     pub scrappable: bool,
+    pub has_ally_ability: bool,
     pub has_used_ally_ability: bool
 }
 
@@ -111,6 +112,7 @@ impl Card {
             cost: 6,
             combat: 8,
             faction: Faction::Blob,
+            has_ally_ability: true,
             name: String::from("BattleBlob"),
             ship_type: ShipType::BattleBlob,
             ..Default::default()
@@ -167,6 +169,7 @@ impl Card {
             card_type: CardType::Base,
             cost: 5,
             faction: Faction::Blob,
+            has_ally_ability: true,
             health: 5,
             name: String::from("The Hive"),
             base_type: BaseType::TheHive,

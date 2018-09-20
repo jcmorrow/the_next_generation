@@ -203,8 +203,8 @@ impl Player {
     }
 
     pub fn can_trigger_ally_ability(&self, card: &Card) -> bool {
-        card.faction != Faction::Unaligned && self.has_factions_in_play(&card.faction) &&
-           !card.has_used_ally_ability
+        card.has_ally_ability && !card.has_used_ally_ability &&
+        card.faction != Faction::Unaligned && self.has_factions_in_play(&card.faction)
     }
 
     pub fn trigger_ally_abilities(&mut self, cards: Vec<Card>) -> Vec<usize> {

@@ -1,5 +1,4 @@
 use card::Card;
-use card::Faction;
 use card::BaseType;
 use player::Player;
 
@@ -15,7 +14,7 @@ impl<'a> AllyAbilityEvent<'a> {
     }
 
     pub fn trigger_ability(&mut self) {
-        
+
         print!("{} uses the ally ability of {}\n",
                self.player.name,
                self.card.name);
