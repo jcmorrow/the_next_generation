@@ -21,14 +21,14 @@ impl<'a> ScrapEvent<'a> {
         match self.card.card_type {
             CardType::Ship => {
                 match self.card.ship_type {
-                    ShipType::Explorer => { self.player.combat += 2;},
-                    _ => {}
+                    ShipType::Explorer => self.player.combat += 2,
+                    _ => ()
                 }
             },
             CardType::Outpost => {
                 match self.card.outpost_type {
-                    OutpostType::BattleStation => { self.player.combat += 5;}
-                    OutpostType::NoOutpostType => {}
+                    OutpostType::BattleStation => self.player.combat += 5,
+                    OutpostType::NoOutpostType => ()
                 }
             },
             _ => { println!("Tried to scrap non-scrappable card {}", self.card.name)}

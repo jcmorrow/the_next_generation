@@ -5,6 +5,7 @@ use ScrapEvent;
 
 use card::Card;
 use card::CardType;
+use card::ShipType;
 use card::Faction;
 use card::ship;
 use card::targetable::Targetable;
@@ -73,6 +74,17 @@ impl Player {
             let card_to_play = self.hand.pop().unwrap();
             PlayEvent::new(&card_to_play, self).play();
 
+            let trade_row_size = trade_row.face_up.len();
+            // Process special abilities
+            match card_to_play.ship_type {
+                ShipType::BattlePod => {
+                    if trade_row_size > 1 {
+                        trade_row.scrap(thread_rng().gen_range(1, trade_row_size))
+                    }
+                },
+                _ => ()
+            }
+
             match card_to_play.card_type {
                 CardType::Ship => { (self.in_play.push(card_to_play)) },
                 CardType::Outpost => { self.bases.push(card_to_play) },
@@ -126,7 +138,7 @@ impl Player {
             let mut options = trade_row.face_up.clone();
             options.sort_unstable_by(|a, b| b.cost.cmp(&a.cost));
             let card_to_buy: &Card = match options.iter()
-                .find(|card| card.cost < self.trade) {
+                .find(|card| card.cost <= self.trade) {
                 Some(card) => card,
                 None => return (),
             };

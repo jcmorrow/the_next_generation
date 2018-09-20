@@ -33,6 +33,7 @@ impl Default for CardType {
 #[derive(Clone)]
 pub enum ShipType {
     BattleBlob,
+    BattlePod,
     Explorer,
     NoShipType,
     Scout,

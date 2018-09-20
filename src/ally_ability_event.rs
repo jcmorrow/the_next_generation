@@ -1,5 +1,7 @@
-use card::Card;
 use card::BaseType;
+use card::Card;
+use card::CardType;
+use card::ShipType;
 use player::Player;
 
 pub struct AllyAbilityEvent<'a> {
@@ -19,12 +21,21 @@ impl<'a> AllyAbilityEvent<'a> {
                self.player.name,
                self.card.name);
 
-        match self.card.base_type {
-            BaseType::TheHive => { self.player.draw(); }
-            _ => {
-                println!("{} does not have an ally ability.",
-                         self.card.name)
-            }
+        match self.card.card_type {
+            CardType::Ship => {
+                match self.card.ship_type {
+                    ShipType::BattlePod => self.player.combat += 2,
+                    _ => ()
+                }
+            },
+            CardType::Base => {
+                match self.card.base_type {
+                    BaseType::TheHive => self.player.draw(),
+                    _ => ()
+                }
+            },
+            _ => { println!("{} does not have an ally ability.",
+                     self.card.name) }
         }
     }
 }

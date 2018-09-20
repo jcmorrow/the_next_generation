@@ -16,6 +16,19 @@ pub fn battle_blob() -> Card {
     }
 }
 
+pub fn battle_pod() -> Card {
+    Card {
+        card_type: CardType::Ship,
+        combat: 4,
+        cost: 2,
+        faction: Faction::Blob,
+        has_ally_ability: true,
+        name: String::from("Battle Pod"),
+        ship_type: ShipType::BattlePod,
+        ..Default::default()
+    }
+}
+
 pub fn explorer() -> Card {
     Card {
         card_type: CardType::Ship,
