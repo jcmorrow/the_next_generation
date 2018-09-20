@@ -63,14 +63,11 @@ impl Player {
 
         self.draw_hand();
 
-        // Appease the borrow checking gods
-        let cards = self.bases.clone();
-        self.trigger_ally_abilities(cards);
+        self.trigger_ally_abilities_in_bases();
 
         while self.hand.len() > 0 {
             let card_to_play = self.hand.pop().unwrap();
             PlayEvent::new(&card_to_play, self).play();
-            AllyAbilityEvent::new(&card_to_play, self).trigger_ability();
 
             match card_to_play.card_type {
                 CardType::Ship => { (self.in_play.push(card_to_play)) },
@@ -78,12 +75,17 @@ impl Player {
                 CardType::Base => { self.bases.push(card_to_play) },
                 _ => { panic!("I don't know how to play this card type!") }
             }
+
+            self.trigger_ally_abilities_in_play();
+            self.trigger_ally_abilities_in_bases();
         }
 
         self.scrap_played_cards();
         self.scrap_bases();
         self.buy(trade_row);
         self.attack(opponents);
+
+        self.unset_has_used_ally_abilities();
     }
 
     pub fn scrap_bases(&mut self) {
@@ -184,11 +186,53 @@ impl Player {
         false
     }
 
-    pub fn trigger_ally_abilities(&mut self, cards: Vec<Card>) {
-        for card in cards {
-            if card.faction != Faction::Unaligned && self.has_factions_in_play(&card.faction) {
-                AllyAbilityEvent::new(&card, self).trigger_ability();
+    pub fn trigger_ally_abilities_in_play(&mut self) {
+        let cards = self.in_play.clone();
+        let indices = self.trigger_ally_abilities(cards);
+        for index in indices {
+            self.in_play[index].has_used_ally_ability = true;
+        }
+    }
+
+    pub fn trigger_ally_abilities_in_bases(&mut self) {
+        let cards = self.bases.clone();
+        let indices = self.trigger_ally_abilities(cards);
+        for index in indices {
+            self.bases[index].has_used_ally_ability = true;
+        }
+    }
+
+    pub fn can_trigger_ally_ability(&self, card: &Card) -> bool {
+        card.faction != Faction::Unaligned && self.has_factions_in_play(&card.faction) &&
+           !card.has_used_ally_ability
+    }
+
+    pub fn trigger_ally_abilities(&mut self, cards: Vec<Card>) -> Vec<usize> {
+        let mut indices: Vec<usize> = Vec::new();
+        for (index, card) in cards.iter().enumerate() {
+            if self.can_trigger_ally_ability(&card) {
+                   AllyAbilityEvent::new(&card, self).trigger_ability();
+                   indices.push(index);
             }
+        }
+        indices
+    }
+
+    pub fn unset_has_used_ally_abilities(&mut self) {
+        for mut card in self.in_play.iter_mut() {
+            card.has_used_ally_ability = false
+        }
+
+        for mut base in self.bases.iter_mut() {
+            base.has_used_ally_ability = false
+        }
+
+        for mut discard_card in self.discard.iter_mut() {
+            discard_card.has_used_ally_ability = false
+        }
+
+        for mut deck_card in self.deck.iter_mut() {
+            deck_card.has_used_ally_ability = false
         }
     }
 }
@@ -282,5 +326,31 @@ use card::Faction;
         assert_eq!(player.hand.len(), 10);
         assert_eq!(player.deck.len(), 0);
         assert_eq!(player.discard.len(), 0);
+    }
+
+    #[test]
+    fn unset_has_used_ally_abilities() {
+        let mut player: Player = Player::new("Testy");
+
+        let mut base_hive = Card::the_hive();
+        let mut discard_hive = Card::the_hive();
+        let mut deck_hive = Card::the_hive();
+        base_hive.has_used_ally_ability = true;
+        discard_hive.has_used_ally_ability = true;
+        deck_hive.has_used_ally_ability = true;
+        player.bases.push(base_hive);
+        player.discard.push(discard_hive);
+        player.deck.push(deck_hive);
+
+        player.unset_has_used_ally_abilities();
+
+        let base_hive = player.bases.pop().unwrap();
+        assert!(!base_hive.has_used_ally_ability);
+
+        let discard_hive = player.discard.pop().unwrap();
+        assert!(!discard_hive.has_used_ally_ability);
+
+        let deck_hive = player.deck.pop().unwrap();
+        assert!(!deck_hive.has_used_ally_ability);
     }
 }
