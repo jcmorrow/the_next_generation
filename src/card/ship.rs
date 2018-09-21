@@ -10,7 +10,7 @@ pub fn battle_blob() -> Card {
         cost: 6,
         combat: 8,
         faction: Faction::Blob,
-        name: String::from("BattleBlob"),
+        name: String::from("Battle Blob"),
         ship_type: ShipType::BattleBlob,
         ..Default::default()
     }

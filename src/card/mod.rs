@@ -140,7 +140,14 @@ impl Card {
                 player.choices.extend(card.ally_abilities.clone())
             }
         }
-        if player.has_allies_in_play(&self.faction, 1) {
+        for card in &mut player.in_play {
+            if card.faction == self.faction && !card.has_used_ally_ability
+            {
+                card.has_used_ally_ability = true;
+                player.choices.extend(card.ally_abilities.clone())
+            }
+        }
+        if player.has_ally_in_play(&self.faction) {
             self.has_used_ally_ability = true;
             player.choices.extend(self.ally_abilities.clone());
         }

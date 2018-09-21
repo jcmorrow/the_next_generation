@@ -59,14 +59,9 @@ impl Player {
         return player;
     }
 
-    pub fn has_allies_in_play(&self, faction: &Faction, min: i32) -> bool {
-        let mut count = 0;
-
+    pub fn has_ally_in_play(&self, faction: &Faction) -> bool {
         for card in &[&self.bases[..], &self.in_play[..]].concat() {
             if card.faction == *faction {
-                count += 1;
-            }
-            if count >= min {
                 return true
             }
         }
@@ -195,6 +190,12 @@ impl Player {
 
     pub fn end_turn(&mut self) {
         self.discard.extend(self.in_play.drain(0..));
+        for card in &mut self.discard { card.has_used_ally_ability = false; }
+        for card in &mut self.deck { card.has_used_ally_ability = false; }
+        for card in &mut self.hand { card.has_used_ally_ability = false; }
+        for card in &mut self.in_play { card.has_used_ally_ability = false; }
+        for card in &mut self.scrapped { card.has_used_ally_ability = false; }
+        for card in &mut self.bases { card.has_used_ally_ability = false; }
     }
 }
 
