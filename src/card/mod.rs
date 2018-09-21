@@ -1,5 +1,9 @@
 use std::fmt;
 
+use player::Player;
+use trade_row::TradeRow;
+use choice::Choice;
+
 pub mod base;
 pub mod ship;
 pub mod outpost;
@@ -7,6 +11,7 @@ pub mod targetable;
 
 #[derive(Clone)]
 #[derive(PartialEq)]
+#[derive(Debug)]
 pub enum Faction {
     Blob,
     MachineCult,
@@ -19,6 +24,7 @@ impl Default for Faction {
 
 #[derive(Clone)]
 #[derive(PartialEq)]
+#[derive(Debug)]
 pub enum CardType {
     NoCardType,
     Outpost,
@@ -31,9 +37,11 @@ impl Default for CardType {
 }
 
 #[derive(Clone)]
+#[derive(Debug)]
 pub enum ShipType {
     BattleBlob,
     BattlePod,
+    BlobCarrier,
     Explorer,
     NoShipType,
     Scout,
@@ -45,6 +53,7 @@ impl Default for ShipType {
 }
 
 #[derive(Clone)]
+#[derive(Debug)]
 pub enum OutpostType {
     BattleStation,
     NoOutpostType,
@@ -55,6 +64,7 @@ impl Default for OutpostType {
 }
 
 #[derive(Clone)]
+#[derive(Debug)]
 pub enum BaseType {
     TheHive,
     NoBaseType,
@@ -88,6 +98,7 @@ impl fmt::Display for CardType {
 }
 
 #[derive(Clone)]
+#[derive(Debug)]
 #[derive(Default)]
 pub struct Card {
     pub base_type: BaseType,
@@ -103,6 +114,38 @@ pub struct Card {
     pub scrappable: bool,
     pub has_ally_ability: bool,
     pub has_used_ally_ability: bool
+}
+
+impl Card {
+    pub fn run(&self,
+               player: &mut Player,
+               opponents: &[&mut Player],
+               trade_row: &mut TradeRow) {
+        match self.trade {
+            0 => (),
+            _ => player.choices.push(Choice::GainTrade(self.trade))
+        }
+        match self.combat {
+            0 => (),
+            _ => player.choices.push(Choice::GainCombat(self.combat))
+        }
+
+        match self.card_type {
+            Ship => {
+                match self.ship_type {
+                    BlobCarrier => {
+                        for card in trade_row.face_up {
+                            player.choices.push(
+                                Choice::AcquireFromTradeRow(card)
+                            )
+                        }
+                    },
+                    _ => ()
+                }
+            },
+            _ => ()
+        }
+    }
 }
 
 impl fmt::Display for Card {

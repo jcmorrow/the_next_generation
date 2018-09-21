@@ -60,3 +60,15 @@ pub fn viper() -> Card {
         ..Default::default()
     }
 }
+
+pub fn overpowered_blob_carrier() -> Card {
+    Card {
+        card_type: CardType::Ship,
+        combat: 7,
+        cost: 6,
+        faction: Faction::Blob,
+        name: String::from("Overpowered Blob Carrier"),
+        ship_type: ShipType::BlobCarrier,
+        ..Default::default()
+    }
+}
