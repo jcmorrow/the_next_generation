@@ -16,16 +16,6 @@ pub fn battle_blob() -> Card {
     }
 }
 
-pub fn scout() -> Card {
-    Card {
-        card_type: CardType::Ship,
-        name: String::from("Scout"),
-        trade: 1,
-        ship_type: ShipType::Scout,
-        ..Default::default()
-    }
-}
-
 pub fn explorer() -> Card {
     Card {
         card_type: CardType::Ship,
@@ -38,6 +28,15 @@ pub fn explorer() -> Card {
     }
 }
 
+pub fn scout() -> Card {
+    Card {
+        card_type: CardType::Ship,
+        name: String::from("Scout"),
+        trade: 1,
+        ship_type: ShipType::Scout,
+        ..Default::default()
+    }
+}
 
 pub fn viper() -> Card {
     Card {
