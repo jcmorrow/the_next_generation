@@ -2,6 +2,7 @@ use card::Card;
 use card::CardType;
 use card::Faction;
 use card::ShipType;
+use choice::Choice;
 
 pub fn battle_blob() -> Card {
     Card {
@@ -9,8 +10,7 @@ pub fn battle_blob() -> Card {
         cost: 6,
         combat: 8,
         faction: Faction::Blob,
-        has_ally_ability: true,
-        name: String::from("BattleBlob"),
+        name: String::from("Battle Blob"),
         ship_type: ShipType::BattleBlob,
         ..Default::default()
     }
@@ -22,7 +22,6 @@ pub fn battle_pod() -> Card {
         combat: 4,
         cost: 2,
         faction: Faction::Blob,
-        has_ally_ability: true,
         name: String::from("Battle Pod"),
         ship_type: ShipType::BattlePod,
         ..Default::default()
@@ -57,6 +56,19 @@ pub fn viper() -> Card {
         combat: 1,
         name: String::from("Viper"),
         ship_type: ShipType::Viper,
+        ..Default::default()
+    }
+}
+
+pub fn blob_carrier() -> Card {
+    Card {
+        ally_abilities: vec!(Choice::AcquireFromTradeRow(0)),
+        card_type: CardType::Ship,
+        combat: 7,
+        cost: 6,
+        faction: Faction::Blob,
+        name: String::from("Blob Carrier"),
+        ship_type: ShipType::BlobCarrier,
         ..Default::default()
     }
 }
