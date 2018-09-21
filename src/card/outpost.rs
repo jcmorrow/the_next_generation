@@ -1,16 +1,25 @@
+use card;
 use card::Card;
-use card::CardType;
 use card::Faction;
-use card::OutpostType;
+
+#[derive(Clone)]
+pub enum Type {
+    BattleStation,
+    NoType,
+}
+
+impl Default for Type {
+    fn default() ->  Type { Type::NoType }
+}
 
 pub fn battle_station() -> Card {
     Card {
-        card_type: CardType::Outpost,
+        card_type: card::Type::Outpost,
         cost: 3,
         faction: Faction::MachineCult,
         health: 5,
         name: String::from("Battle Station"),
-        outpost_type: OutpostType::BattleStation,
+        outpost_type: Type::BattleStation,
         scrappable: true,
         ..Default::default()
     }

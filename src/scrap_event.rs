@@ -1,7 +1,7 @@
 use card::Card;
-use card::CardType;
-use card::OutpostType;
-use card::ShipType;
+use card::Type;
+use card::outpost;
+use card::ship;
 use player::Player;
 
 pub struct ScrapEvent<'a> {
@@ -19,16 +19,16 @@ impl<'a> ScrapEvent<'a> {
 
     pub fn scrap(&mut self)  {
         match self.card.card_type {
-            CardType::Ship => {
+            Type::Ship => {
                 match self.card.ship_type {
-                    ShipType::Explorer => self.player.combat += 2,
+                    ship::Type::Explorer => self.player.combat += 2,
                     _ => ()
                 }
             },
-            CardType::Outpost => {
+            Type::Outpost => {
                 match self.card.outpost_type {
-                    OutpostType::BattleStation => self.player.combat += 5,
-                    OutpostType::NoOutpostType => ()
+                    outpost::Type::BattleStation => self.player.combat += 5,
+                    outpost::Type::NoType => ()
                 }
             },
             _ => { println!("Tried to scrap non-scrappable card {}", self.card.name)}

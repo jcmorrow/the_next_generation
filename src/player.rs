@@ -4,8 +4,7 @@ use PlayEvent;
 use ScrapEvent;
 
 use card::Card;
-use card::CardType;
-use card::ShipType;
+use card::Type;
 use card::Faction;
 use card::ship;
 use card::targetable::Targetable;
@@ -77,7 +76,7 @@ impl Player {
             let trade_row_size = trade_row.face_up.len();
             // Process special abilities
             match card_to_play.ship_type {
-                ShipType::BattlePod => {
+                ship::Type::BattlePod => {
                     if trade_row_size > 1 {
                         trade_row.scrap(thread_rng().gen_range(1, trade_row_size))
                     }
@@ -86,9 +85,9 @@ impl Player {
             }
 
             match card_to_play.card_type {
-                CardType::Ship => { (self.in_play.push(card_to_play)) },
-                CardType::Outpost => { self.bases.push(card_to_play) },
-                CardType::Base => { self.bases.push(card_to_play) },
+                Type::Ship => { (self.in_play.push(card_to_play)) },
+                Type::Outpost => { self.bases.push(card_to_play) },
+                Type::Base => { self.bases.push(card_to_play) },
                 _ => { panic!("I don't know how to play this card type!") }
             }
 
@@ -255,7 +254,7 @@ impl Player {
 
 impl Targetable for Player {
     fn is_targetable(&self) -> bool {
-        !self.bases.iter().any(|ref base| base.card_type == CardType::Outpost)
+        !self.bases.iter().any(|ref base| base.card_type == Type::Outpost)
     }
 
     fn receive_combat(&mut self, combat: i32) {

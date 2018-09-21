@@ -10,6 +10,7 @@ pub mod targetable;
 pub enum Faction {
     Blob,
     MachineCult,
+    StarEmpire,
     Unaligned,
 }
 
@@ -19,49 +20,15 @@ impl Default for Faction {
 
 #[derive(Clone)]
 #[derive(PartialEq)]
-pub enum CardType {
+pub enum Type {
     NoCardType,
     Outpost,
     Ship,
     Base
 }
 
-impl Default for CardType {
-    fn default() ->  CardType { CardType::NoCardType }
-}
-
-#[derive(Clone)]
-pub enum ShipType {
-    BattleBlob,
-    BattlePod,
-    Explorer,
-    NoShipType,
-    Scout,
-    Viper,
-}
-
-impl Default for ShipType {
-    fn default() ->  ShipType { ShipType::NoShipType }
-}
-
-#[derive(Clone)]
-pub enum OutpostType {
-    BattleStation,
-    NoOutpostType,
-}
-
-impl Default for OutpostType {
-    fn default() ->  OutpostType { OutpostType::NoOutpostType }
-}
-
-#[derive(Clone)]
-pub enum BaseType {
-    TheHive,
-    NoBaseType,
-}
-
-impl Default for BaseType {
-    fn default() ->  BaseType { BaseType::NoBaseType }
+impl Default for Type {
+    fn default() ->  Type { Type::NoCardType }
 }
 
 impl fmt::Display for Faction {
@@ -69,19 +36,20 @@ impl fmt::Display for Faction {
         let name = match *self {
             Faction::Blob => "Blob",
             Faction::MachineCult => "Machine Cult",
+            Faction::StarEmpire => "Star Empire",
             Faction::Unaligned => "Unaligned",
         };
         write!(f, "{}", name)
     }
 }
 
-impl fmt::Display for CardType {
+impl fmt::Display for Type {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let name = match *self {
-            CardType::Ship => "Ship",
-            CardType::Outpost => "Outpost",
-            CardType::Base => "Base",
-            CardType::NoCardType => "NoCardType",
+            Type::Ship => "Ship",
+            Type::Outpost => "Outpost",
+            Type::Base => "Base",
+            Type::NoCardType => "NoCardType",
         };
         write!(f, "{}", name)
     }
@@ -90,15 +58,15 @@ impl fmt::Display for CardType {
 #[derive(Clone)]
 #[derive(Default)]
 pub struct Card {
-    pub base_type: BaseType,
-    pub card_type: CardType,
+    pub base_type: base::Type,
+    pub card_type: Type,
     pub combat: i32,
     pub cost: i32,
     pub faction: Faction,
     pub health: i32,
     pub name: String,
-    pub ship_type: ShipType,
-    pub outpost_type: OutpostType,
+    pub ship_type: ship::Type,
+    pub outpost_type: outpost::Type,
     pub trade: i32,
     pub scrappable: bool,
     pub has_ally_ability: bool,
