@@ -26,13 +26,15 @@ pub struct Player {
     pub hand: Vec<Card>,
     pub in_play: Vec<Card>,
     pub name: String,
+    pub perrenial_choices: Vec<Choice>,
     pub scrapped: Vec<Card>,
     pub trade:  i32,
+    pub turn_start_choices: Vec<Choice>,
 }
 
 impl Player {
     pub fn new(name: &str) -> Player {
-        let mut player = Player{
+        let mut player = Player {
             authority: STARTING_AUTHORITY,
             bases: Vec::new(),
             choices: Vec::new(),
@@ -41,9 +43,11 @@ impl Player {
             deck: Vec::new(),
             hand: Vec::new(),
             in_play: Vec::new(),
-            scrapped: Vec::new(),
             name: name.to_string(),
+            perrenial_choices: Vec::new(),
+            scrapped: Vec::new(),
             trade: 0,
+            turn_start_choices: Vec::new()
         };
 
         for _n in 0..8 {
@@ -80,6 +84,13 @@ impl Player {
         }
     }
 
+    fn index_discard_opponents(&self, opponents: &[&mut Player]) -> Option<usize> {
+        match opponents.len() {
+            0 => None,
+            _ => Some(0)
+        }
+    }
+
     fn index_acquire_from_trade_row(&self,
                                     trade_row: &TradeRow) -> Option<usize> {
         let mut highest_cost = 0;
@@ -110,7 +121,7 @@ impl Player {
         }
     }
 
-    fn index_from_hand(&self) -> Option<usize> {
+    pub fn index_from_hand(&self) -> Option<usize> {
         // For now, play the first card in the hand
         match self.hand.len() {
             0 => None,
@@ -118,27 +129,10 @@ impl Player {
         }
     }
 
-    pub fn make_choice(&mut self,
-                       trade_row: &TradeRow,
-                       opponents: &[&mut Player]) -> Choice {
-        let mut perrenial_choices: Vec<Choice> = Vec::new();
-
-        match self.index_attack_opponents(opponents) {
-            Some(i) => perrenial_choices.push(Choice::Attack(i)),
-            None => ()
-        }
-
-        match self.index_buy_from_trade_row(trade_row) {
-            Some(i) => perrenial_choices.push(Choice::Buy(i)),
-            None => ()
-        }
-
-        match self.index_from_hand() {
-            Some(i) => perrenial_choices.push(Choice::Play(i)),
-            None => ()
-        }
-
-        match perrenial_choices.pop() {
+    fn make_perennial_choice(&mut self,
+                             trade_row: &TradeRow,
+                             opponents: &[&mut Player]) -> Choice {
+        match self.perrenial_choices.pop() {
             Some(c) => c,
             None => {
                 match self.choices.pop() {
@@ -149,12 +143,55 @@ impl Player {
                                 // this is not quite right
                                 None => Choice::EndTurn,
                             }
-                        }
+                        },
+                        Choice::DiscardAttack(_) => {
+                            match self.index_discard_opponents(opponents) {
+                                Some(i) => Choice::DiscardAttack(i),
+                                None => Choice::EndTurn
+                            }
+                        },
                         c => c
                     },
                     None => Choice::EndTurn
                 }
             }
+        }
+    }
+
+    pub fn make_choice(&mut self,
+                       trade_row: &TradeRow,
+                       opponents: &[&mut Player]) -> Choice {
+        if self.turn_start_choices.len() > 0 {
+            return self.turn_start_choices.pop().unwrap()
+        }
+        self.perrenial_choices.clear();
+        match self.index_attack_opponents(opponents) {
+            Some(i) => self.perrenial_choices.push(Choice::Attack(i)),
+            None => ()
+        }
+
+        match self.index_buy_from_trade_row(trade_row) {
+            Some(i) => self.perrenial_choices.push(Choice::Buy(i)),
+            None => ()
+        }
+
+        match self.index_from_hand() {
+            Some(i) => self.perrenial_choices.push(Choice::Play(i)),
+            None => ()
+        }
+
+        match self.turn_start_choices.pop() {
+            Some(c) => match c {
+                Choice::DiscardCard(_) => {
+                    match self.index_from_hand() {
+                        Some(i) => Choice::DiscardCard(i),
+                        None => self.make_perennial_choice(trade_row, opponents)
+                    }
+                },
+                // Note: this should never happen, since only DiscardCard choices are at turn start
+                c => c
+            },
+            None => self.make_perennial_choice(trade_row, opponents)
         }
     }
 
@@ -196,6 +233,7 @@ impl Player {
         for card in &mut self.in_play { card.has_used_ally_ability = false; }
         for card in &mut self.scrapped { card.has_used_ally_ability = false; }
         for card in &mut self.bases { card.has_used_ally_ability = false; }
+        self.turn_start_choices.clear();
     }
 }
 

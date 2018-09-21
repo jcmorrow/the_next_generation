@@ -9,7 +9,10 @@ use player::Player;
 pub enum Choice {
     AcquireFromTradeRow(usize),
     Buy(usize),
+    DiscardAttack(usize),
+    DiscardCard(usize),
     EndTurn,
+    GainAttack(i32),
     Play(usize),
     Scrap(usize),
     Attack(usize),
@@ -26,6 +29,11 @@ impl Choice {
                 println!("{} plays {}", player.name, card.name);
                 card.run(player, opponents, trade_row);
                 player.in_play.push(card);
+            },
+            Choice::DiscardCard(i) => {
+                let mut card = player.hand.remove(i);
+                println!("{} discards {}", player.name, card.name);
+                player.discard.push(card);
             },
             Choice::AcquireFromTradeRow(i) => {
                 let card = trade_row.buy(i);
@@ -46,7 +54,15 @@ impl Choice {
                          combat);
                 opponents[i].authority -= combat;
                 player.combat = 0;
-            }
+            },
+            Choice::DiscardAttack(opponent_index) => {
+                println!("{} makes {} discard!", player.name, opponents[opponent_index].name);
+                opponents[opponent_index].turn_start_choices.push(
+                    Choice::DiscardCard(0))
+            },
+            Choice::GainAttack(n) => {
+                player.combat += n;
+            },
             _ => (),
         }
     }

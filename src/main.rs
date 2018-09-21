@@ -24,8 +24,8 @@ fn main() {
         print!("Turn {}\n", turn_count);
         players.rotate_left(1);
         let (current_player, opponents)  = &mut players.split_at_mut(1);
-        print!("{:#}", current_player[0]);
         current_player[0].begin_turn();
+        print!("{:#}", current_player[0]);
         loop {
             let choice = current_player[0].make_choice(&trade_row, opponents);
             match choice {

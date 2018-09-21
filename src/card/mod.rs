@@ -15,6 +15,7 @@ pub mod targetable;
 pub enum Faction {
     Blob,
     MachineCult,
+    StarEmpire,
     Unaligned,
 }
 
@@ -43,6 +44,7 @@ pub enum ShipType {
     BattlePod,
     BlobCarrier,
     Explorer,
+    ImperialFighter,
     NoShipType,
     Scout,
     Viper,
@@ -79,6 +81,7 @@ impl fmt::Display for Faction {
         let name = match *self {
             Faction::Blob => "Blob",
             Faction::MachineCult => "Machine Cult",
+            Faction::StarEmpire => "Star Empire",
             Faction::Unaligned => "Unaligned",
         };
         write!(f, "{}", name)
