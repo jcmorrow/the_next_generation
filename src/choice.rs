@@ -7,19 +7,17 @@ use player::Player;
 #[derive(Debug)]
 pub enum Choice {
     AcquireFromTradeRow(usize),
-    GainCombat(i32),
-    GainTrade(i32),
     Buy(usize),
     EndTurn,
     Play(usize),
-    Scrap(Card),
-    Attack(Player),
+    Scrap(usize),
+    Attack(usize),
 }
 
 impl Choice {
     pub fn choose(self,
                   player: &mut Player,
-                  opponents: &[&mut Player],
+                  opponents: &mut [&mut Player],
                   trade_row: &mut TradeRow) {
         match self {
             Choice::Play(i) => {
@@ -39,14 +37,15 @@ impl Choice {
                 player.trade -= card.cost;
                 player.discard.push(card);
             },
-            Choice::GainTrade(n) => {
-                println!("{} gains {} trade", player.name, n);
-                player.trade += n;
-            },
-            Choice::GainCombat(n) => {
-                println!("{} gains {} combat", player.name, n);
-                player.combat += n;
-            },
+            Choice::Attack(i) => {
+                let combat = player.combat;
+                println!("{} attacks {} for {}",
+                         player.name,
+                         opponents[i].name,
+                         combat);
+                opponents[i].authority -= combat;
+                player.combat = 0;
+            }
             _ => (),
         }
     }

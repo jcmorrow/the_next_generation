@@ -2,7 +2,9 @@ use card::Card;
 use card::base;
 use card::outpost;
 use card::ship;
+
 use std::fmt;
+use rand::{thread_rng, Rng};
 
 pub struct TradeRow {
     pub deck: Vec<Card>,
@@ -13,7 +15,7 @@ pub struct TradeRow {
 impl TradeRow {
     pub fn buy(&mut self, index: usize) -> (Card) {
         match index {
-            5 => self.face_up.insert(0, ship::explorer()),
+            5 => self.face_up.insert(5, ship::explorer()),
             i => {
                 match self.deck.pop() {
                     Some(card) => self.face_up.insert(i, card),
@@ -44,22 +46,17 @@ impl TradeRow {
             scrapped: Vec::new()
         };
 
-        for _n in 0..15 {
-            trade_row.deck.push(base::the_hive());
-        }
-        for _n in 0..15 {
-            trade_row.deck.push(ship::battle_blob());
-        }
-        for _n in 0..15 {
-            trade_row.deck.push(outpost::battle_station());
-        }
+        for _n in 0..15 { trade_row.deck.push(base::the_hive()); }
+        for _n in 0..15 { trade_row.deck.push(ship::battle_blob()); }
+        for _n in 0..15 { trade_row.deck.push(outpost::battle_station()); }
+        for _n in 0..15 { trade_row.deck.push(ship::battle_pod()); }
+
+        thread_rng().shuffle(&mut trade_row.deck);
+
         for _n in 0..5 {
             trade_row.face_up.push(trade_row.deck.pop().unwrap());
         }
-        for _n in 0..15 {
-            trade_row.deck.push(ship::battle_pod());
-        }
-        trade_row.face_up.push(ship::explorer());
+        trade_row.face_up.insert(5, ship::explorer());
         trade_row
     }
 }

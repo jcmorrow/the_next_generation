@@ -58,7 +58,20 @@ impl Player {
         return player;
     }
 
-    fn index_acquire_from_trade_row(&self, trade_row: &TradeRow) -> Option<usize> {
+    fn index_attack_opponents(&self, opponents: &[&mut Player]) -> Option<usize> {
+        match opponents.len() {
+            0 => None,
+            _ => {
+                match self.combat {
+                    0 => None,
+                    _ => Some(0),
+                }
+            }
+        }
+    }
+
+    fn index_acquire_from_trade_row(&self,
+                                    trade_row: &TradeRow) -> Option<usize> {
         let mut highest_cost = 0;
         let mut highest_cost_index = 0;
         for (index, card) in trade_row.face_up.iter().enumerate() {
@@ -95,14 +108,20 @@ impl Player {
         }
     }
 
-    pub fn make_choice(&mut self, trade_row: &TradeRow) -> Choice {
+    pub fn make_choice(&mut self,
+                       trade_row: &TradeRow,
+                       opponents: &[&mut Player]) -> Choice {
         let mut perrenial_choices: Vec<Choice> = Vec::new();
-        match self.index_from_hand() {
-            Some(i) => perrenial_choices.push(Choice::Play(i)),
+        match self.index_attack_opponents(opponents) {
+            Some(i) => perrenial_choices.push(Choice::Attack(i)),
             None => ()
         }
         match self.index_buy_from_trade_row(trade_row) {
             Some(i) => perrenial_choices.push(Choice::Buy(i)),
+            None => ()
+        }
+        match self.index_from_hand() {
+            Some(i) => perrenial_choices.push(Choice::Play(i)),
             None => ()
         }
         match perrenial_choices.pop() {

@@ -35,17 +35,17 @@ fn main() {
         print!("{:#}", current_player[0]);
         current_player[0].begin_turn();
         loop {
-            let choice = current_player[0].make_choice(&trade_row);
+            let choice = current_player[0].make_choice(&trade_row, opponents);
             match choice {
                 Choice::EndTurn => break,
                 _ => (choice.choose(current_player[0], opponents, &mut trade_row))
             };
         }
         current_player[0].end_turn();
-        if turn_count >= 10 {
-            println!("Game ends");
-            break;
-        }
+        // if turn_count >= 10 {
+        //     println!("Game ends");
+        //     break;
+        // }
         turn_count = turn_count + 1;
         print!("\n{:#}", trade_row);
     }

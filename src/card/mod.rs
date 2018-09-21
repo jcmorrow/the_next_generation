@@ -123,11 +123,11 @@ impl Card {
                trade_row: &mut TradeRow) {
         match self.trade {
             0 => (),
-            _ => player.choices.push(Choice::GainTrade(self.trade))
+            n => player.trade += n,
         }
         match self.combat {
             0 => (),
-            _ => player.choices.push(Choice::GainCombat(self.combat))
+            n => player.combat += n,
         }
         match self.card_type {
             CardType::Ship => {
