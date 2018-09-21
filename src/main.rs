@@ -1,18 +1,12 @@
 extern crate rand;
 
-use ally_ability_event::AllyAbilityEvent;
-use attack_event::AttackEvent;
-use play_event::PlayEvent;
-use scrap_event::ScrapEvent;
+use choice::Choice;
 use player::Player;
 use trade_row::TradeRow;
 
-mod ally_ability_event;
-mod attack_event;
+mod choice;
 mod card;
-mod play_event;
 mod player;
-mod scrap_event;
 mod trade_row;
 
 fn main() {
@@ -30,8 +24,16 @@ fn main() {
         print!("Turn {}\n", turn_count);
         players.rotate_left(1);
         let (current_player, opponents)  = &mut players.split_at_mut(1);
+        current_player[0].begin_turn();
         print!("{:#}", current_player[0]);
-        current_player[0].take_turn(opponents, &mut trade_row);
+        loop {
+            let choice = current_player[0].make_choice(&trade_row, opponents);
+            match choice {
+                Choice::EndTurn => break,
+                _ => (choice.choose(current_player[0], opponents, &mut trade_row))
+            };
+        }
+        current_player[0].end_turn();
         turn_count = turn_count + 1;
         print!("\n{:#}", trade_row);
     }

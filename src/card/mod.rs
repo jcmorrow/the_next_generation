@@ -1,5 +1,9 @@
 use std::fmt;
 
+use player::Player;
+use trade_row::TradeRow;
+use choice::Choice;
+
 pub mod base;
 pub mod ship;
 pub mod outpost;
@@ -7,9 +11,11 @@ pub mod targetable;
 
 #[derive(Clone)]
 #[derive(PartialEq)]
+#[derive(Debug)]
 pub enum Faction {
     Blob,
     MachineCult,
+    StarEmpire,
     Unaligned,
 }
 
@@ -19,6 +25,7 @@ impl Default for Faction {
 
 #[derive(Clone)]
 #[derive(PartialEq)]
+#[derive(Debug)]
 pub enum CardType {
     NoCardType,
     Outpost,
@@ -31,10 +38,13 @@ impl Default for CardType {
 }
 
 #[derive(Clone)]
+#[derive(Debug)]
 pub enum ShipType {
     BattleBlob,
     BattlePod,
+    BlobCarrier,
     Explorer,
+    ImperialFighter,
     NoShipType,
     Scout,
     Viper,
@@ -45,6 +55,7 @@ impl Default for ShipType {
 }
 
 #[derive(Clone)]
+#[derive(Debug)]
 pub enum OutpostType {
     BattleStation,
     NoOutpostType,
@@ -55,6 +66,7 @@ impl Default for OutpostType {
 }
 
 #[derive(Clone)]
+#[derive(Debug)]
 pub enum BaseType {
     TheHive,
     NoBaseType,
@@ -69,6 +81,7 @@ impl fmt::Display for Faction {
         let name = match *self {
             Faction::Blob => "Blob",
             Faction::MachineCult => "Machine Cult",
+            Faction::StarEmpire => "Star Empire",
             Faction::Unaligned => "Unaligned",
         };
         write!(f, "{}", name)
@@ -88,8 +101,11 @@ impl fmt::Display for CardType {
 }
 
 #[derive(Clone)]
+#[derive(Debug)]
 #[derive(Default)]
 pub struct Card {
+    pub abilities: Vec<Choice>,
+    pub ally_abilities: Vec<Choice>,
     pub base_type: BaseType,
     pub card_type: CardType,
     pub combat: i32,
@@ -103,6 +119,35 @@ pub struct Card {
     pub scrappable: bool,
     pub has_ally_ability: bool,
     pub has_used_ally_ability: bool
+}
+
+impl Card {
+    pub fn run(&mut self,
+               player: &mut Player,
+               _opponents: &[&mut Player],
+               _trade_row: &mut TradeRow) {
+        match self.trade {
+            0 => (),
+            n => player.trade += n,
+        }
+        match self.combat {
+            0 => (),
+            n => player.combat += n,
+        }
+        player.choices.extend(self.abilities.clone());
+
+        for card in &mut player.in_play {
+            if card.faction == self.faction && !card.has_used_ally_ability
+            {
+                card.has_used_ally_ability = true;
+                player.choices.extend(card.ally_abilities.clone())
+            }
+        }
+        if player.has_ally_in_play(&self.faction) {
+            self.has_used_ally_ability = true;
+            player.choices.extend(self.ally_abilities.clone());
+        }
+    }
 }
 
 impl fmt::Display for Card {
