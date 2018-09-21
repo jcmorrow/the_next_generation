@@ -33,16 +33,16 @@ fn main() {
         players.rotate_left(1);
         let (current_player, opponents)  = &mut players.split_at_mut(1);
         print!("{:#}", current_player[0]);
+        current_player[0].begin_turn();
         loop {
-            current_player[0].draw_hand();
             let choice = current_player[0].make_choice(&trade_row);
-            println!("{} {}", current_player[0].name, choice);
             match choice {
-                Choice::EndTurn => { break; }
+                Choice::EndTurn => break,
                 _ => (choice.choose(current_player[0], opponents, &mut trade_row))
             };
         }
-        if turn_count >= 1 {
+        current_player[0].end_turn();
+        if turn_count >= 10 {
             println!("Game ends");
             break;
         }

@@ -12,12 +12,13 @@ pub struct TradeRow {
 
 impl TradeRow {
     pub fn buy(&mut self, index: usize) -> (Card) {
-        if index == 0 {
-            self.face_up.insert(0, ship::explorer());
-        } else {
-            match self.deck.pop() {
-                Some(card) => self.face_up.insert(index, card),
-                None => (),
+        match index {
+            5 => self.face_up.insert(0, ship::explorer()),
+            i => {
+                match self.deck.pop() {
+                    Some(card) => self.face_up.insert(i, card),
+                    None => (),
+                }
             }
         }
         self.face_up.remove(index)

@@ -58,7 +58,7 @@ impl Player {
         return player;
     }
 
-    fn index_from_trade_row(&self, trade_row: &TradeRow) -> usize {
+    fn index_acquire_from_trade_row(&self, trade_row: &TradeRow) -> Option<usize> {
         let mut highest_cost = 0;
         let mut highest_cost_index = 0;
         for (index, card) in trade_row.face_up.iter().enumerate() {
@@ -67,28 +67,57 @@ impl Player {
                 highest_cost_index = index;
             }
         }
-        highest_cost_index
+        Some(highest_cost_index)
+    }
+
+    fn index_buy_from_trade_row(&self, trade_row: &TradeRow) -> Option<usize> {
+        let mut buy_anything = false;
+        let mut highest_cost = 0;
+        let mut highest_cost_index = 0;
+        for (index, card) in trade_row.face_up.iter().enumerate() {
+            if card.cost >= highest_cost && self.trade >= card.cost {
+                highest_cost = card.cost;
+                highest_cost_index = index;
+                buy_anything = true;
+            }
+        }
+        match buy_anything {
+            true => Some(highest_cost_index),
+            false => None,
+        }
+    }
+
+    fn index_from_hand(&self) -> Option<usize> {
+        // For now, play the first card in the hand
+        match self.hand.len() {
+            0 => None,
+            _ => Some(0)
+        }
     }
 
     pub fn make_choice(&mut self, trade_row: &TradeRow) -> Choice {
-        return match self.choices.pop() {
-            Some(c) => {
-                match c {
-                    Choice::AcquireFromTradeRow(_) => {
-                        Choice::AcquireFromTradeRow(self.index_from_trade_row(trade_row))
-                    },
-                    _ => c
+        let choice = match self.index_from_hand() {
+            Some(i) => Choice::Play(i),
+            None => {
+                match self.index_buy_from_trade_row(&trade_row) {
+                    Some(i) => Choice::Buy(i),
+                    None => {
+                        match self.choices.pop() {
+                            Some(c) => {
+                                c
+                            },
+                            None => Choice::EndTurn
+                        }
+                    }
                 }
-            },
-            None => Choice::EndTurn,
-        }
+            }
+        };
+        choice
     }
 
     pub fn draw(&mut self) {
         match self.deck.pop() {
-            Some(x) => {
-                self.choices.push(Choice::Play(x));
-            }
+            Some(c) => self.hand.push(c),
             None => {
                 self.deck.extend(self.discard.drain(0..));
                 thread_rng().shuffle(&mut self.deck);
@@ -100,7 +129,10 @@ impl Player {
         };
     }
 
-    pub fn draw_hand(&mut self) {
+    pub fn begin_turn(&mut self) {
+        self.combat = 0;
+        self.trade = 0;
+
         let mut num_to_draw = HAND_SIZE;
         let total_cards = self.deck.len() + self.discard.len();
 
@@ -111,6 +143,10 @@ impl Player {
         for _i in 0..num_to_draw {
             self.draw();
         }
+    }
+
+    pub fn end_turn(&mut self) {
+        self.discard.extend(self.in_play.drain(0..));
     }
 }
 
@@ -141,10 +177,10 @@ impl fmt::Display for Player {
 
 #[cfg(test)]
 mod tests {
-use card::Faction;
-use card::base;
-use card::ship;
-use player::Player;
+    use card::Faction;
+    use card::base;
+    use card::ship;
+    use player::Player;
 
     #[test]
     fn overdraw() {

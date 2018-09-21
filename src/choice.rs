@@ -9,9 +9,9 @@ pub enum Choice {
     AcquireFromTradeRow(usize),
     GainCombat(i32),
     GainTrade(i32),
-    Buy(Card),
+    Buy(usize),
     EndTurn,
-    Play(Card),
+    Play(usize),
     Scrap(Card),
     Attack(Player),
 }
@@ -22,30 +22,32 @@ impl Choice {
                   opponents: &[&mut Player],
                   trade_row: &mut TradeRow) {
         match self {
-            Choice::Play(c) => {
-                c.run(player, opponents, trade_row);
-                player.in_play.push(c);
+            Choice::Play(i) => {
+                let card = player.hand.remove(i);
+                println!("{} plays {}", player.name, card.name);
+                card.run(player, opponents, trade_row);
+                player.in_play.push(card);
             },
             Choice::AcquireFromTradeRow(i) => {
-                player.deck.insert(0, trade_row.buy(i));
-            }
+                let card = trade_row.buy(i);
+                println!("{} acquires {} to the top of the deck", player.name, card.name);
+                player.deck.insert(0, card);
+            },
+            Choice::Buy(i) => {
+                let card = trade_row.buy(i);
+                println!("{} buys {}", player.name, card.name);
+                player.trade -= card.cost;
+                player.discard.push(card);
+            },
+            Choice::GainTrade(n) => {
+                println!("{} gains {} trade", player.name, n);
+                player.trade += n;
+            },
+            Choice::GainCombat(n) => {
+                println!("{} gains {} combat", player.name, n);
+                player.combat += n;
+            },
             _ => (),
-        }
-    }
-}
-
-impl fmt::Display for Choice {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Choice::Buy(c) => write!(f, "buys {}", c),
-            Choice::EndTurn => write!(f, "ends turns"),
-            Choice::Play(c) => write!(f, "plays {}", c),
-            Choice::Scrap(c) => write!(f, "scraps {}", c),
-            Choice::Attack(p) => write!(f, "attacks {}", p),
-            Choice::GainCombat(p) => write!(f, "gains {} combat", p),
-            Choice::GainTrade(p) => write!(f, "gains {} trade", p),
-            Choice::AcquireFromTradeRow(i) => write!(f, "gains card at {} index", i),
-            _ => write!(f, "Error")
         }
     }
 }
