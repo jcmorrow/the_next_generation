@@ -292,22 +292,23 @@ impl fmt::Display for Player {
 
 #[cfg(test)]
 mod tests {
-use player::Player;
-use card::Card;
 use card::Faction;
+use card::base;
+use card::ship;
+use player::Player;
 
     #[test]
     fn has_no_factions_in_play() {
         let mut player: Player = Player::new("Testy");
-        player.in_play.push(battle_blob());
+        player.in_play.push(ship::battle_blob());
         assert!(!player.has_factions_in_play(&Faction::Blob));
     }
 
     #[test]
     fn has_factions_in_play() {
         let mut player: Player = Player::new("Testy");
-        player.in_play.push(battle_blob());
-        player.in_play.push(battle_blob());
+        player.in_play.push(ship::battle_blob());
+        player.in_play.push(ship::battle_blob());
         print!("{}", player);
         assert!(player.has_factions_in_play(&Faction::Blob));
     }
@@ -318,13 +319,13 @@ use card::Faction;
 
         assert_eq!(player.hand.len(), 0);
 
-        player.bases.push(the_hive());
+        player.bases.push(base::the_hive());
         let cards = player.bases.clone();
         player.trigger_ally_abilities(cards);
 
         assert_eq!(player.hand.len(), 0);
 
-        player.bases.push(the_hive());
+        player.bases.push(base::the_hive());
         let cards = player.bases.clone();
         player.trigger_ally_abilities(cards);
 
@@ -348,9 +349,9 @@ use card::Faction;
     fn unset_has_used_ally_abilities() {
         let mut player: Player = Player::new("Testy");
 
-        let mut base_hive = the_hive();
-        let mut discard_hive = the_hive();
-        let mut deck_hive = the_hive();
+        let mut base_hive = base::the_hive();
+        let mut discard_hive = base::the_hive();
+        let mut deck_hive = base::the_hive();
         base_hive.has_used_ally_ability = true;
         discard_hive.has_used_ally_ability = true;
         deck_hive.has_used_ally_ability = true;
