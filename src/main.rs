@@ -1,19 +1,13 @@
 extern crate rand;
 
-// use ally_ability_event::AllyAbilityEvent;
-// use attack_event::AttackEvent;
-// use play_event::PlayEvent;
-// use scrap_event::ScrapEvent;
 use choice::Choice;
+use event::Event;
 use player::Player;
 use trade_row::TradeRow;
 
-// mod ally_ability_event;
-// mod attack_event;
-// mod play_event;
-// mod scrap_event;
-mod choice;
 mod card;
+mod choice;
+mod event;
 mod player;
 mod trade_row;
 
@@ -23,6 +17,7 @@ fn main() {
     let mut trade_row = TradeRow::new();
     let mut players = Vec::new();
     let mut turn_count = 0;
+    let mut events: Vec<Event> = Vec::new();
 
     players.push(&mut player_1);
     players.push(&mut player_2);
@@ -38,7 +33,11 @@ fn main() {
             let choice = current_player[0].make_choice(&trade_row);
             match choice {
                 Choice::EndTurn => break,
-                _ => (choice.choose(current_player[0], opponents, &mut trade_row))
+                _ => {
+                    events.push(choice.choose(current_player[0],
+                                              opponents,
+                                              &mut trade_row));
+                }
             };
         }
         current_player[0].end_turn();

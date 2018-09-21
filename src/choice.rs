@@ -1,5 +1,6 @@
 use std::fmt;
 
+use event::Event;
 use card::Card;
 use trade_row::TradeRow;
 use player::Player;
@@ -17,24 +18,24 @@ pub enum Choice {
 }
 
 impl Choice {
-    pub fn choose(self,
-                  player: &mut Player,
+    pub fn choose<'a>(&'a self,
+                  player: &'a mut Player,
                   opponents: &[&mut Player],
-                  trade_row: &mut TradeRow) {
+                  trade_row: &mut TradeRow) -> Event<'a> {
         match self {
             Choice::Play(i) => {
-                let card = player.hand.remove(i);
+                let card = player.hand.remove(*i);
                 println!("{} plays {}", player.name, card.name);
                 card.run(player, opponents, trade_row);
                 player.in_play.push(card);
             },
             Choice::AcquireFromTradeRow(i) => {
-                let card = trade_row.buy(i);
+                let card = trade_row.buy(*i);
                 println!("{} acquires {} to the top of the deck", player.name, card.name);
                 player.deck.insert(0, card);
             },
             Choice::Buy(i) => {
-                let card = trade_row.buy(i);
+                let card = trade_row.buy(*i);
                 println!("{} buys {}", player.name, card.name);
                 player.trade -= card.cost;
                 player.discard.push(card);
@@ -48,6 +49,7 @@ impl Choice {
                 player.combat += n;
             },
             _ => (),
-        }
+        };
+        Event::new(&player, &self, "log")
     }
 }

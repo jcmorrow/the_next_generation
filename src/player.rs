@@ -96,23 +96,24 @@ impl Player {
     }
 
     pub fn make_choice(&mut self, trade_row: &TradeRow) -> Choice {
-        let choice = match self.index_from_hand() {
-            Some(i) => Choice::Play(i),
+        let mut perrenial_choices: Vec<Choice> = Vec::new();
+        match self.index_from_hand() {
+            Some(i) => perrenial_choices.push(Choice::Play(i)),
+            None => ()
+        }
+        match self.index_buy_from_trade_row(trade_row) {
+            Some(i) => perrenial_choices.push(Choice::Buy(i)),
+            None => ()
+        }
+        match perrenial_choices.pop() {
+            Some(c) => c,
             None => {
-                match self.index_buy_from_trade_row(&trade_row) {
-                    Some(i) => Choice::Buy(i),
-                    None => {
-                        match self.choices.pop() {
-                            Some(c) => {
-                                c
-                            },
-                            None => Choice::EndTurn
-                        }
-                    }
+                match self.choices.pop() {
+                    Some(c) => c,
+                    None => Choice::EndTurn
                 }
             }
-        };
-        choice
+        }
     }
 
     pub fn draw(&mut self) {
