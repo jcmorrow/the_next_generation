@@ -35,7 +35,7 @@ fn main() {
         print!("{:#}", current_player[0]);
         loop {
             current_player[0].draw_hand();
-            let choice = current_player[0].make_choice();
+            let choice = current_player[0].make_choice(&trade_row);
             println!("{} {}", current_player[0].name, choice);
             match choice {
                 Choice::EndTurn => { break; }

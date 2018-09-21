@@ -44,6 +44,7 @@ impl fmt::Display for Choice {
             Choice::Attack(p) => write!(f, "attacks {}", p),
             Choice::GainCombat(p) => write!(f, "gains {} combat", p),
             Choice::GainTrade(p) => write!(f, "gains {} trade", p),
+            Choice::AcquireFromTradeRow(i) => write!(f, "gains card at {} index", i),
             _ => write!(f, "Error")
         }
     }

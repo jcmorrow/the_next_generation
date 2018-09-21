@@ -6,9 +6,9 @@
 use choice::Choice;
 use card::Card;
 use card::ship;
+use trade_row::TradeRow;
 
 use rand::{thread_rng, Rng};
-
 use std::fmt;
 
 const HAND_SIZE: usize = 5;
@@ -58,12 +58,28 @@ impl Player {
         return player;
     }
 
-    pub fn take_turn(&mut self) {
+    fn index_from_trade_row(&self, trade_row: &TradeRow) -> usize {
+        let mut highest_cost = 0;
+        let mut highest_cost_index = 0;
+        for (index, card) in trade_row.face_up.iter().enumerate() {
+            if card.cost >= highest_cost {
+                highest_cost = card.cost;
+                highest_cost_index = index;
+            }
+        }
+        highest_cost_index
     }
 
-    pub fn make_choice(&mut self) -> Choice {
+    pub fn make_choice(&mut self, trade_row: &TradeRow) -> Choice {
         return match self.choices.pop() {
-            Some(x) => x,
+            Some(c) => {
+                match c {
+                    Choice::AcquireFromTradeRow(_) => {
+                        Choice::AcquireFromTradeRow(self.index_from_trade_row(trade_row))
+                    },
+                    _ => c
+                }
+            },
             None => Choice::EndTurn,
         }
     }
