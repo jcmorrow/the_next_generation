@@ -43,20 +43,23 @@ impl TradeRow {
             scrapped: Vec::new()
         };
 
-        for _n in 0..15 {
-            trade_row.deck.push(base::the_hive());
-        }
-        for _n in 0..15 {
-            trade_row.deck.push(ship::battle_blob());
-        }
-        for _n in 0..15 {
-            trade_row.deck.push(outpost::battle_station());
+        // for _n in 0..15 {
+        //     trade_row.deck.push(base::the_hive());
+        // }
+        // for _n in 0..15 {
+        //     trade_row.deck.push(ship::battle_blob());
+        // }
+        // for _n in 0..15 {
+        //     trade_row.deck.push(outpost::battle_station());
+        // }
+        // for _n in 0..15 {
+        //     trade_row.deck.push(ship::battle_pod());
+        // }
+        for _n in 0..50 {
+            trade_row.deck.push(ship::survey_ship());
         }
         for _n in 0..5 {
             trade_row.face_up.push(trade_row.deck.pop().unwrap());
-        }
-        for _n in 0..15 {
-            trade_row.deck.push(ship::battle_pod());
         }
         trade_row.face_up.push(ship::explorer());
         trade_row

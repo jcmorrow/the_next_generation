@@ -1,4 +1,5 @@
 use card::Card;
+use card::ship;
 use player::Player;
 
 pub struct PlayEvent<'a> {
@@ -19,9 +20,9 @@ impl<'a> PlayEvent<'a> {
         self.player.combat += self.card.combat;
         print!("{} plays {}\n", self.player.name, self.card.name);
 
-        // We can do special abilities this way
-        // match self.card.ship_type {
-        //     ShipType::Scout => { self.player.trade += 1; }
-        // }
+        match self.card.ship_type {
+            ship::Type::SurveyShip => self.player.draw(),
+            _ => (),
+        }
     }
 }

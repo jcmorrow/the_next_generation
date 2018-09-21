@@ -7,6 +7,7 @@ pub mod targetable;
 
 #[derive(Clone)]
 #[derive(PartialEq)]
+#[derive(Debug)]
 pub enum Faction {
     Blob,
     MachineCult,
@@ -20,6 +21,7 @@ impl Default for Faction {
 
 #[derive(Clone)]
 #[derive(PartialEq)]
+#[derive(Debug)]
 pub enum Type {
     NoCardType,
     Outpost,
@@ -57,6 +59,7 @@ impl fmt::Display for Type {
 
 #[derive(Clone)]
 #[derive(Default)]
+#[derive(Debug)]
 pub struct Card {
     pub base_type: base::Type,
     pub card_type: Type,

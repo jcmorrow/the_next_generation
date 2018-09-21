@@ -3,6 +3,7 @@ use card::Card;
 use card::Faction;
 
 #[derive(Clone)]
+#[derive(Debug)]
 pub enum Type {
     BattleStation,
     NoType,

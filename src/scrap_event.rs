@@ -22,6 +22,7 @@ impl<'a> ScrapEvent<'a> {
             Type::Ship => {
                 match self.card.ship_type {
                     ship::Type::Explorer => self.player.combat += 2,
+                    ship::Type::SurveyShip => (), // Target opponent discards
                     _ => ()
                 }
             },
@@ -31,7 +32,8 @@ impl<'a> ScrapEvent<'a> {
                     outpost::Type::NoType => ()
                 }
             },
-            _ => { println!("Tried to scrap non-scrappable card {}", self.card.name)}
+            _ => { println!("Tried to scrap non-scrappable card {}",
+                            self.card.name)}
         }
 
         println!("{} scraps {}", self.player.name, self.card.name);

@@ -3,6 +3,7 @@ use card::Card;
 use card::Faction;
 
 #[derive(Clone)]
+#[derive(Debug)]
 pub enum Type {
     BattleBlob,
     BattlePod,
@@ -69,10 +70,12 @@ pub fn scout() -> Card {
 pub fn survey_ship() -> Card {
     Card {
         card_type: card::Type::Ship,
+        cost: 3,
         faction: Faction::StarEmpire,
         name: String::from("Survey Ship"),
         trade: 1,
         ship_type: Type::SurveyShip,
+        scrappable: true,
         ..Default::default()
     }
 }
