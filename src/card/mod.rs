@@ -117,10 +117,10 @@ pub struct Card {
 }
 
 impl Card {
-    pub fn run(&self,
-               player: &mut Player,
+    pub fn run<'a>(&self,
+               player: &mut Player<'a>,
                opponents: &[&mut Player],
-               trade_row: &mut TradeRow) {
+               trade_row: &'a mut TradeRow) {
         match self.trade {
             0 => (),
             _ => player.choices.push(Choice::GainTrade(self.trade))
@@ -131,12 +131,12 @@ impl Card {
         }
 
         match self.card_type {
-            Ship => {
+            CardType::Ship => {
                 match self.ship_type {
-                    BlobCarrier => {
-                        for card in trade_row.face_up {
+                    ShipType::BlobCarrier => {
+                        for card in &trade_row.face_up {
                             player.choices.push(
-                                Choice::AcquireFromTradeRow(card)
+                                Choice::AcquireFromTradeRow(&card)
                             )
                         }
                     },

@@ -13,14 +13,14 @@ pub enum Choice<'a> {
     EndTurn,
     Play(Card),
     Scrap(Card),
-    Attack(&'a Player),
+    Attack(Player<'a>),
 }
 
 impl<'a> Choice<'a> {
     pub fn choose(self,
-                  player: &mut Player,
+                  player: &mut Player<'a>,
                   opponents: &[&mut Player],
-                  trade_row: &mut TradeRow) {
+                  trade_row: &'a mut TradeRow) {
         match self {
             Choice::Play(c) => {
                 c.run(player, opponents, trade_row);
@@ -40,7 +40,8 @@ impl<'a> fmt::Display for Choice<'a> {
             Choice::Scrap(c) => write!(f, "scraps {}", c),
             Choice::Attack(p) => write!(f, "attacks {}", p),
             Choice::GainCombat(p) => write!(f, "gains {} combat", p),
-            Choice::GainTrade(p) => write!(f, "gains {} trade", p)
+            Choice::GainTrade(p) => write!(f, "gains {} trade", p),
+            Choice::AcquireFromTradeRow(p) => write!(f, "acquires {} from trade", p)
         }
     }
 }

@@ -18,7 +18,7 @@ const STARTING_AUTHORITY: i32 = 50;
 pub struct Player<'a> {
     pub authority: i32,
     pub bases: Vec<Card>,
-    pub choices: Vec<Choice 'a>,
+    pub choices: Vec<Choice<'a>>,
     pub combat: i32,
     pub deck: Vec<Card>,
     pub discard: Vec<Card>,
@@ -98,7 +98,7 @@ impl<'a> Player<'a> {
     }
 }
 
-impl fmt::Display for Player {
+impl<'a> fmt::Display for Player<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Name: {}\n", self.name).unwrap();
         write!(f, "Authority: {}\n", self.authority).unwrap();
