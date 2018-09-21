@@ -2,17 +2,21 @@ use AllyAbilityEvent;
 use AttackEvent;
 use PlayEvent;
 use ScrapEvent;
+
 use card::Card;
 use card::CardType;
 use card::Faction;
-use trade_row::TradeRow;
-
+use card::ship;
 use card::targetable::Targetable;
-use std::fmt;
+
 use rand::{thread_rng, Rng};
 
-const STARTING_AUTHORITY: i32 = 50;
+use std::fmt;
+
+use trade_row::TradeRow;
+
 const HAND_SIZE: usize = 5;
+const STARTING_AUTHORITY: i32 = 50;
 
 pub struct Player {
     pub authority: i32,
@@ -43,11 +47,11 @@ impl Player {
         };
 
         for _n in 0..8 {
-            player.deck.push(Card::scout());
+            player.deck.push(ship::scout());
         }
 
         for _n in 0..2 {
-            player.deck.push(Card::viper());
+            player.deck.push(ship::viper());
         }
 
         thread_rng().shuffle(&mut player.deck);
@@ -283,15 +287,15 @@ use card::Faction;
     #[test]
     fn has_no_factions_in_play() {
         let mut player: Player = Player::new("Testy");
-        player.in_play.push(Card::battle_blob());
+        player.in_play.push(battle_blob());
         assert!(!player.has_factions_in_play(&Faction::Blob));
     }
 
     #[test]
     fn has_factions_in_play() {
         let mut player: Player = Player::new("Testy");
-        player.in_play.push(Card::battle_blob());
-        player.in_play.push(Card::battle_blob());
+        player.in_play.push(battle_blob());
+        player.in_play.push(battle_blob());
         print!("{}", player);
         assert!(player.has_factions_in_play(&Faction::Blob));
     }
@@ -302,13 +306,13 @@ use card::Faction;
 
         assert_eq!(player.hand.len(), 0);
 
-        player.bases.push(Card::the_hive());
+        player.bases.push(the_hive());
         let cards = player.bases.clone();
         player.trigger_ally_abilities(cards);
 
         assert_eq!(player.hand.len(), 0);
 
-        player.bases.push(Card::the_hive());
+        player.bases.push(the_hive());
         let cards = player.bases.clone();
         player.trigger_ally_abilities(cards);
 
@@ -332,9 +336,9 @@ use card::Faction;
     fn unset_has_used_ally_abilities() {
         let mut player: Player = Player::new("Testy");
 
-        let mut base_hive = Card::the_hive();
-        let mut discard_hive = Card::the_hive();
-        let mut deck_hive = Card::the_hive();
+        let mut base_hive = the_hive();
+        let mut discard_hive = the_hive();
+        let mut deck_hive = the_hive();
         base_hive.has_used_ally_ability = true;
         discard_hive.has_used_ally_ability = true;
         deck_hive.has_used_ally_ability = true;

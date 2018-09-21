@@ -86,7 +86,6 @@ impl fmt::Display for CardType {
     }
 }
 
-
 #[derive(Clone)]
 #[derive(Default)]
 pub struct Card {
@@ -103,79 +102,6 @@ pub struct Card {
     pub scrappable: bool,
     pub has_ally_ability: bool,
     pub has_used_ally_ability: bool
-}
-
-impl Card {
-    pub fn battle_blob() -> Card {
-        Card {
-            card_type: CardType::Ship,
-            cost: 6,
-            combat: 8,
-            faction: Faction::Blob,
-            has_ally_ability: true,
-            name: String::from("BattleBlob"),
-            ship_type: ShipType::BattleBlob,
-            ..Default::default()
-        }
-    }
-
-    pub fn scout() -> Card {
-        Card {
-            card_type: CardType::Ship,
-            name: String::from("Scout"),
-            trade: 1,
-            ship_type: ShipType::Scout,
-            ..Default::default()
-        }
-    }
-
-    pub fn explorer() -> Card {
-        Card {
-            card_type: CardType::Ship,
-            cost: 2,
-            name: String::from("Explorer"),
-            ship_type: ShipType::Explorer,
-            trade: 2,
-            scrappable: true,
-            ..Default::default()
-        }
-    }
-
-    pub fn viper() -> Card {
-        Card {
-            card_type: CardType::Ship,
-            combat: 1,
-            name: String::from("Viper"),
-            ship_type: ShipType::Viper,
-            ..Default::default()
-        }
-    }
-
-    pub fn battle_station() -> Card {
-        Card {
-            card_type: CardType::Outpost,
-            cost: 3,
-            faction: Faction::MachineCult,
-            health: 5,
-            name: String::from("Battle Station"),
-            outpost_type: OutpostType::BattleStation,
-            scrappable: true,
-            ..Default::default()
-        }
-    }
-
-    pub fn the_hive() -> Card {
-        Card {
-            card_type: CardType::Base,
-            cost: 5,
-            faction: Faction::Blob,
-            has_ally_ability: true,
-            health: 5,
-            name: String::from("The Hive"),
-            base_type: BaseType::TheHive,
-            ..Default::default()
-        }
-    }
 }
 
 impl fmt::Display for Card {

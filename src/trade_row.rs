@@ -1,5 +1,7 @@
 use card::Card;
-
+use card::base;
+use card::outpost;
+use card::ship;
 use std::fmt;
 
 pub struct TradeRow {
@@ -10,7 +12,7 @@ pub struct TradeRow {
 impl TradeRow {
     pub fn buy(&mut self, index: usize) -> (Card) {
         if index == 0 {
-            self.face_up.insert(0, Card::explorer());
+            self.face_up.insert(0, ship::explorer());
         } else {
             match self.deck.pop() {
                 Some(card) => self.face_up.insert(5, card),
@@ -27,15 +29,15 @@ impl TradeRow {
         };
 
         for _n in 0..15 {
-            trade_row.deck.push(Card::the_hive());
+            trade_row.deck.push(base::the_hive());
         }
         for _n in 0..15 {
-            trade_row.deck.push(Card::battle_blob());
+            trade_row.deck.push(ship::battle_blob());
         }
         for _n in 0..15 {
-            trade_row.deck.push(Card::battle_station());
+            trade_row.deck.push(outpost::battle_station());
         }
-        trade_row.face_up.push(Card::explorer());
+        trade_row.face_up.push(ship::explorer());
         for _n in 0..5 {
             trade_row.face_up.push(trade_row.deck.pop().unwrap());
         }
