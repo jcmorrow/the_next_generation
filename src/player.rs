@@ -5,6 +5,7 @@
 
 use choice::Choice;
 use card::Card;
+use card::Faction;
 use card::ship;
 use trade_row::TradeRow;
 
@@ -56,6 +57,20 @@ impl Player {
         thread_rng().shuffle(&mut player.deck);
 
         return player;
+    }
+
+    pub fn has_allies_in_play(&self, faction: &Faction, min: i32) -> bool {
+        let mut count = 0;
+
+        for card in &[&self.bases[..], &self.in_play[..]].concat() {
+            if card.faction == *faction {
+                count += 1;
+            }
+            if count >= min {
+                return true
+            }
+        }
+        false
     }
 
     fn index_attack_opponents(&self, opponents: &[&mut Player]) -> Option<usize> {
@@ -112,23 +127,36 @@ impl Player {
                        trade_row: &TradeRow,
                        opponents: &[&mut Player]) -> Choice {
         let mut perrenial_choices: Vec<Choice> = Vec::new();
+
         match self.index_attack_opponents(opponents) {
             Some(i) => perrenial_choices.push(Choice::Attack(i)),
             None => ()
         }
+
         match self.index_buy_from_trade_row(trade_row) {
             Some(i) => perrenial_choices.push(Choice::Buy(i)),
             None => ()
         }
+
         match self.index_from_hand() {
             Some(i) => perrenial_choices.push(Choice::Play(i)),
             None => ()
         }
+
         match perrenial_choices.pop() {
             Some(c) => c,
             None => {
                 match self.choices.pop() {
-                    Some(c) => c,
+                    Some(c) => match c {
+                        Choice::AcquireFromTradeRow(_) => {
+                            match self.index_acquire_from_trade_row(trade_row) {
+                                Some(i) => Choice::AcquireFromTradeRow(i),
+                                // this is not quite right
+                                None => Choice::EndTurn,
+                            }
+                        }
+                        c => c
+                    },
                     None => Choice::EndTurn
                 }
             }

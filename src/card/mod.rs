@@ -101,6 +101,8 @@ impl fmt::Display for CardType {
 #[derive(Debug)]
 #[derive(Default)]
 pub struct Card {
+    pub abilities: Vec<Choice>,
+    pub ally_abilities: Vec<Choice>,
     pub base_type: BaseType,
     pub card_type: CardType,
     pub combat: i32,
@@ -117,7 +119,7 @@ pub struct Card {
 }
 
 impl Card {
-    pub fn run(&self,
+    pub fn run(&mut self,
                player: &mut Player,
                opponents: &[&mut Player],
                trade_row: &mut TradeRow) {
@@ -129,16 +131,18 @@ impl Card {
             0 => (),
             n => player.combat += n,
         }
-        match self.card_type {
-            CardType::Ship => {
-                match self.ship_type {
-                    ShipType::BlobCarrier => {
-                        player.choices.push(Choice::AcquireFromTradeRow(0));
-                    },
-                    _ => ()
-                }
-            },
-            _ => ()
+        player.choices.extend(self.abilities.clone());
+
+        for card in &mut player.bases {
+            if card.faction == self.faction && !card.has_used_ally_ability
+            {
+                card.has_used_ally_ability = true;
+                player.choices.extend(card.ally_abilities.clone())
+            }
+        }
+        if player.has_allies_in_play(&self.faction, 1) {
+            self.has_used_ally_ability = true;
+            player.choices.extend(self.ally_abilities.clone());
         }
     }
 }

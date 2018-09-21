@@ -5,6 +5,7 @@ use trade_row::TradeRow;
 use player::Player;
 
 #[derive(Debug)]
+#[derive(Clone)]
 pub enum Choice {
     AcquireFromTradeRow(usize),
     Buy(usize),
@@ -21,7 +22,7 @@ impl Choice {
                   trade_row: &mut TradeRow) {
         match self {
             Choice::Play(i) => {
-                let card = player.hand.remove(i);
+                let mut card = player.hand.remove(i);
                 println!("{} plays {}", player.name, card.name);
                 card.run(player, opponents, trade_row);
                 player.in_play.push(card);
