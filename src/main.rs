@@ -1,17 +1,9 @@
 extern crate rand;
 
-// use ally_ability_event::AllyAbilityEvent;
-// use attack_event::AttackEvent;
-// use play_event::PlayEvent;
-// use scrap_event::ScrapEvent;
 use choice::Choice;
 use player::Player;
 use trade_row::TradeRow;
 
-// mod ally_ability_event;
-// mod attack_event;
-// mod play_event;
-// mod scrap_event;
 mod choice;
 mod card;
 mod player;
@@ -42,10 +34,6 @@ fn main() {
             };
         }
         current_player[0].end_turn();
-        // if turn_count >= 10 {
-        //     println!("Game ends");
-        //     break;
-        // }
         turn_count = turn_count + 1;
         print!("\n{:#}", trade_row);
     }
