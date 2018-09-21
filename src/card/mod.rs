@@ -133,9 +133,7 @@ impl Card {
             CardType::Ship => {
                 match self.ship_type {
                     ShipType::BlobCarrier => {
-                        for (index, _) in trade_row.face_up.iter().enumerate() {
-                            player.choices.push(Choice::AcquireFromTradeRow(index));
-                        }
+                        player.choices.push(Choice::AcquireFromTradeRow(0));
                     },
                     _ => ()
                 }
