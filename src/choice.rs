@@ -5,18 +5,18 @@ use trade_row::TradeRow;
 use player::Player;
 
 #[derive(Debug)]
-pub enum Choice<'a> {
-    AcquireFromTradeRow(&'a Card),
+pub enum Choice {
+    AcquireFromTradeRow(usize),
     GainCombat(i32),
     GainTrade(i32),
     Buy(Card),
     EndTurn,
     Play(Card),
     Scrap(Card),
-    Attack(&'a Player),
+    Attack(Player),
 }
 
-impl<'a> Choice<'a> {
+impl Choice {
     pub fn choose(self,
                   player: &mut Player,
                   opponents: &[&mut Player],
@@ -26,12 +26,15 @@ impl<'a> Choice<'a> {
                 c.run(player, opponents, trade_row);
                 player.in_play.push(c);
             },
+            Choice::AcquireFromTradeRow(i) => {
+                player.deck.insert(0, trade_row.buy(i));
+            }
             _ => (),
         }
     }
 }
 
-impl<'a> fmt::Display for Choice<'a> {
+impl fmt::Display for Choice {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Choice::Buy(c) => write!(f, "buys {}", c),
@@ -40,7 +43,8 @@ impl<'a> fmt::Display for Choice<'a> {
             Choice::Scrap(c) => write!(f, "scraps {}", c),
             Choice::Attack(p) => write!(f, "attacks {}", p),
             Choice::GainCombat(p) => write!(f, "gains {} combat", p),
-            Choice::GainTrade(p) => write!(f, "gains {} trade", p)
+            Choice::GainTrade(p) => write!(f, "gains {} trade", p),
+            _ => write!(f, "Error")
         }
     }
 }

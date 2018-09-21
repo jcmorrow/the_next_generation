@@ -129,15 +129,12 @@ impl Card {
             0 => (),
             _ => player.choices.push(Choice::GainCombat(self.combat))
         }
-
         match self.card_type {
-            Ship => {
+            CardType::Ship => {
                 match self.ship_type {
-                    BlobCarrier => {
-                        for card in trade_row.face_up {
-                            player.choices.push(
-                                Choice::AcquireFromTradeRow(card)
-                            )
+                    ShipType::BlobCarrier => {
+                        for (index, _) in trade_row.face_up.iter().enumerate() {
+                            player.choices.push(Choice::AcquireFromTradeRow(index));
                         }
                     },
                     _ => ()

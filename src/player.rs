@@ -15,10 +15,10 @@ const HAND_SIZE: usize = 5;
 const STARTING_AUTHORITY: i32 = 50;
 
 #[derive(Debug)]
-pub struct Player<'a> {
+pub struct Player {
     pub authority: i32,
     pub bases: Vec<Card>,
-    pub choices: Vec<Choice 'a>,
+    pub choices: Vec<Choice>,
     pub combat: i32,
     pub deck: Vec<Card>,
     pub discard: Vec<Card>,
@@ -29,7 +29,7 @@ pub struct Player<'a> {
     pub trade:  i32,
 }
 
-impl<'a> Player<'a> {
+impl Player {
     pub fn new(name: &str) -> Player {
         let mut player = Player{
             authority: STARTING_AUTHORITY,
