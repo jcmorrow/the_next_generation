@@ -9,6 +9,7 @@ pub enum Choice {
     Attack(usize),
     BlobDraw(usize),
     Buy(usize),
+    CopyShip(usize),
     Decline,
     DestroyBase(usize, usize),
     DiscardAttack(usize),
@@ -135,6 +136,15 @@ impl Choice {
                     player.draw();
                 }
             },
+            Choice::CopyShip(i) => {
+                let mut card = player.in_play[i].clone();
+                println!("{}'s Stealth Needle copies {}", player.name, card.name);
+                if card.faction == Faction::Blob {
+                    player.blobs_played_this_turn += 1;
+                }
+                card.run(player, opponents, trade_row);
+                player.in_play.push(card);
+            }
             _ => (),
         }
     }

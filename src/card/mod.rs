@@ -39,6 +39,7 @@ impl Default for CardType {
 }
 
 #[derive(Clone)]
+#[derive(PartialEq)]
 #[derive(Debug)]
 pub enum ShipType {
     BattleBlob,
@@ -49,6 +50,7 @@ pub enum ShipType {
     ImperialFighter,
     NoShipType,
     Scout,
+    StealthNeedle,
     TradeBot,
     Viper,
 }

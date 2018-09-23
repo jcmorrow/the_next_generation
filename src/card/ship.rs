@@ -97,6 +97,18 @@ pub fn scout() -> Card {
     }
 }
 
+pub fn stealth_needle() -> Card {
+    Card {
+        abilities: vec!(Choice::CopyShip(0)),
+        card_type: CardType::Ship,
+        cost: 4,
+        faction: Faction::MachineCult,
+        name: String::from("Stealth Needle"),
+        ship_type: ShipType::StealthNeedle,
+        ..Default::default()
+    }
+}
+
 pub fn trade_bot() -> Card {
     Card {
         abilities: vec!(

@@ -2,6 +2,7 @@ use choice::Choice;
 use card::Card;
 use card::CardType;
 use card::Faction;
+use card::ShipType;
 use card::ship;
 use trade_row::TradeRow;
 
@@ -83,6 +84,19 @@ impl Player {
             }
         }
         bases
+    }
+
+    pub fn ships_to_copy(&self) -> Option<usize> {
+        let mut ships: Vec<usize> = Vec::new();
+        for (i, card) in self.in_play.iter().enumerate() {
+            if card.card_type == CardType::Ship && card.ship_type != ShipType::StealthNeedle {
+                ships.push(i);
+            }
+        }
+        match ships.len() {
+            0 => None,
+            _ => Some(ships[0])
+        }
     }
 
     fn index_attack_opponents(&self, opponents: &[&mut Player]) -> Option<usize> {
@@ -225,6 +239,12 @@ impl Player {
                             match self.index_scrap_from_trade_row(trade_row) {
                                 Some(i) => Choice::ScrapFromTradeRow(i),
                                 None => Choice::Decline
+                            }
+                        },
+                        Choice::CopyShip(_) => {
+                            match self.ships_to_copy() {
+                                None => Choice::Decline,
+                                Some(n) => Choice::CopyShip(n)
                             }
                         },
                         c => c
