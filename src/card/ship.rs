@@ -62,6 +62,19 @@ pub fn blob_destroyer() -> Card {
     }
 }
 
+pub fn blob_fighter() -> Card {
+    Card {
+        ally_abilities: vec!(Choice::Draw),
+        abilities: vec!(Choice::GainAttack(3)),
+        card_type: CardType::Ship,
+        cost: 1,
+        faction: Faction::Blob,
+        name: String::from("Blob Fighter"),
+        ship_type: ShipType::BlobFighter,
+        ..Default::default()
+    }
+}
+
 pub fn explorer() -> Card {
     Card {
         abilities: vec!(Choice::GainTrade(2)),
@@ -83,6 +96,19 @@ pub fn imperial_fighter() -> Card {
         faction: Faction::StarEmpire,
         name: String::from("Imperial Fighter"),
         ship_type: ShipType::ImperialFighter,
+        ..Default::default()
+    }
+}
+
+pub fn mothership() -> Card {
+    Card {
+        ally_abilities: vec!(Choice::Draw),
+        abilities: vec!(Choice::GainAttack(6), Choice::Draw),
+        card_type: CardType::Ship,
+        cost: 7,
+        faction: Faction::Blob,
+        name: String::from("Mothership"),
+        ship_type: ShipType::Mothership,
         ..Default::default()
     }
 }
