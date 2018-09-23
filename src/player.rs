@@ -9,7 +9,7 @@ use card::Faction;
 use card::ship;
 use trade_row::TradeRow;
 
-use rand::{thread_rng, Rng};
+use rand::{random, thread_rng, Rng};
 use std::fmt;
 
 const HAND_SIZE: usize = 5;
@@ -155,6 +155,13 @@ impl Player {
                             match self.index_discard_opponents(opponents) {
                                 Some(i) => Choice::DiscardAttack(i),
                                 None => Choice::EndTurn
+                            }
+                        },
+                        Choice::Or(a, b, _) => {
+                            if random() {
+                                Choice::Or(a, b, true)
+                            } else {
+                                Choice::Or(a, b, false)
                             }
                         },
                         c => c

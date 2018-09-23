@@ -16,6 +16,7 @@ pub enum Faction {
     Blob,
     MachineCult,
     StarEmpire,
+    TradeFederation,
     Unaligned,
 }
 
@@ -58,6 +59,7 @@ impl Default for ShipType {
 #[derive(Debug)]
 pub enum OutpostType {
     BattleStation,
+    TradingPost,
     NoOutpostType,
 }
 
@@ -82,6 +84,7 @@ impl fmt::Display for Faction {
             Faction::Blob => "Blob",
             Faction::MachineCult => "Machine Cult",
             Faction::StarEmpire => "Star Empire",
+            Faction::TradeFederation => "Trade Federation",
             Faction::Unaligned => "Unaligned",
         };
         write!(f, "{}", name)
@@ -108,7 +111,6 @@ pub struct Card {
     pub ally_abilities: Vec<Choice>,
     pub base_type: BaseType,
     pub card_type: CardType,
-    pub combat: i32,
     pub cost: i32,
     pub faction: Faction,
     pub has_used_ally_ability: bool,
@@ -117,7 +119,6 @@ pub struct Card {
     pub outpost_type: OutpostType,
     pub scrap_abilities: Vec<Choice>,
     pub ship_type: ShipType,
-    pub trade: i32
 }
 
 impl Card {
@@ -125,16 +126,7 @@ impl Card {
                player: &mut Player,
                opponents: &[&mut Player],
                trade_row: &mut TradeRow) {
-        match self.trade {
-            0 => (),
-            n => player.trade += n,
-        }
-        match self.combat {
-            0 => (),
-            n => player.combat += n,
-        }
         player.choices.extend(self.abilities.clone());
-
         for card in &mut player.bases {
             if card.faction == self.faction && !card.has_used_ally_ability
             {

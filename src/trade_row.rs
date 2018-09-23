@@ -48,6 +48,7 @@ impl TradeRow {
 
 
         for _n in 0..15 { trade_row.deck.push(ship::imperial_fighter()); }
+        for _n in 0..15 { trade_row.deck.push(outpost::trading_post()); }
         for _n in 0..15 { trade_row.deck.push(base::the_hive()); }
         for _n in 0..15 { trade_row.deck.push(outpost::battle_station()); }
         for _n in 0..15 { trade_row.deck.push(ship::battle_blob()); }
