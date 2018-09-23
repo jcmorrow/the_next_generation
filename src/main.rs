@@ -1,6 +1,7 @@
 extern crate rand;
 
 use choice::Choice;
+use choice::Event;
 use player::Player;
 use trade_row::TradeRow;
 
@@ -10,31 +11,35 @@ mod player;
 mod trade_row;
 
 fn main() {
-    let mut player_1 = Player::new("Cameron");
-    let mut player_2 = Player::new("Josh");
+    let player_1 = Player::new("Cameron");
+    let player_2 = Player::new("Josh");
     let mut trade_row = TradeRow::new();
-    let mut players = Vec::new();
+    let mut players = vec!(player_1, player_2);
+
+    let mut events: Vec<Event> = Vec::new();
     let mut turn_count = 0;
 
-    players.push(&mut player_1);
-    players.push(&mut player_2);
-
-    while !players.iter().any(|ref p| p.authority < 1)
+    while players.iter().all(|ref p| p.authority > 0)
     {
+        let mut current_player = players.pop().unwrap();
         print!("Turn {}\n", turn_count);
-        players.rotate_left(1);
-        let (current_player, opponents)  = &mut players.split_at_mut(1);
-        current_player[0].begin_turn();
-        print!("{:#}", current_player[0]);
+        current_player.begin_turn();
+        print!("{:#}", current_player);
         loop {
-            let choice = current_player[0].make_choice(&trade_row, opponents);
+            let choice = current_player.make_choice(&trade_row, &players[..]);
             match choice {
                 Choice::EndTurn => break,
-                _ => (choice.choose(current_player[0], opponents, &mut trade_row))
+                _ => {
+                    let event = choice.choose(&mut current_player,
+                                              &mut players[..],
+                                              &mut trade_row);
+                    // events.push(event)
+                }
             };
         }
-        current_player[0].end_turn();
+        current_player.end_turn();
         turn_count = turn_count + 1;
         print!("\n{:#}", trade_row);
+        players.insert(0, current_player);
     }
 }

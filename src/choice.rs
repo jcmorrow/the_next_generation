@@ -25,16 +25,33 @@ pub enum Choice {
     ScrapSelf(usize),
 }
 
+pub struct Event<'a> {
+    player: &'a Player,
+    // card: &'a Card,
+    summary: String,
+}
+
+impl<'a> Event<'a> {
+    pub fn new<'b>(summary: &str,
+                   // _card: &'b Card,
+                   player: &'b Player) -> Event<'b> {
+        Event {
+            summary: summary.to_string(),
+            player: player,
+        }
+    }
+}
+
 impl Choice {
-    pub fn choose(self,
-                  player: &mut Player,
-                  opponents: &mut [&mut Player],
-                  trade_row: &mut TradeRow) {
+    pub fn choose<'a>(self,
+                  player: &'a mut Player,
+                  mut opponents: &mut [Player],
+                  trade_row: &mut TradeRow) -> Event<'a> {
         match self {
             Choice::Play(i) => {
                 let mut card = player.hand.remove(i);
                 println!("{} plays {}", player.name, card.name);
-                card.run(player, opponents, trade_row);
+                card.run(player, &mut opponents, trade_row);
                 player.in_play.push(card);
             },
             Choice::DestroyBase(opponent, base) => {
@@ -122,5 +139,7 @@ impl Choice {
             },
             _ => (),
         }
+
+        Event::new("Play", &*player)
     }
 }
