@@ -7,6 +7,7 @@ pub enum Choice {
     AcquireFromTradeRow(usize),
     Attack(usize),
     Buy(usize),
+    Decline,
     DiscardAttack(usize),
     DiscardCard(usize),
     EndTurn,
