@@ -111,14 +111,13 @@ pub struct Card {
     pub combat: i32,
     pub cost: i32,
     pub faction: Faction,
+    pub has_used_ally_ability: bool,
     pub health: i32,
     pub name: String,
-    pub ship_type: ShipType,
     pub outpost_type: OutpostType,
-    pub trade: i32,
-    pub scrappable: bool,
-    pub has_ally_ability: bool,
-    pub has_used_ally_ability: bool
+    pub scrap_abilities: Vec<Choice>,
+    pub ship_type: ShipType,
+    pub trade: i32
 }
 
 impl Card {

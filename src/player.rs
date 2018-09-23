@@ -129,6 +129,13 @@ impl Player {
         }
     }
 
+    pub fn index_from_play(&self) -> Option<usize> {
+        match self.in_play.len() {
+            0 => None,
+            _ => Some(0)
+        }
+    }
+
     fn make_perennial_choice(&mut self,
                              trade_row: &TradeRow,
                              opponents: &[&mut Player]) -> Choice {
@@ -178,6 +185,12 @@ impl Player {
         match self.index_from_hand() {
             Some(i) => self.perrenial_choices.push(Choice::Play(i)),
             None => ()
+        }
+
+        for (index, card) in self.in_play.iter().enumerate() {
+            if card.scrap_abilities.len() > 0 {
+                self.perrenial_choices.push(Choice::ScrapSelf(index));
+            }
         }
 
         match self.turn_start_choices.pop() {

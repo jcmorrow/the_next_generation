@@ -15,6 +15,7 @@ pub enum Choice {
     GainAttack(i32),
     Play(usize),
     Scrap(usize),
+    ScrapSelf(usize),
     Attack(usize),
 }
 
@@ -62,6 +63,12 @@ impl Choice {
             },
             Choice::GainAttack(n) => {
                 player.combat += n;
+            },
+            Choice::ScrapSelf(i) => {
+                let card = player.in_play.remove(i);
+                println!("{}'s {} scraps itself", player.name, card.name);
+                player.choices.extend(card.scrap_abilities.clone());
+                player.scrapped.push(card);
             },
             _ => (),
         }

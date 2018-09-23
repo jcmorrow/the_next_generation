@@ -8,7 +8,6 @@ pub fn the_hive() -> Card {
         card_type: CardType::Base,
         cost: 5,
         faction: Faction::Blob,
-        has_ally_ability: true,
         health: 5,
         name: String::from("The Hive"),
         base_type: BaseType::TheHive,

@@ -46,9 +46,9 @@ pub fn explorer() -> Card {
         card_type: CardType::Ship,
         cost: 2,
         name: String::from("Explorer"),
+        scrap_abilities: vec!(Choice::GainAttack(2)),
         ship_type: ShipType::Explorer,
         trade: 2,
-        scrappable: true,
         ..Default::default()
     }
 }

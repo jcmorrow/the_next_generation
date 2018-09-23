@@ -2,6 +2,7 @@ use card::Card;
 use card::CardType;
 use card::Faction;
 use card::OutpostType;
+use choice::Choice;
 
 pub fn battle_station() -> Card {
     Card {
@@ -11,7 +12,7 @@ pub fn battle_station() -> Card {
         health: 5,
         name: String::from("Battle Station"),
         outpost_type: OutpostType::BattleStation,
-        scrappable: true,
+        scrap_abilities: vec!(Choice::GainAttack(5)),
         ..Default::default()
     }
 }
