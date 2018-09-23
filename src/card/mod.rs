@@ -126,7 +126,7 @@ pub struct Card {
 impl Card {
     pub fn run(&mut self,
                player: &mut Player,
-               opponents: &mut [Player],
+               opponents: &mut [&mut Player],
                trade_row: &mut TradeRow) {
         player.choices.extend(self.abilities.clone());
         for card in &mut player.in_play {

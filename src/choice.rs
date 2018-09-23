@@ -44,9 +44,10 @@ impl<'a> Event<'a> {
 
 impl Choice {
     pub fn choose<'a>(self,
-                  player: &'a mut Player,
-                  mut opponents: &mut [Player],
-                  trade_row: &mut TradeRow) -> Event<'a> {
+                  player: &mut Player,
+                  mut opponents: &mut [&mut Player],
+                  trade_row: &mut TradeRow,
+                  current_player_ref: &'a Player) -> Event<'a> {
         match self {
             Choice::Play(i) => {
                 let mut card = player.hand.remove(i);
@@ -140,6 +141,6 @@ impl Choice {
             _ => (),
         }
 
-        Event::new("Play", &*player)
+        Event::new("Play", current_player_ref)
     }
 }

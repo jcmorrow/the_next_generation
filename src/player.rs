@@ -83,7 +83,7 @@ impl Player {
         bases
     }
 
-    fn index_attack_opponents(&self, opponents: &[Player]) -> Option<usize> {
+    fn index_attack_opponents(&self, opponents: &[&mut Player]) -> Option<usize> {
         match opponents.len() {
             0 => None,
             _ => {
@@ -95,7 +95,7 @@ impl Player {
         }
     }
 
-    fn indices_destroy_base(&self, opponents: &[Player]) -> Option<(usize, usize)> {
+    fn indices_destroy_base(&self, opponents: &[&mut Player]) -> Option<(usize, usize)> {
         for (index, opponent) in opponents.iter().enumerate() {
             if opponent.bases().len() > 0 {
                 return Some((index, 0));
@@ -104,7 +104,7 @@ impl Player {
         None
     }
 
-    fn index_discard_opponents(&self, opponents: &[Player]) -> Option<usize> {
+    fn index_discard_opponents(&self, opponents: &[&mut Player]) -> Option<usize> {
         match opponents.len() {
             0 => None,
             _ => Some(0)
@@ -157,7 +157,7 @@ impl Player {
 
     fn make_perennial_choice(&mut self,
                              trade_row: &TradeRow,
-                             opponents: &[Player]) -> Choice {
+                             opponents: &[&mut Player]) -> Choice {
         match self.perrenial_choices.pop() {
             Some(c) => c,
             None => {
@@ -216,7 +216,7 @@ impl Player {
 
     pub fn make_choice(&mut self,
                        trade_row: &TradeRow,
-                       opponents: &[Player]) -> Choice {
+                       opponents: &[&mut Player]) -> Choice {
         if self.turn_start_choices.len() > 0 {
             return self.turn_start_choices.pop().unwrap()
         }
