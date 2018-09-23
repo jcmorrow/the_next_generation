@@ -45,6 +45,7 @@ pub enum ShipType {
     BattlePod,
     BlobCarrier,
     BlobDestroyer,
+    BlobFighter,
     Explorer,
     ImperialFighter,
     Mothership,
