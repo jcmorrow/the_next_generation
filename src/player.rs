@@ -1,5 +1,6 @@
 use choice::Choice;
 use card::Card;
+use card::CardType;
 use card::Faction;
 use card::ship;
 use trade_row::TradeRow;
@@ -13,7 +14,6 @@ const STARTING_AUTHORITY: i32 = 50;
 #[derive(Debug)]
 pub struct Player {
     pub authority: i32,
-    pub bases: Vec<Card>,
     pub choices: Vec<Choice>,
     pub combat: i32,
     pub deck: Vec<Card>,
@@ -38,7 +38,6 @@ impl Player {
     pub fn new(name: &str) -> Player {
         let mut player = Player {
             authority: STARTING_AUTHORITY,
-            bases: Vec::new(),
             choices: Vec::new(),
             combat: 0,
             discard: Vec::new(),
@@ -66,12 +65,22 @@ impl Player {
     }
 
     pub fn has_ally_in_play(&self, faction: &Faction) -> bool {
-        for card in &[&self.bases[..], &self.in_play[..]].concat() {
+        for card in &self.in_play {
             if card.faction == *faction {
                 return true
             }
         }
         false
+    }
+
+    pub fn bases(&self) -> Vec<usize> {
+        let mut bases: Vec<usize> = Vec::new();
+        for (i, card) in self.in_play.iter().enumerate() {
+            if card.card_type == CardType::Outpost || card.card_type == CardType::Base {
+                bases.push(i);
+            }
+        }
+        bases
     }
 
     fn index_attack_opponents(&self, opponents: &[&mut Player]) -> Option<usize> {
@@ -84,6 +93,15 @@ impl Player {
                 }
             }
         }
+    }
+
+    fn indices_destroy_base(&self, opponents: &[&mut Player]) -> Option<(usize, usize)> {
+        for (index, opponent) in opponents.iter().enumerate() {
+            if opponent.bases().len() > 0 {
+                return Some((index, 0));
+            }
+        }
+        None
     }
 
     fn index_discard_opponents(&self, opponents: &[&mut Player]) -> Option<usize> {
@@ -157,11 +175,15 @@ impl Player {
                                 None => Choice::Decline
                             }
                         },
-                        Choice::Or(a, b, _) => {
-                            if random() {
-                                Choice::Or(a, b, true)
-                            } else {
-                                Choice::Or(a, b, false)
+                        Choice::DestroyBase(_, _) => {
+                            match self.indices_destroy_base(opponents) {
+                                Some(opponent_base) => Choice::DestroyBase(
+                                    // opponnent index
+                                    opponent_base.0,
+                                    // base index
+                                    opponent_base.1,
+                                ),
+                                None => Choice::Decline,
                             }
                         },
                         Choice::ScrapDiscard(_) => {
@@ -175,6 +197,14 @@ impl Player {
                                 Some(i) => Choice::ScrapHand(i),
                                 None => Choice::Decline
                             }
+                        },
+                        Choice::Or(a, b, _) => {
+                            // Stupid robot choices
+                            Choice::Or(a, b, random())
+                        },
+                        Choice::AndOr(a, b, _, _) => {
+                            // Stupid robot choices
+                            Choice::AndOr(a, b, random(), random())
                         },
                         c => c
                     },
@@ -258,13 +288,20 @@ impl Player {
     }
 
     pub fn end_turn(&mut self) {
-        self.discard.extend(self.in_play.drain(0..));
+        let mut to_discard: Vec<usize> = Vec::new();
+        for (i, card) in self.in_play.iter().enumerate() {
+            if card.card_type == CardType::Ship {
+                to_discard.push(i);
+            }
+        }
+        for i in to_discard.iter().rev() {
+            self.discard.push(self.in_play.remove(*i));
+        }
         for card in &mut self.discard { card.has_used_ally_ability = false; }
         for card in &mut self.deck { card.has_used_ally_ability = false; }
         for card in &mut self.hand { card.has_used_ally_ability = false; }
         for card in &mut self.in_play { card.has_used_ally_ability = false; }
         for card in &mut self.scrapped { card.has_used_ally_ability = false; }
-        for card in &mut self.bases { card.has_used_ally_ability = false; }
         self.turn_start_choices.clear();
     }
 }
@@ -275,9 +312,6 @@ impl fmt::Display for Player {
         write!(f, "Authority: {}\n", self.authority).unwrap();
         write!(f, "Trade: {}\n", self.trade).unwrap();
         write!(f, "Combat: {}\n", self.combat).unwrap();
-        for base in self.bases.iter() {
-            write!(f, "Base: {}", base).unwrap();
-        }
         for card in self.in_play.iter() {
             write!(f, "In play: {}", card).unwrap();
         }

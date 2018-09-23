@@ -44,6 +44,7 @@ pub enum ShipType {
     BattleBlob,
     BattlePod,
     BlobCarrier,
+    BlobDestroyer,
     Explorer,
     ImperialFighter,
     NoShipType,
@@ -128,13 +129,6 @@ impl Card {
                opponents: &[&mut Player],
                trade_row: &mut TradeRow) {
         player.choices.extend(self.abilities.clone());
-        for card in &mut player.bases {
-            if card.faction == self.faction && !card.has_used_ally_ability
-            {
-                card.has_used_ally_ability = true;
-                player.choices.extend(card.ally_abilities.clone())
-            }
-        }
         for card in &mut player.in_play {
             if card.faction == self.faction && !card.has_used_ally_ability
             {

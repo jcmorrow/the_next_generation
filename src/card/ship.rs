@@ -41,6 +41,26 @@ pub fn blob_carrier() -> Card {
     }
 }
 
+pub fn blob_destroyer() -> Card {
+    Card {
+        ally_abilities: vec!(
+                            Choice::AndOr(
+                                Box::new(Choice::DestroyBase(0, 0)),
+                                Box::new(Choice::ScrapFromTradeRow(0)),
+                                false,
+                                false
+                            )
+                        ),
+        abilities: vec!(Choice::GainAttack(6)),
+        card_type: CardType::Ship,
+        cost: 4,
+        faction: Faction::Blob,
+        name: String::from("Blob Destoyer"),
+        ship_type: ShipType::BlobDestroyer,
+        ..Default::default()
+    }
+}
+
 pub fn explorer() -> Card {
     Card {
         abilities: vec!(Choice::GainTrade(2)),

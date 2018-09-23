@@ -8,8 +8,10 @@ pub enum Choice {
     Attack(usize),
     Buy(usize),
     Decline,
+    DestroyBase(usize, usize),
     DiscardAttack(usize),
     DiscardCard(usize),
+    AndOr(Box<Choice>, Box<Choice>, bool, bool),
     EndTurn,
     GainAttack(i32),
     GainAuthority(i32),
@@ -18,6 +20,8 @@ pub enum Choice {
     Play(usize),
     ScrapDiscard(usize),
     ScrapHand(usize),
+    Scrap(usize),
+    ScrapFromTradeRow(usize),
     ScrapSelf(usize),
 }
 
@@ -32,6 +36,15 @@ impl Choice {
                 println!("{} plays {}", player.name, card.name);
                 card.run(player, opponents, trade_row);
                 player.in_play.push(card);
+            },
+            Choice::DestroyBase(opponent, base) => {
+                let chosen_opponent = &mut opponents[opponent];
+                let chosen_base = chosen_opponent.in_play.remove(base);
+                println!("{} destroys {}'s {}",
+                         player.name,
+                         chosen_opponent.name,
+                         chosen_base);
+                chosen_opponent.discard.push(chosen_base);
             },
             Choice::DiscardCard(i) => {
                 let mut card = player.hand.remove(i);
@@ -92,6 +105,14 @@ impl Choice {
                 let card = player.hand.remove(i);
                 println!("{} scraps {} from hand", player.name, card.name);
                 player.scrapped.push(card);
+            },
+            Choice::AndOr(a, b, first, second) => {
+                if first {
+                    player.choices.push(*a);
+                }
+                if second {
+                    player.choices.push(*b);
+                }
             },
             Choice::ScrapSelf(i) => {
                 let card = player.in_play.remove(i);
