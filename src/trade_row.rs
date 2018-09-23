@@ -28,13 +28,6 @@ impl TradeRow {
         card
     }
 
-    pub fn index_from(&self) -> Option<usize> {
-        match self.face_up.len() {
-            0 => None,
-            _ => Some(0)
-        }
-    }
-
     pub fn new() -> TradeRow {
         let mut trade_row = TradeRow{
             deck: Vec::new(),
