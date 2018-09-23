@@ -76,6 +76,25 @@ pub fn scout() -> Card {
     }
 }
 
+pub fn trade_bot() -> Card {
+    Card {
+        abilities: vec!(
+            Choice::GainTrade(1),
+            Choice::Or(
+                Box::new(Choice::ScrapHand(0)),
+                Box::new(Choice::ScrapDiscard(0)),
+                true
+            )),
+        ally_abilities: vec!(Choice::GainAttack(2)),
+        card_type: CardType::Ship,
+        cost: 1,
+        faction: Faction::MachineCult,
+        name: String::from("Trade Bot"),
+        ship_type: ShipType::TradeBot,
+        ..Default::default()
+    }
+}
+
 pub fn viper() -> Card {
     Card {
         abilities: vec!(Choice::GainAttack(1)),
