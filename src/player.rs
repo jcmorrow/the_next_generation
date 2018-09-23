@@ -143,6 +143,13 @@ impl Player {
         }
     }
 
+    fn index_scrap_from_trade_row(&self, trade_row: &TradeRow) -> Option<usize> {
+        match trade_row.face_up.len() {
+            0 => None,
+            _ => Some(0)
+        }
+    }
+
     pub fn index_from(&self, card_pile: CardPile) -> Option<usize> {
         let card_pile = match card_pile {
             CardPile::Discard => &self.discard,
@@ -215,7 +222,7 @@ impl Player {
                             Choice::AndOr(a, b, random(), random())
                         },
                         Choice::ScrapFromTradeRow(_) => {
-                            match trade_row.index_from() {
+                            match self.index_scrap_from_trade_row(trade_row) {
                                 Some(i) => Choice::ScrapFromTradeRow(i),
                                 None => Choice::Decline
                             }
