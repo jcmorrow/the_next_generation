@@ -15,7 +15,8 @@ pub enum Choice {
     GainTrade(i32),
     Or(Box<Choice>, Box<Choice>, bool),
     Play(usize),
-    Scrap(usize),
+    ScrapDiscard(usize),
+    ScrapHand(usize),
     ScrapSelf(usize),
 }
 
@@ -80,6 +81,16 @@ impl Choice {
                         false => { *b }
                     }
                 );
+            },
+            Choice::ScrapDiscard(i) => {
+                let card = player.discard.remove(i);
+                println!("{} scraps {} from discard", player.name, card.name);
+                player.scrapped.push(card);
+            },
+            Choice::ScrapHand(i) => {
+                let card = player.hand.remove(i);
+                println!("{} scraps {} from hand", player.name, card.name);
+                player.scrapped.push(card);
             },
             Choice::ScrapSelf(i) => {
                 let card = player.in_play.remove(i);
