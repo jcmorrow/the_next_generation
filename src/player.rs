@@ -1,50 +1,49 @@
-use AllyAbilityEvent;
-use AttackEvent;
-use PlayEvent;
-use ScrapEvent;
-
+use choice::Choice;
 use card::Card;
 use card::CardType;
-use card::ShipType;
 use card::Faction;
 use card::ship;
-use card::targetable::Targetable;
+use trade_row::TradeRow;
 
 use rand::{thread_rng, Rng};
-
 use std::fmt;
-
-use trade_row::TradeRow;
 
 const HAND_SIZE: usize = 5;
 const STARTING_AUTHORITY: i32 = 50;
 
+#[derive(Debug)]
 pub struct Player {
     pub authority: i32,
-    pub bases: Vec<Card>,
+    pub bases: Vec<usize>,
+    pub choices: Vec<Choice>,
     pub combat: i32,
     pub deck: Vec<Card>,
     pub discard: Vec<Card>,
     pub hand: Vec<Card>,
     pub in_play: Vec<Card>,
-    pub scrapped: Vec<Card>,
     pub name: String,
+    pub perrenial_choices: Vec<Choice>,
+    pub scrapped: Vec<Card>,
     pub trade:  i32,
+    pub turn_start_choices: Vec<Choice>,
 }
 
 impl Player {
     pub fn new(name: &str) -> Player {
-        let mut player = Player{
+        let mut player = Player {
             authority: STARTING_AUTHORITY,
             bases: Vec::new(),
+            choices: Vec::new(),
             combat: 0,
             discard: Vec::new(),
             deck: Vec::new(),
             hand: Vec::new(),
             in_play: Vec::new(),
-            scrapped: Vec::new(),
             name: name.to_string(),
+            perrenial_choices: Vec::new(),
+            scrapped: Vec::new(),
             trade: 0,
+            turn_start_choices: Vec::new()
         };
 
         for _n in 0..8 {
@@ -60,110 +59,136 @@ impl Player {
         return player;
     }
 
-    pub fn take_turn(&mut self,
-                     opponents: &mut [&mut Player],
-                     trade_row: &mut TradeRow) {
-        self.combat = 0;
-        self.trade = 0;
+    pub fn has_ally_in_play(&self, faction: &Faction) -> bool {
+        self.in_play.iter().any(|ref c| c.faction == *faction)
+    }
 
-        self.draw_hand();
+    fn index_attack_opponents(&self, opponents: &[&mut Player]) -> Option<usize> {
+        match opponents.len() {
+            0 => None,
+            _ => {
+                match self.combat {
+                    0 => None,
+                    _ => Some(0),
+                }
+            }
+        }
+    }
 
-        self.trigger_ally_abilities_in_bases();
+    fn index_discard_opponents(&self, opponents: &[&mut Player]) -> Option<usize> {
+        match opponents.len() {
+            0 => None,
+            _ => Some(0)
+        }
+    }
 
-        while self.hand.len() > 0 {
-            let card_to_play = self.hand.pop().unwrap();
-            PlayEvent::new(&card_to_play, self).play();
+    fn index_acquire_from_trade_row(&self,
+                                    trade_row: &TradeRow) -> Option<usize> {
+        let mut highest_cost = 0;
+        let mut highest_cost_index = 0;
+        for (index, card) in trade_row.face_up.iter().enumerate() {
+            if card.cost >= highest_cost {
+                highest_cost = card.cost;
+                highest_cost_index = index;
+            }
+        }
+        Some(highest_cost_index)
+    }
 
-            let trade_row_size = trade_row.face_up.len();
-            // Process special abilities
-            match card_to_play.ship_type {
-                ShipType::BattlePod => {
-                    if trade_row_size > 1 {
-                        trade_row.scrap(thread_rng().gen_range(1, trade_row_size))
+    fn index_buy_from_trade_row(&self, trade_row: &TradeRow) -> Option<usize> {
+        let mut buy_anything = false;
+        let mut highest_cost = 0;
+        let mut highest_cost_index = 0;
+        for (index, card) in trade_row.face_up.iter().enumerate() {
+            if card.cost >= highest_cost && self.trade >= card.cost {
+                highest_cost = card.cost;
+                highest_cost_index = index;
+                buy_anything = true;
+            }
+        }
+        match buy_anything {
+            true => Some(highest_cost_index),
+            false => None,
+        }
+    }
+
+    pub fn index_from_hand(&self) -> Option<usize> {
+        // For now, play the first card in the hand
+        match self.hand.len() {
+            0 => None,
+            _ => Some(0)
+        }
+    }
+
+    fn make_perennial_choice(&mut self,
+                             trade_row: &TradeRow,
+                             opponents: &[&mut Player]) -> Choice {
+        match self.perrenial_choices.pop() {
+            Some(c) => c,
+            None => {
+                match self.choices.pop() {
+                    Some(c) => match c {
+                        Choice::AcquireFromTradeRow(_) => {
+                            match self.index_acquire_from_trade_row(trade_row) {
+                                Some(i) => Choice::AcquireFromTradeRow(i),
+                                // this is not quite right
+                                None => Choice::EndTurn,
+                            }
+                        },
+                        Choice::DiscardAttack(_) => {
+                            match self.index_discard_opponents(opponents) {
+                                Some(i) => Choice::DiscardAttack(i),
+                                None => Choice::EndTurn
+                            }
+                        },
+                        c => c
+                    },
+                    None => Choice::EndTurn
+                }
+            }
+        }
+    }
+
+    pub fn make_choice(&mut self,
+                       trade_row: &TradeRow,
+                       opponents: &[&mut Player]) -> Choice {
+        if self.turn_start_choices.len() > 0 {
+            return self.turn_start_choices.pop().unwrap()
+        }
+        self.perrenial_choices.clear();
+        match self.index_attack_opponents(opponents) {
+            Some(i) => self.perrenial_choices.push(Choice::Attack(i)),
+            None => ()
+        }
+
+        match self.index_buy_from_trade_row(trade_row) {
+            Some(i) => self.perrenial_choices.push(Choice::Buy(i)),
+            None => ()
+        }
+
+        match self.index_from_hand() {
+            Some(i) => self.perrenial_choices.push(Choice::Play(i)),
+            None => ()
+        }
+
+        match self.turn_start_choices.pop() {
+            Some(c) => match c {
+                Choice::DiscardCard(_) => {
+                    match self.index_from_hand() {
+                        Some(i) => Choice::DiscardCard(i),
+                        None => self.make_perennial_choice(trade_row, opponents)
                     }
                 },
-                _ => ()
-            }
-
-            match card_to_play.card_type {
-                CardType::Ship => { (self.in_play.push(card_to_play)) },
-                CardType::Outpost => { self.bases.push(card_to_play) },
-                CardType::Base => { self.bases.push(card_to_play) },
-                _ => { panic!("I don't know how to play this card type!") }
-            }
-
-            self.trigger_ally_abilities_in_play();
-            self.trigger_ally_abilities_in_bases();
+                // Note: this should never happen, since only DiscardCard choices are at turn start
+                c => c
+            },
+            None => self.make_perennial_choice(trade_row, opponents)
         }
-
-        self.scrap_played_cards();
-        self.scrap_bases();
-        self.buy(trade_row);
-        self.attack(opponents);
-
-        self.unset_has_used_ally_abilities();
-    }
-
-    pub fn scrap_bases(&mut self) {
-        let mut indices: Vec<usize> = Vec::new();
-
-        for (i, base) in self.bases.iter().enumerate() {
-            if base.scrappable {
-                indices.push(i);
-            }
-        }
-
-        for index in indices.iter().rev() {
-            let base = self.bases.remove(*index);
-            ScrapEvent::new(&base, self).scrap();
-            self.scrapped.push(base);
-        }
-    }
-
-    pub fn scrap_played_cards(&mut self) {
-        while self.in_play.len() > 0 {
-            let card_in_play = self.in_play.pop().unwrap();
-
-            if card_in_play.scrappable {
-                ScrapEvent::new(&card_in_play, self).scrap();
-                self.scrapped.push(card_in_play);
-            } else {
-                self.discard.push(card_in_play);
-            }
-        }
-    }
-
-    pub fn buy(&mut self, trade_row: &mut TradeRow) {
-         while self.trade > 0 {
-            let mut options = trade_row.face_up.clone();
-            options.sort_unstable_by(|a, b| b.cost.cmp(&a.cost));
-            let card_to_buy: &Card = match options.iter()
-                .find(|card| card.cost <= self.trade) {
-                Some(card) => card,
-                None => return (),
-            };
-            let index_of_card_to_buy = match trade_row.face_up.iter()
-                .enumerate()
-                .find(|(_index, card)| card.name == card_to_buy.name) {
-                Some((index, _card)) => index,
-                None => panic!("Couldn't find card in trade row!"),
-            };
-            let card = trade_row.buy(index_of_card_to_buy);
-            self.trade -= card.cost;
-            self.discard.push(card);
-         }
-    }
-
-    pub fn attack(&mut self, opponents: &mut [&mut Player]) {
-        let mut rng = thread_rng();
-        let target = &mut opponents[rng.gen_range(0, opponents.len())];
-        AttackEvent::new(self.combat, self, target).log();
-        target.receive_combat(self.combat);
     }
 
     pub fn draw(&mut self) {
         match self.deck.pop() {
-            Some(x) => self.hand.push(x),
+            Some(c) => self.hand.push(c),
             None => {
                 self.deck.extend(self.discard.drain(0..));
                 thread_rng().shuffle(&mut self.deck);
@@ -175,7 +200,10 @@ impl Player {
         };
     }
 
-    pub fn draw_hand(&mut self) {
+    pub fn begin_turn(&mut self) {
+        self.combat = 0;
+        self.trade = 0;
+
         let mut num_to_draw = HAND_SIZE;
         let total_cards = self.deck.len() + self.discard.len();
 
@@ -188,80 +216,22 @@ impl Player {
         }
     }
 
-    pub fn has_factions_in_play(&self, faction: &Faction) -> bool {
-        let mut count = 0;
-
-        for card in &[&self.bases[..], &self.in_play[..]].concat() {
-            if card.faction == *faction {
-                count += 1;
-            }
-            if count > 1 {
-                return true
+    pub fn end_turn(&mut self) {
+        let mut to_discard: Vec<usize> = Vec::new();
+        for (i, card) in self.in_play.iter().enumerate() {
+            if card.card_type == CardType::Ship {
+                to_discard.push(i);
             }
         }
-        false
-    }
-
-    pub fn trigger_ally_abilities_in_play(&mut self) {
-        let cards = self.in_play.clone();
-        let indices = self.trigger_ally_abilities(cards);
-        for index in indices {
-            self.in_play[index].has_used_ally_ability = true;
+        for i in to_discard.iter().rev() {
+            self.discard.push(self.in_play.remove(*i));
         }
-    }
-
-    pub fn trigger_ally_abilities_in_bases(&mut self) {
-        let cards = self.bases.clone();
-        let indices = self.trigger_ally_abilities(cards);
-        for index in indices {
-            self.bases[index].has_used_ally_ability = true;
-        }
-    }
-
-    pub fn can_trigger_ally_ability(&self, card: &Card) -> bool {
-        card.has_ally_ability && !card.has_used_ally_ability &&
-        card.faction != Faction::Unaligned && self.has_factions_in_play(&card.faction)
-    }
-
-    pub fn trigger_ally_abilities(&mut self, cards: Vec<Card>) -> Vec<usize> {
-        let mut indices: Vec<usize> = Vec::new();
-        for (index, card) in cards.iter().enumerate() {
-            if self.can_trigger_ally_ability(&card) {
-                   AllyAbilityEvent::new(&card, self).trigger_ability();
-                   indices.push(index);
-            }
-        }
-        indices
-    }
-
-    pub fn unset_has_used_ally_abilities(&mut self) {
-        for mut card in self.in_play.iter_mut() {
-            card.has_used_ally_ability = false
-        }
-
-        for mut base in self.bases.iter_mut() {
-            base.has_used_ally_ability = false
-        }
-
-        for mut discard_card in self.discard.iter_mut() {
-            discard_card.has_used_ally_ability = false
-        }
-
-        for mut deck_card in self.deck.iter_mut() {
-            deck_card.has_used_ally_ability = false
-        }
-    }
-}
-
-impl Targetable for Player {
-    fn is_targetable(&self) -> bool {
-        !self.bases.iter().any(|ref base| base.card_type == CardType::Outpost)
-    }
-
-    fn receive_combat(&mut self, combat: i32) {
-        if self.is_targetable() {
-            self.authority -= combat;
-        }
+        for card in &mut self.discard { card.has_used_ally_ability = false; }
+        for card in &mut self.deck { card.has_used_ally_ability = false; }
+        for card in &mut self.hand { card.has_used_ally_ability = false; }
+        for card in &mut self.in_play { card.has_used_ally_ability = false; }
+        for card in &mut self.scrapped { card.has_used_ally_ability = false; }
+        self.turn_start_choices.clear();
     }
 }
 
@@ -271,9 +241,6 @@ impl fmt::Display for Player {
         write!(f, "Authority: {}\n", self.authority).unwrap();
         write!(f, "Trade: {}\n", self.trade).unwrap();
         write!(f, "Combat: {}\n", self.combat).unwrap();
-        for base in self.bases.iter() {
-            write!(f, "Base: {}", base).unwrap();
-        }
         for card in self.in_play.iter() {
             write!(f, "In play: {}", card).unwrap();
         }
@@ -292,45 +259,10 @@ impl fmt::Display for Player {
 
 #[cfg(test)]
 mod tests {
-use card::Faction;
-use card::base;
-use card::ship;
-use player::Player;
-
-    #[test]
-    fn has_no_factions_in_play() {
-        let mut player: Player = Player::new("Testy");
-        player.in_play.push(ship::battle_blob());
-        assert!(!player.has_factions_in_play(&Faction::Blob));
-    }
-
-    #[test]
-    fn has_factions_in_play() {
-        let mut player: Player = Player::new("Testy");
-        player.in_play.push(ship::battle_blob());
-        player.in_play.push(ship::battle_blob());
-        print!("{}", player);
-        assert!(player.has_factions_in_play(&Faction::Blob));
-    }
-
-    #[test]
-    fn battle_blobs_draw() {
-        let mut player: Player = Player::new("Testy");
-
-        assert_eq!(player.hand.len(), 0);
-
-        player.bases.push(base::the_hive());
-        let cards = player.bases.clone();
-        player.trigger_ally_abilities(cards);
-
-        assert_eq!(player.hand.len(), 0);
-
-        player.bases.push(base::the_hive());
-        let cards = player.bases.clone();
-        player.trigger_ally_abilities(cards);
-
-        assert_eq!(player.hand.len(), 2);
-    }
+    use card::Faction;
+    use card::base;
+    use card::ship;
+    use player::Player;
 
     #[test]
     fn overdraw() {
@@ -346,28 +278,14 @@ use player::Player;
     }
 
     #[test]
-    fn unset_has_used_ally_abilities() {
+    fn end_turn() {
         let mut player: Player = Player::new("Testy");
 
-        let mut base_hive = base::the_hive();
-        let mut discard_hive = base::the_hive();
-        let mut deck_hive = base::the_hive();
-        base_hive.has_used_ally_ability = true;
-        discard_hive.has_used_ally_ability = true;
-        deck_hive.has_used_ally_ability = true;
-        player.bases.push(base_hive);
-        player.discard.push(discard_hive);
-        player.deck.push(deck_hive);
+        player.in_play.push(ship::viper());
+        player.in_play.push(base::the_hive());
+        player.end_turn();
 
-        player.unset_has_used_ally_abilities();
-
-        let base_hive = player.bases.pop().unwrap();
-        assert!(!base_hive.has_used_ally_ability);
-
-        let discard_hive = player.discard.pop().unwrap();
-        assert!(!discard_hive.has_used_ally_ability);
-
-        let deck_hive = player.deck.pop().unwrap();
-        assert!(!deck_hive.has_used_ally_ability);
+        assert_eq!(player.in_play.len(), 1);
+        assert_eq!(player.discard.len(), 1);
     }
 }
