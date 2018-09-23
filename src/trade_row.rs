@@ -26,19 +26,6 @@ impl TradeRow {
         self.face_up.remove(index)
     }
 
-    pub fn scrap(&mut self, index: usize) {
-        // Cannot scrap Explorer from trade row
-        if index != 0 && index <= self.face_up.len() - 1 {
-            let scrapped_card = self.face_up.remove(index);
-            println!("{} has been scrapped from the Trade Row!", scrapped_card.name);
-            self.scrapped.push(scrapped_card);
-            match self.deck.pop() {
-                Some(card) => self.face_up.insert(index, card),
-                None => ()
-            }
-        }
-    }
-
     pub fn new() -> TradeRow {
         let mut trade_row = TradeRow{
             deck: Vec::new(),
@@ -47,14 +34,14 @@ impl TradeRow {
         };
 
 
-        for _n in 0..15 { trade_row.deck.push(ship::imperial_fighter()); }
-        for _n in 0..15 { trade_row.deck.push(outpost::trading_post()); }
-        for _n in 0..15 { trade_row.deck.push(base::the_hive()); }
-        for _n in 0..15 { trade_row.deck.push(outpost::battle_station()); }
-        for _n in 0..15 { trade_row.deck.push(ship::battle_blob()); }
-        for _n in 0..15 { trade_row.deck.push(ship::battle_pod()); }
-        for _n in 0..15 { trade_row.deck.push(ship::blob_carrier()); }
-        for _n in 0..15 { trade_row.deck.push(ship::trade_bot()); }
+        for _n in 0..3 { trade_row.deck.push(ship::imperial_fighter()); }
+        for _n in 0..2 { trade_row.deck.push(outpost::trading_post()); }
+        for _n in 0..1 { trade_row.deck.push(base::the_hive()); }
+        for _n in 0..2 { trade_row.deck.push(outpost::battle_station()); }
+        for _n in 0..1 { trade_row.deck.push(ship::battle_blob()); }
+        for _n in 0..2 { trade_row.deck.push(ship::battle_pod()); }
+        for _n in 0..1 { trade_row.deck.push(ship::blob_carrier()); }
+        for _n in 0..3 { trade_row.deck.push(ship::trade_bot()); }
 
         thread_rng().shuffle(&mut trade_row.deck);
 
