@@ -1,4 +1,5 @@
 use card::Faction;
+use card::ShipType;
 use effect::Effect;
 use trade_row::TradeRow;
 use player::Player;
@@ -12,6 +13,7 @@ pub enum Choice {
     BlobDraw(usize),
     Buy(usize),
     BuyTopDeck(usize),
+    CopyShip(usize),
     Decline,
     DestroyBase(usize, usize),
     DiscardCard(usize),
@@ -180,6 +182,18 @@ impl Choice {
             },
             Choice::GainTrade(n) => {
                 player.effects.push(Effect::GainTrade(n));
+            },
+            Choice::CopyShip(i) => {
+                let mut ship_to_copy = player.in_play[i].clone();
+                println!("{}'s Stealth Needle copies {}", player.name, ship_to_copy.name);
+                if ship_to_copy.faction == Faction::Blob {
+                    player.blobs_played_this_turn += 1;
+                }
+
+                if ship_to_copy.scrap_abilities.len() > 0 || ship_to_copy.scrap_effects.len() > 0 {
+                    player.perrenial_choices.push(Choice::ScrapSelf(i));
+                }
+                ship_to_copy.run(player, opponents, trade_row);
             },
             _ => (),
         }

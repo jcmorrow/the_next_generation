@@ -40,6 +40,7 @@ impl Default for CardType {
 }
 
 #[derive(Clone)]
+#[derive(PartialEq)]
 #[derive(Debug)]
 pub enum ShipType {
     Battlecruiser,
@@ -69,6 +70,7 @@ pub enum ShipType {
     Scout,
     SupplyBot,
     SurveyShip,
+    StealthNeedle,
     TradeBot,
     TradeEscort,
     TradePod,
@@ -174,11 +176,14 @@ impl Card {
         player.effects.extend(self.effects.clone());
 
         let fleet_hq_played = player.in_play.iter().any(|c| c.base_type == BaseType::FleetHQ);
+        let stealth_needle_played = player.in_play.iter().any(|c| c.ship_type == ShipType::StealthNeedle);
         // Conditional ability triggers
         if fleet_hq_played {
             match self.card_type {
-                CardType::Ship => {
-                    player.effects.push(Effect::GainCombat(1));
+                CardType::Ship => match self.ship_type {
+                    // Needle gets +1 combat when this method runs for its cloned card
+                    ShipType::StealthNeedle => (),
+                    _ => player.effects.push(Effect::GainCombat(1))
                 },
                 _ => ()
             }
@@ -197,8 +202,11 @@ impl Card {
         }
 
         for card in &mut player.in_play {
-            if (card.faction == self.faction || card.outpost_type == OutpostType::MechWorld)
-                && !card.has_used_ally_ability
+            if (
+                card.faction == self.faction ||
+                card.faction == Faction::MachineCult && stealth_needle_played ||
+                card.outpost_type == OutpostType::MechWorld
+            ) && !card.has_used_ally_ability
             {
                 card.has_used_ally_ability = true;
                 player.choices.extend(card.ally_abilities.clone());
