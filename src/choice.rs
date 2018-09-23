@@ -75,12 +75,12 @@ impl Choice {
                 player.trade += n;
             },
             Choice::Or(a, b, first) => {
-                player.choices.push(
-                    match first {
-                        true => { *a },
-                        false => { *b }
-                    }
-                );
+                let choice = match first {
+                    true => { *a },
+                    false => { *b }
+                };
+                println!("{} chooses {:?}", player.name, choice);
+                player.choices.push(choice);
             },
             Choice::ScrapDiscard(i) => {
                 let card = player.discard.remove(i);

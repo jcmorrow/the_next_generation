@@ -1,8 +1,3 @@
-// use AllyAbilityEvent;
-// use AttackEvent;
-// use PlayEvent;
-// use ScrapEvent;
-
 use choice::Choice;
 use card::Card;
 use card::Faction;
@@ -168,6 +163,18 @@ impl Player {
                                 Choice::Or(a, b, true)
                             } else {
                                 Choice::Or(a, b, false)
+                            }
+                        },
+                        Choice::ScrapDiscard(_) => {
+                            match self.index_from(CardPile::Discard) {
+                                Some(i) => Choice::ScrapDiscard(i),
+                                None => Choice::EndTurn
+                            }
+                        },
+                        Choice::ScrapHand(_) => {
+                            match self.index_from(CardPile::Hand) {
+                                Some(i) => Choice::ScrapHand(i),
+                                None => Choice::EndTurn
                             }
                         },
                         c => c
