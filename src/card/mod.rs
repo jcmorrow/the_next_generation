@@ -48,6 +48,7 @@ pub enum ShipType {
     ImperialFighter,
     NoShipType,
     Scout,
+    TradeBot,
     Viper,
 }
 

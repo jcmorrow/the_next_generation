@@ -54,6 +54,7 @@ impl TradeRow {
         for _n in 0..15 { trade_row.deck.push(ship::battle_blob()); }
         for _n in 0..15 { trade_row.deck.push(ship::battle_pod()); }
         for _n in 0..15 { trade_row.deck.push(ship::blob_carrier()); }
+        for _n in 0..15 { trade_row.deck.push(ship::trade_bot()); }
 
         thread_rng().shuffle(&mut trade_row.deck);
 
