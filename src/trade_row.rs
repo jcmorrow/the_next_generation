@@ -36,6 +36,7 @@ impl TradeRow {
         };
 
 
+        for _n in 0..1 { trade_row.deck.push(ship::mothership()); }
         for _n in 0..1 { trade_row.deck.push(base::blob_world()); }
         for _n in 0..1 { trade_row.deck.push(base::the_hive()); }
         for _n in 0..1 { trade_row.deck.push(ship::battle_blob()); }

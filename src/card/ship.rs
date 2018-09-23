@@ -87,6 +87,19 @@ pub fn imperial_fighter() -> Card {
     }
 }
 
+pub fn mothership() -> Card {
+    Card {
+        ally_abilities: vec!(Choice::Draw),
+        abilities: vec!(Choice::GainAttack(6), Choice::Draw),
+        card_type: CardType::Ship,
+        cost: 7,
+        faction: Faction::Blob,
+        name: String::from("Mothership"),
+        ship_type: ShipType::Mothership,
+        ..Default::default()
+    }
+}
+
 pub fn scout() -> Card {
     Card {
         abilities: vec!(Choice::GainTrade(1)),

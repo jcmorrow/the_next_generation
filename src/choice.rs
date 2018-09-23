@@ -13,6 +13,7 @@ pub enum Choice {
     DestroyBase(usize, usize),
     DiscardAttack(usize),
     DiscardCard(usize),
+    Draw,
     AndOr(Box<Choice>, Box<Choice>, bool, bool),
     EndTurn,
     GainAttack(i32),
@@ -129,10 +130,14 @@ impl Choice {
                 player.choices.extend(card.scrap_abilities.clone());
                 player.scrapped.push(card);
             },
+            Choice::Draw => {
+                println!("{} draws a card", player.name);
+                player.draw();
+            },
             Choice::BlobDraw(n) => {
                 println!("{} draws {} cards from Blob World", player.name, n);
                 for _ in 0..n {
-                    player.draw();
+                    player.choices.push(Choice::Draw);
                 }
             },
             _ => (),

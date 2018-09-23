@@ -47,6 +47,7 @@ pub enum ShipType {
     BlobDestroyer,
     Explorer,
     ImperialFighter,
+    Mothership,
     NoShipType,
     Scout,
     TradeBot,
