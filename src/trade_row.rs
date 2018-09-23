@@ -13,8 +13,10 @@ pub struct TradeRow {
 }
 
 impl TradeRow {
-    pub fn buy(&mut self, index: usize) -> (Card) {
+    pub fn get_card(&mut self, index: usize) -> Card {
+        let card = self.face_up.remove(index);
         match index {
+            // TODO: panic central if the trade row deck runs out
             5 => self.face_up.insert(5, ship::explorer()),
             i => {
                 match self.deck.pop() {
@@ -23,7 +25,14 @@ impl TradeRow {
                 }
             }
         }
-        self.face_up.remove(index)
+        card
+    }
+
+    pub fn index_from(&self) -> Option<usize> {
+        match self.face_up.len() {
+            0 => None,
+            _ => Some(0)
+        }
     }
 
     pub fn new() -> TradeRow {

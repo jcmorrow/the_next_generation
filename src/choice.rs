@@ -21,8 +21,8 @@ pub enum Choice {
     Or(Box<Choice>, Box<Choice>, bool),
     Play(usize),
     ScrapDiscard(usize),
-    ScrapHand(usize),
     ScrapFromTradeRow(usize),
+    ScrapHand(usize),
     ScrapSelf(usize),
 }
 
@@ -56,12 +56,17 @@ impl Choice {
                 player.discard.push(card);
             },
             Choice::AcquireFromTradeRow(i) => {
-                let card = trade_row.buy(i);
+                let card = trade_row.get_card(i);
                 println!("{} acquires {} to the top of the deck", player.name, card.name);
                 player.deck.insert(0, card);
             },
+            Choice::ScrapFromTradeRow(i) => {
+                let card = trade_row.get_card(i);
+                println!("{} has been scrapped from the Trade Row", card.name);
+                trade_row.scrapped.push(card);
+            }
             Choice::Buy(i) => {
-                let card = trade_row.buy(i);
+                let card = trade_row.get_card(i);
                 println!("{} buys {}", player.name, card.name);
                 player.trade -= card.cost;
                 player.discard.push(card);
