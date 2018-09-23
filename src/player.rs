@@ -148,14 +148,13 @@ impl Player {
                         Choice::AcquireFromTradeRow(_) => {
                             match self.index_acquire_from_trade_row(trade_row) {
                                 Some(i) => Choice::AcquireFromTradeRow(i),
-                                // this is not quite right
-                                None => Choice::EndTurn,
+                                None => Choice::Decline,
                             }
                         },
                         Choice::DiscardAttack(_) => {
                             match self.index_discard_opponents(opponents) {
                                 Some(i) => Choice::DiscardAttack(i),
-                                None => Choice::EndTurn
+                                None => Choice::Decline
                             }
                         },
                         Choice::Or(a, b, _) => {
@@ -168,13 +167,13 @@ impl Player {
                         Choice::ScrapDiscard(_) => {
                             match self.index_from(CardPile::Discard) {
                                 Some(i) => Choice::ScrapDiscard(i),
-                                None => Choice::EndTurn
+                                None => Choice::Decline
                             }
                         },
                         Choice::ScrapHand(_) => {
                             match self.index_from(CardPile::Hand) {
                                 Some(i) => Choice::ScrapHand(i),
-                                None => Choice::EndTurn
+                                None => Choice::Decline
                             }
                         },
                         c => c
