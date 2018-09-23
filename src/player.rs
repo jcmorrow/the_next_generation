@@ -32,6 +32,13 @@ pub struct Player {
     pub turn_start_choices: Vec<Choice>,
 }
 
+pub enum CardPile {
+    Discard,
+    Deck,
+    Hand,
+    InPlay
+}
+
 impl Player {
     pub fn new(name: &str) -> Player {
         let mut player = Player {
@@ -121,16 +128,15 @@ impl Player {
         }
     }
 
-    pub fn index_from_hand(&self) -> Option<usize> {
-        // For now, play the first card in the hand
-        match self.hand.len() {
-            0 => None,
-            _ => Some(0)
-        }
-    }
+    pub fn index_from(&self, card_pile: CardPile) -> Option<usize> {
+        let card_pile = match card_pile {
+            CardPile::Discard => &self.discard,
+            CardPile::Deck => &self.deck,
+            CardPile::Hand => &self.hand,
+            CardPile::InPlay => &self.in_play
+        };
 
-    pub fn index_from_play(&self) -> Option<usize> {
-        match self.in_play.len() {
+        match card_pile.len() {
             0 => None,
             _ => Some(0)
         }
@@ -189,7 +195,7 @@ impl Player {
             None => ()
         }
 
-        match self.index_from_hand() {
+        match self.index_from(CardPile::Hand) {
             Some(i) => self.perrenial_choices.push(Choice::Play(i)),
             None => ()
         }
@@ -203,7 +209,7 @@ impl Player {
         match self.turn_start_choices.pop() {
             Some(c) => match c {
                 Choice::DiscardCard(_) => {
-                    match self.index_from_hand() {
+                    match self.index_from(CardPile::Hand) {
                         Some(i) => Choice::DiscardCard(i),
                         None => self.make_perennial_choice(trade_row, opponents)
                     }
