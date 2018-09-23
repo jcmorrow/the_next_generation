@@ -1,3 +1,4 @@
+use card::Faction;
 use trade_row::TradeRow;
 use player::Player;
 
@@ -6,6 +7,7 @@ use player::Player;
 pub enum Choice {
     AcquireFromTradeRow(usize),
     Attack(usize),
+    BlobDraw(usize),
     Buy(usize),
     Decline,
     DestroyBase(usize, usize),
@@ -20,7 +22,6 @@ pub enum Choice {
     Play(usize),
     ScrapDiscard(usize),
     ScrapHand(usize),
-    Scrap(usize),
     ScrapFromTradeRow(usize),
     ScrapSelf(usize),
 }
@@ -34,6 +35,9 @@ impl Choice {
             Choice::Play(i) => {
                 let mut card = player.hand.remove(i);
                 println!("{} plays {}", player.name, card.name);
+                if card.faction == Faction::Blob {
+                    player.blobs_played_this_turn += 1;
+                }
                 card.run(player, opponents, trade_row);
                 player.in_play.push(card);
             },
@@ -119,6 +123,12 @@ impl Choice {
                 println!("{}'s {} scraps itself", player.name, card.name);
                 player.choices.extend(card.scrap_abilities.clone());
                 player.scrapped.push(card);
+            },
+            Choice::BlobDraw(n) => {
+                println!("{} draws {} cards from Blob World", player.name, n);
+                for _ in 0..n {
+                    player.draw();
+                }
             },
             _ => (),
         }

@@ -14,6 +14,7 @@ const STARTING_AUTHORITY: i32 = 50;
 #[derive(Debug)]
 pub struct Player {
     pub authority: i32,
+    pub blobs_played_this_turn: usize,
     pub choices: Vec<Choice>,
     pub combat: i32,
     pub deck: Vec<Card>,
@@ -38,6 +39,7 @@ impl Player {
     pub fn new(name: &str) -> Player {
         let mut player = Player {
             authority: STARTING_AUTHORITY,
+            blobs_played_this_turn: 0,
             choices: Vec::new(),
             combat: 0,
             discard: Vec::new(),
@@ -186,6 +188,12 @@ impl Player {
                                 None => Choice::Decline,
                             }
                         },
+                        Choice::BlobDraw(_) => {
+                            match self.blobs_played_this_turn {
+                                0 => Choice::Decline,
+                                n => Choice::BlobDraw(n),
+                            }
+                        },
                         Choice::ScrapDiscard(_) => {
                             match self.index_from(CardPile::Discard) {
                                 Some(i) => Choice::ScrapDiscard(i),
@@ -285,6 +293,10 @@ impl Player {
         for _i in 0..num_to_draw {
             self.draw();
         }
+
+        for base in &self.in_play {
+            self.choices.extend(base.abilities.clone());
+        }
     }
 
     pub fn end_turn(&mut self) {
@@ -303,6 +315,7 @@ impl Player {
         for card in &mut self.in_play { card.has_used_ally_ability = false; }
         for card in &mut self.scrapped { card.has_used_ally_ability = false; }
         self.turn_start_choices.clear();
+        self.blobs_played_this_turn = 0;
     }
 }
 
