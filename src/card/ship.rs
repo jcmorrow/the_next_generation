@@ -18,7 +18,8 @@ pub fn battle_blob() -> Card {
 
 pub fn battle_pod() -> Card {
     Card {
-        abilities: vec!(Choice::GainAttack(4)),
+        abilities: vec!(Choice::ScrapFromTradeRow(0), Choice::GainAttack(4)),
+        ally_abilities: vec!(Choice::GainAttack(2)),
         card_type: CardType::Ship,
         cost: 2,
         faction: Faction::Blob,
@@ -30,8 +31,8 @@ pub fn battle_pod() -> Card {
 
 pub fn blob_carrier() -> Card {
     Card {
-        ally_abilities: vec!(Choice::AcquireFromTradeRow(0)),
         abilities: vec!(Choice::GainAttack(7)),
+        ally_abilities: vec!(Choice::AcquireFromTradeRow(0)),
         card_type: CardType::Ship,
         cost: 6,
         faction: Faction::Blob,

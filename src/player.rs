@@ -214,6 +214,12 @@ impl Player {
                             // Stupid robot choices
                             Choice::AndOr(a, b, random(), random())
                         },
+                        Choice::ScrapFromTradeRow(_) => {
+                            match trade_row.index_from() {
+                                Some(i) => Choice::ScrapFromTradeRow(i),
+                                None => Choice::Decline
+                            }
+                        },
                         c => c
                     },
                     None => Choice::EndTurn
