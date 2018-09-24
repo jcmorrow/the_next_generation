@@ -1,4 +1,5 @@
 use card::Faction;
+use card::ShipType;
 use trade_row::TradeRow;
 use player::Player;
 
@@ -137,13 +138,23 @@ impl Choice {
                 }
             },
             Choice::CopyShip(i) => {
-                let mut card = player.in_play[i].clone();
-                println!("{}'s Stealth Needle copies {}", player.name, card.name);
-                if card.faction == Faction::Blob {
+                let mut card_to_copy = player.in_play[i].clone();
+
+                for mut card in &mut player.in_play {
+                    match card.ship_type {
+                        ShipType::StealthNeedle => {
+                            player.choices.extend(card_to_copy.abilities.clone());
+                            player.choices.extend(card_to_copy.ally_abilities.clone());
+                            card.scrap_abilities.extend(card_to_copy.scrap_abilities.clone());
+                        },
+                        _ => ()
+                    }
+                }
+                println!("{}'s Stealth Needle copies {}", player.name, card_to_copy.name);
+                if card_to_copy.faction == Faction::Blob {
                     player.blobs_played_this_turn += 1;
                 }
-                card.run(player, opponents, trade_row);
-                player.in_play.push(card);
+                card_to_copy.run(player, opponents, trade_row);
             }
             _ => (),
         }

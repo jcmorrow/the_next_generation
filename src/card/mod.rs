@@ -116,6 +116,7 @@ pub struct Card {
     pub base_type: BaseType,
     pub card_type: CardType,
     pub cost: i32,
+    pub ephemeral: bool, // Stealth Needle shenanigans
     pub faction: Faction,
     pub has_used_ally_ability: bool,
     pub health: i32,
@@ -130,7 +131,13 @@ impl Card {
                player: &mut Player,
                opponents: &[&mut Player],
                trade_row: &mut TradeRow) {
-        player.choices.extend(self.abilities.clone());
+        for ability in self.abilities.clone() {
+            match ability {
+                Choice::GainAttack(_) => player.turn_start_choices.push(ability),
+                Choice::GainTrade(_) => player.turn_start_choices.push(ability),
+                _ => player.choices.push(ability)
+            }
+        }
         for card in &mut player.in_play {
             if card.faction == self.faction && !card.has_used_ally_ability
             {
