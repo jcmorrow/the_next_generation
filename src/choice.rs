@@ -141,6 +141,8 @@ impl Choice {
             _ => (),
         }
 
-        Event::new("Play", player)
+        let x:() = &*player;
+
+        Event::new("Play", &*player)
     }
 }
