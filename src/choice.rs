@@ -25,6 +25,7 @@ pub enum Choice {
     ScrapSelf(usize),
 }
 
+#[derive(Debug)]
 pub struct Event<'a> {
     player: &'a Player,
     // card: &'a Card,
@@ -44,10 +45,9 @@ impl<'a> Event<'a> {
 
 impl Choice {
     pub fn choose<'a>(self,
-                  player: &mut Player,
+                  player: &'a mut Player,
                   mut opponents: &mut [&mut Player],
-                  trade_row: &mut TradeRow,
-                  current_player_ref: &'a Player) -> Event<'a> {
+                  trade_row: &mut TradeRow) -> Event<'a> {
         match self {
             Choice::Play(i) => {
                 let mut card = player.hand.remove(i);
@@ -141,6 +141,6 @@ impl Choice {
             _ => (),
         }
 
-        Event::new("Play", current_player_ref)
+        Event::new("Play", player)
     }
 }
