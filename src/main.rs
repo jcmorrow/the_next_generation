@@ -6,6 +6,7 @@ use trade_row::TradeRow;
 
 mod choice;
 mod card;
+mod event;
 mod player;
 mod trade_row;
 

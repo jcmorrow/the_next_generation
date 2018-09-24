@@ -3,6 +3,7 @@ use card::Card;
 use card::CardType;
 use card::Faction;
 use card::ship;
+use event::Event;
 use trade_row::TradeRow;
 
 use rand::{random, thread_rng, Rng};
@@ -12,12 +13,13 @@ const HAND_SIZE: usize = 5;
 const STARTING_AUTHORITY: i32 = 50;
 
 #[derive(Debug)]
-pub struct Player {
+pub struct Player<'a> {
     pub authority: i32,
     pub choices: Vec<Choice>,
     pub combat: i32,
     pub deck: Vec<Card>,
     pub discard: Vec<Card>,
+    pub events: Vec<Event<'a>>,
     pub hand: Vec<Card>,
     pub in_play: Vec<Card>,
     pub name: String,
@@ -34,7 +36,7 @@ pub enum CardPile {
     InPlay
 }
 
-impl Player {
+impl<'a> Player<'a> {
     pub fn new(name: &str) -> Player {
         let mut player = Player {
             authority: STARTING_AUTHORITY,
@@ -42,6 +44,7 @@ impl Player {
             combat: 0,
             discard: Vec::new(),
             deck: Vec::new(),
+            events: Vec::new(),
             hand: Vec::new(),
             in_play: Vec::new(),
             name: name.to_string(),
@@ -306,7 +309,7 @@ impl Player {
     }
 }
 
-impl fmt::Display for Player {
+impl<'a> fmt::Display for Player<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Name: {}\n", self.name).unwrap();
         write!(f, "Authority: {}\n", self.authority).unwrap();

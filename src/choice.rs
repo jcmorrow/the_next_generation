@@ -1,5 +1,6 @@
-use trade_row::TradeRow;
+use event::Event;
 use player::Player;
+use trade_row::TradeRow;
 
 #[derive(Debug)]
 #[derive(Clone)]
@@ -36,6 +37,7 @@ impl Choice {
                 println!("{} plays {}", player.name, card.name);
                 card.run(player, opponents, trade_row);
                 player.in_play.push(card);
+                player.events.push(Event{ card: Some(&card) });
             },
             Choice::DestroyBase(opponent, base) => {
                 let chosen_opponent = &mut opponents[opponent];
