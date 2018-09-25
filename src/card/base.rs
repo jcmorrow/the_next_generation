@@ -3,7 +3,9 @@ use card::CardType;
 use card::Faction;
 use card::BaseType;
 use choice::Choice;
+use effect::Effect;
 
+// TODO: shit we have to figure out an OR of an effect and a choice...
 // pub fn blob_world() -> Card {
 //     Card {
 //         abilities: vec!(Choice::Or(
