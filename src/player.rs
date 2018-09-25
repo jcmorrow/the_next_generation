@@ -181,12 +181,6 @@ impl Player {
                                 None => Choice::Decline,
                             }
                         },
-                        Choice::DiscardAttack(_) => {
-                            match self.index_discard_opponents(opponents) {
-                                Some(i) => Choice::DiscardAttack(i),
-                                None => Choice::Decline
-                            }
-                        },
                         Choice::DestroyBase(_, _) => {
                             match self.indices_destroy_base(opponents) {
                                 Some(opponent_base) => Choice::DestroyBase(
@@ -244,7 +238,16 @@ impl Player {
         while self.effects.len() > 0 {
             match self.effects.pop() {
                 None => {println!("oh noews")},
-                Some(e) => e.process(self, opponents, trade_row)
+                Some(e) => match e {
+                    Effect::DiscardAttack(_) => {
+                        let e = match self.index_discard_opponents(opponents) {
+                            Some(i) => Effect::DiscardAttack(i),
+                            None => Effect::Empty
+                        };
+                        e.process(self, opponents, trade_row)
+                    },
+                    _ => e.process(self, opponents, trade_row)
+                }
             }
         }
     }
@@ -274,7 +277,7 @@ impl Player {
         }
 
         for (index, card) in self.in_play.iter().enumerate() {
-            if card.scrap_abilities.len() > 0 {
+            if card.scrap_abilities.len() > 0 || card.scrap_effects.len() > 0 {
                 self.perrenial_choices.push(Choice::ScrapSelf(index));
             }
         }

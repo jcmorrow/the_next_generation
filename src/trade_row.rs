@@ -46,6 +46,7 @@ impl TradeRow {
         // for _n in 0..2 { trade_row.deck.push(ship::blob_destroyer()); }
         // for _n in 0..3 { trade_row.deck.push(ship::imperial_fighter()); }
         // for _n in 0..3 { trade_row.deck.push(ship::trade_bot()); }
+        for _n in 0..20 { trade_row.deck.push(ship::imperial_fighter()); }
         for _n in 0..20 { trade_row.deck.push(ship::cutter()); }
 
         thread_rng().shuffle(&mut trade_row.deck);
