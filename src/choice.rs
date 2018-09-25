@@ -1,4 +1,5 @@
 use card::Faction;
+use effect::Effect;
 use trade_row::TradeRow;
 use player::Player;
 
@@ -86,8 +87,7 @@ impl Choice {
                     Choice::DiscardCard(0))
             },
             Choice::GainAttack(n) => {
-                println!("{} gains {} attack", player.name, n);
-                player.combat += n;
+                player.effects.push(Effect::GainCombat(n));
             },
             Choice::GainAuthority(n) => {
                 println!("{} gains {} authority", player.name, n);

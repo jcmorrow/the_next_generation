@@ -1,5 +1,6 @@
 use std::fmt;
 
+use effect::Effect;
 use player::Player;
 use trade_row::TradeRow;
 use choice::Choice;
@@ -114,6 +115,7 @@ pub struct Card {
     pub base_type: BaseType,
     pub card_type: CardType,
     pub cost: i32,
+    pub effects: Vec<Effect>,
     pub faction: Faction,
     pub has_used_ally_ability: bool,
     pub health: i32,
@@ -129,6 +131,7 @@ impl Card {
                opponents: &[&mut Player],
                trade_row: &mut TradeRow) {
         player.choices.extend(self.abilities.clone());
+        player.effects.extend(self.effects.clone());
         for card in &mut player.in_play {
             if card.faction == self.faction && !card.has_used_ally_ability
             {
