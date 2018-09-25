@@ -1,5 +1,4 @@
 use card::Faction;
-use effect::Effect;
 use trade_row::TradeRow;
 use player::Player;
 
@@ -12,13 +11,9 @@ pub enum Choice {
     Buy(usize),
     Decline,
     DestroyBase(usize, usize),
-    DiscardAttack(usize),
     DiscardCard(usize),
     AndOr(Box<Choice>, Box<Choice>, bool, bool),
     EndTurn,
-    GainAttack(i32),
-    GainAuthority(i32),
-    GainTrade(i32),
     Or(Box<Choice>, Box<Choice>, bool),
     Play(usize),
     ScrapDiscard(usize),
@@ -81,11 +76,6 @@ impl Choice {
                 opponents[i].authority -= combat;
                 player.combat = 0;
             },
-            Choice::DiscardAttack(opponent_index) => {
-                println!("{} makes {} discard!", player.name, opponents[opponent_index].name);
-                opponents[opponent_index].turn_start_choices.push(
-                    Choice::DiscardCard(0))
-            },
             Choice::Or(a, b, first) => {
                 let choice = match first {
                     true => { *a },
@@ -114,8 +104,9 @@ impl Choice {
             },
             Choice::ScrapSelf(i) => {
                 let card = player.in_play.remove(i);
-                println!("{}'s {} scraps itself", player.name, card.name);
+                println!("{} chooses to scrap {}", player.name, card.name);
                 player.choices.extend(card.scrap_abilities.clone());
+                player.effects.extend(card.scrap_effects.clone());
                 player.scrapped.push(card);
             },
             Choice::BlobDraw(n) => {

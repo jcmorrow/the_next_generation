@@ -124,6 +124,7 @@ pub struct Card {
     pub name: String,
     pub outpost_type: OutpostType,
     pub scrap_abilities: Vec<Choice>,
+    pub scrap_effects: Vec<Effect>,
     pub ship_type: ShipType,
 }
 
