@@ -86,16 +86,6 @@ impl Choice {
                 opponents[opponent_index].turn_start_choices.push(
                     Choice::DiscardCard(0))
             },
-            Choice::GainAttack(n) => {
-                player.effects.push(Effect::GainCombat(n));
-            },
-            Choice::GainAuthority(n) => {
-                println!("{} gains {} authority", player.name, n);
-                player.authority += n;
-            },
-            Choice::GainTrade(n) => {
-                player.effects.push(Effect::GainTrade(n));
-            },
             Choice::Or(a, b, first) => {
                 let choice = match first {
                     true => { *a },

@@ -46,6 +46,7 @@ pub enum ShipType {
     BattlePod,
     BlobCarrier,
     BlobDestroyer,
+    Cutter,
     Explorer,
     ImperialFighter,
     NoShipType,
@@ -112,6 +113,7 @@ impl fmt::Display for CardType {
 pub struct Card {
     pub abilities: Vec<Choice>,
     pub ally_abilities: Vec<Choice>,
+    pub ally_effects: Vec<Effect>,
     pub base_type: BaseType,
     pub card_type: CardType,
     pub cost: i32,
@@ -136,12 +138,14 @@ impl Card {
             if card.faction == self.faction && !card.has_used_ally_ability
             {
                 card.has_used_ally_ability = true;
-                player.choices.extend(card.ally_abilities.clone())
+                player.choices.extend(card.ally_abilities.clone());
+                player.effects.extend(card.ally_effects.clone());
             }
         }
         if player.has_ally_in_play(&self.faction) {
             self.has_used_ally_ability = true;
             player.choices.extend(self.ally_abilities.clone());
+            player.effects.extend(self.ally_effects.clone());
         }
     }
 }

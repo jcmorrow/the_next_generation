@@ -63,6 +63,19 @@ use effect::Effect;
 //     }
 // }
 //
+pub fn cutter() -> Card {
+    Card {
+        ally_effects: vec!(Effect::GainCombat(4)),
+        card_type: CardType::Ship,
+        cost: 2,
+        effects: vec!(Effect::GainTrade(2), Effect::GainAuthority(4)),
+        faction: Faction::TradeFederation,
+        name: String::from("Cutter"),
+        ship_type: ShipType::Cutter,
+        ..Default::default()
+    }
+}
+
 pub fn explorer() -> Card {
     Card {
         abilities: vec!(Choice::GainTrade(2)),
