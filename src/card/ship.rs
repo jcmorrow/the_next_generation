@@ -88,15 +88,15 @@ pub fn explorer() -> Card {
 //     }
 // }
 //
-// pub fn scout() -> Card {
-//     Card {
-//         abilities: vec!(Choice::GainTrade(1)),
-//         card_type: CardType::Ship,
-//         name: String::from("Scout"),
-//         ship_type: ShipType::Scout,
-//         ..Default::default()
-//     }
-// }
+pub fn scout() -> Card {
+    Card {
+        card_type: CardType::Ship,
+        effects: vec!(Effect::GainTrade(1)),
+        name: String::from("Scout"),
+        ship_type: ShipType::Scout,
+        ..Default::default()
+    }
+}
 //
 // pub fn trade_bot() -> Card {
 //     Card {

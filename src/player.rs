@@ -56,17 +56,13 @@ impl Player {
             turn_start_choices: Vec::new()
         };
 
-        // for _n in 0..8 {
-        //     player.deck.push(ship::scout());
-        // }
-
-        for _n in 0..10 {
-            player.deck.push(ship::viper());
+        for _n in 0..8 {
+            player.deck.push(ship::scout());
         }
 
-        // for _n in 0..2 {
-        //     player.deck.push(ship::viper());
-        // }
+        for _n in 0..2 {
+            player.deck.push(ship::viper());
+        }
 
         thread_rng().shuffle(&mut player.deck);
 

@@ -94,8 +94,7 @@ impl Choice {
                 player.authority += n;
             },
             Choice::GainTrade(n) => {
-                println!("{} gains {} trade", player.name, n);
-                player.trade += n;
+                player.effects.push(Effect::GainTrade(n));
             },
             Choice::Or(a, b, first) => {
                 let choice = match first {
