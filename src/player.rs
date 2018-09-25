@@ -3,6 +3,7 @@ use card::Card;
 use card::CardType;
 use card::Faction;
 use card::ship;
+use effect::Effect;
 use trade_row::TradeRow;
 
 use rand::{random, thread_rng, Rng};
@@ -19,6 +20,7 @@ pub struct Player {
     pub combat: i32,
     pub deck: Vec<Card>,
     pub discard: Vec<Card>,
+    pub effects: Vec<Effect>,
     pub hand: Vec<Card>,
     pub in_play: Vec<Card>,
     pub name: String,
@@ -44,6 +46,7 @@ impl Player {
             combat: 0,
             discard: Vec::new(),
             deck: Vec::new(),
+            effects: Vec::new(),
             hand: Vec::new(),
             in_play: Vec::new(),
             name: name.to_string(),
@@ -53,13 +56,17 @@ impl Player {
             turn_start_choices: Vec::new()
         };
 
-        for _n in 0..8 {
-            player.deck.push(ship::scout());
-        }
+        // for _n in 0..8 {
+        //     player.deck.push(ship::scout());
+        // }
 
-        for _n in 0..2 {
+        for _n in 0..10 {
             player.deck.push(ship::viper());
         }
+
+        // for _n in 0..2 {
+        //     player.deck.push(ship::viper());
+        // }
 
         thread_rng().shuffle(&mut player.deck);
 
@@ -235,12 +242,25 @@ impl Player {
         }
     }
 
+    pub fn process_effects(&mut self,
+                           trade_row: &TradeRow,
+                           opponents: &mut [&mut Player]) {
+        while self.effects.len() > 0 {
+            match self.effects.pop() {
+                None => {println!("oh noews")},
+                Some(e) => e.process(self, opponents, trade_row)
+            }
+        }
+    }
+
+
     pub fn make_choice(&mut self,
                        trade_row: &TradeRow,
                        opponents: &[&mut Player]) -> Choice {
         if self.turn_start_choices.len() > 0 {
             return self.turn_start_choices.pop().unwrap()
         }
+
         self.perrenial_choices.clear();
         match self.index_attack_opponents(opponents) {
             Some(i) => self.perrenial_choices.push(Choice::Attack(i)),
