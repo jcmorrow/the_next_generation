@@ -1,7 +1,6 @@
 extern crate rand;
 
 use choice::Choice;
-use effect::Effect;
 use player::Player;
 use trade_row::TradeRow;
 
@@ -28,7 +27,6 @@ fn main() {
         current_player[0].begin_turn();
         print!("{:#}", current_player[0]);
         loop {
-            current_player[0].process_effects(&trade_row, opponents);
             let choice = current_player[0].make_choice(&trade_row, opponents);
             match choice {
                 Choice::EndTurn => break,

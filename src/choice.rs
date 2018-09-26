@@ -1,4 +1,5 @@
 use card::Faction;
+use effect::Effect;
 use trade_row::TradeRow;
 use player::Player;
 
@@ -6,14 +7,17 @@ use player::Player;
 #[derive(Clone)]
 pub enum Choice {
     AcquireFromTradeRow(usize),
+    AndOr(Box<Choice>, Box<Choice>, bool, bool),
     Attack(usize),
     BlobDraw(usize),
     Buy(usize),
     Decline,
     DestroyBase(usize, usize),
     DiscardCard(usize),
-    AndOr(Box<Choice>, Box<Choice>, bool, bool),
     EndTurn,
+    GainAuthority(i32),
+    GainCombat(i32),
+    GainTrade(i32),
     Or(Box<Choice>, Box<Choice>, bool),
     Play(usize),
     ScrapDiscard(usize),
@@ -85,14 +89,14 @@ impl Choice {
                 player.choices.push(choice);
             },
             Choice::ScrapDiscard(i) => {
-                let card = player.discard.remove(i);
+                let card = &player.discard[i];
                 println!("{} scraps {} from discard", player.name, card.name);
-                player.scrapped.push(card);
+                player.effects.push(Effect::ScrapDiscard(i));
             },
             Choice::ScrapHand(i) => {
-                let card = player.hand.remove(i);
+                let card = &player.hand[i];
                 println!("{} scraps {} from hand", player.name, card.name);
-                player.scrapped.push(card);
+                player.effects.push(Effect::ScrapHand(i));
             },
             Choice::AndOr(a, b, first, second) => {
                 if first {
@@ -103,11 +107,11 @@ impl Choice {
                 }
             },
             Choice::ScrapSelf(i) => {
-                let card = player.in_play.remove(i);
+                let card = &player.in_play[i];
                 println!("{} chooses to scrap {}", player.name, card.name);
                 player.choices.extend(card.scrap_abilities.clone());
                 player.effects.extend(card.scrap_effects.clone());
-                player.scrapped.push(card);
+                player.effects.push(Effect::ScrapSelf(i));
             },
             Choice::BlobDraw(n) => {
                 println!("{} draws {} cards from Blob World", player.name, n);
@@ -115,7 +119,17 @@ impl Choice {
                     player.draw();
                 }
             },
+            Choice::GainAuthority(n) => {
+                player.effects.push(Effect::GainAuthority(n));
+            },
+            Choice::GainCombat(n) => {
+                player.effects.push(Effect::GainCombat(n));
+            },
+            Choice::GainTrade(n) => {
+                player.effects.push(Effect::GainTrade(n));
+            },
             _ => (),
         }
+        player.process_effects(&trade_row, opponents);
     }
 }
