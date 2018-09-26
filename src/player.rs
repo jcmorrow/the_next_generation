@@ -235,19 +235,19 @@ impl Player {
     pub fn process_effects(&mut self,
                            trade_row: &TradeRow,
                            opponents: &mut [&mut Player]) {
-        while self.effects.len() > 0 {
-            match self.effects.pop() {
-                None => {println!("oh noews")},
-                Some(e) => match e {
-                    Effect::DiscardAttack(_) => {
-                        let e = match self.index_discard_opponents(opponents) {
-                            Some(i) => Effect::DiscardAttack(i),
-                            None => Effect::Empty
-                        };
-                        e.process(self, opponents, trade_row)
-                    },
-                    _ => e.process(self, opponents, trade_row)
-                }
+        let mut effects = Vec::new();
+        effects.extend(self.effects.drain(0..));
+
+        for effect in &effects {
+            match effect {
+                Effect::DiscardAttack(_) => {
+                    let e = match self.index_discard_opponents(opponents) {
+                        Some(i) => Effect::DiscardAttack(i),
+                        None => Effect::Empty
+                    };
+                    e.process(self, opponents, trade_row)
+                },
+                e => e.process(self, opponents, trade_row)
             }
         }
     }

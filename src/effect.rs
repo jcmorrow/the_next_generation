@@ -9,12 +9,14 @@ pub enum Effect {
     GainAuthority(i32),
     GainCombat(i32),
     GainTrade(i32),
+    ScrapDiscard(usize),
+    ScrapHand(usize),
     ScrapSelf(usize),
     Empty
 }
 
 impl Effect {
-    pub fn process(self,
+    pub fn process(&self,
                    player: &mut Player,
                    opponents: &mut [&mut Player],
                    trade_row: &TradeRow) {
@@ -33,9 +35,21 @@ impl Effect {
                 player.trade += n;
             },
             Effect::DiscardAttack(opponent_index) => {
-                println!("{} makes {} discard!", player.name, opponents[opponent_index].name);
-                opponents[opponent_index].turn_start_choices.push(
+                println!("{} makes {} discard!", player.name, opponents[*opponent_index].name);
+                opponents[*opponent_index].turn_start_choices.push(
                     Choice::DiscardCard(0))
+            },
+            Effect::ScrapDiscard(i) => {
+                let card = player.discard.remove(*i);
+                player.scrapped.push(card);
+            },
+            Effect::ScrapHand(i) => {
+                let card = player.hand.remove(*i);
+                player.scrapped.push(card);
+            },
+            Effect::ScrapSelf(i) => {
+                let card = player.in_play.remove(*i);
+                player.scrapped.push(card);
             },
             _ => ()
         }
