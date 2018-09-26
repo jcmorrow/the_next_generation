@@ -35,7 +35,6 @@ impl TradeRow {
             scrapped: Vec::new()
         };
 
-
         for _n in 0..1 { trade_row.deck.push(base::blob_world()); }
         for _n in 0..1 { trade_row.deck.push(base::the_hive()); }
         for _n in 0..1 { trade_row.deck.push(ship::battle_blob()); }
@@ -46,6 +45,7 @@ impl TradeRow {
         for _n in 0..2 { trade_row.deck.push(ship::blob_destroyer()); }
         for _n in 0..3 { trade_row.deck.push(ship::imperial_fighter()); }
         for _n in 0..3 { trade_row.deck.push(ship::trade_bot()); }
+        for _n in 0..1 { trade_row.deck.push(ship::stealth_needle()); }
 
         thread_rng().shuffle(&mut trade_row.deck);
 

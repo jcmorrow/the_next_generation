@@ -2,6 +2,7 @@ use choice::Choice;
 use card::Card;
 use card::CardType;
 use card::Faction;
+use card::ShipType;
 use card::ship;
 use trade_row::TradeRow;
 
@@ -85,6 +86,26 @@ impl Player {
         bases
     }
 
+    pub fn ships_to_copy(&self) -> Option<usize> {
+        let mut any_ships = false;
+        let mut highest_cost = 0;
+        let mut highest_cost_index: usize = 0;
+        for (i, card) in self.in_play.iter().enumerate() {
+            if card.card_type == CardType::Ship && card.ship_type != ShipType::StealthNeedle {
+                any_ships = true;
+                if card.cost >= highest_cost {
+                    highest_cost = card.cost;
+                    highest_cost_index = i;
+                }
+            }
+        }
+
+        match any_ships {
+            false => None,
+            true => Some(highest_cost_index)
+        }
+    }
+
     fn index_attack_opponents(&self, opponents: &[&mut Player]) -> Option<usize> {
         match opponents.len() {
             0 => None,
@@ -113,11 +134,11 @@ impl Player {
         }
     }
 
-    fn index_acquire_from_trade_row(&self,
-                                    trade_row: &TradeRow) -> Option<usize> {
+    fn index_of_most_expensive_card(&self,
+                                    cards: &Vec<Card>) -> Option<usize> {
         let mut highest_cost = 0;
         let mut highest_cost_index = 0;
-        for (index, card) in trade_row.face_up.iter().enumerate() {
+        for (index, card) in cards.iter().enumerate() {
             if card.cost >= highest_cost {
                 highest_cost = card.cost;
                 highest_cost_index = index;
@@ -173,7 +194,7 @@ impl Player {
                 match self.choices.pop() {
                     Some(c) => match c {
                         Choice::AcquireFromTradeRow(_) => {
-                            match self.index_acquire_from_trade_row(trade_row) {
+                            match self.index_of_most_expensive_card(&trade_row.face_up) {
                                 Some(i) => Choice::AcquireFromTradeRow(i),
                                 None => Choice::Decline,
                             }
@@ -225,6 +246,12 @@ impl Player {
                             match self.index_scrap_from_trade_row(trade_row) {
                                 Some(i) => Choice::ScrapFromTradeRow(i),
                                 None => Choice::Decline
+                            }
+                        },
+                        Choice::CopyShip(_) => {
+                            match self.ships_to_copy() {
+                                None => Choice::Decline,
+                                Some(n) => Choice::CopyShip(n)
                             }
                         },
                         c => c
@@ -320,7 +347,14 @@ impl Player {
             }
         }
         for i in to_discard.iter().rev() {
-            self.discard.push(self.in_play.remove(*i));
+            let mut card = self.in_play.remove(*i);
+
+            match card.ship_type {
+                ShipType::StealthNeedle => {
+                    self.discard.push(ship::stealth_needle())
+                },
+                _ => self.discard.push(card)
+            }
         }
         for card in &mut self.discard { card.has_used_ally_ability = false; }
         for card in &mut self.deck { card.has_used_ally_ability = false; }
