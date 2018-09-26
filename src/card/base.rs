@@ -3,6 +3,7 @@ use card::CardType;
 use card::Faction;
 use card::BaseType;
 use choice::Choice;
+use effect::Effect;
 
 pub fn blob_world() -> Card {
     Card {
