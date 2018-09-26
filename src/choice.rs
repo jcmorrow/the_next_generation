@@ -116,7 +116,7 @@ impl Choice {
             Choice::BlobDraw(n) => {
                 println!("{} draws {} cards from Blob World", player.name, n);
                 for _ in 0..n {
-                    player.draw();
+                    player.effects.push(Effect::Draw);
                 }
             },
             Choice::GainAuthority(n) => {

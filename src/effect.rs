@@ -6,6 +6,7 @@ use player::Player;
 #[derive(Clone)]
 pub enum Effect {
     DiscardAttack(usize),
+    Draw,
     GainAuthority(i32),
     GainCombat(i32),
     GainTrade(i32),
@@ -38,6 +39,10 @@ impl Effect {
                 println!("{} makes {} discard!", player.name, opponents[*opponent_index].name);
                 opponents[*opponent_index].turn_start_choices.push(
                     Choice::DiscardCard(0))
+            },
+            Effect::Draw => {
+                println!("{} draws a card.", player.name);
+                player.draw();
             },
             Effect::ScrapDiscard(i) => {
                 let card = player.discard.remove(*i);

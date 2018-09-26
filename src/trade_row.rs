@@ -37,7 +37,7 @@ impl TradeRow {
 
 
         for _n in 0..1 { trade_row.deck.push(base::blob_world()); }
-        // for _n in 0..1 { trade_row.deck.push(base::the_hive()); }
+        for _n in 0..1 { trade_row.deck.push(base::the_hive()); }
         for _n in 0..1 { trade_row.deck.push(ship::battle_blob()); }
         for _n in 0..1 { trade_row.deck.push(ship::blob_carrier()); }
         for _n in 0..2 { trade_row.deck.push(outpost::battle_station()); }
@@ -48,6 +48,8 @@ impl TradeRow {
         for _n in 0..3 { trade_row.deck.push(ship::trade_bot()); }
         for _n in 0..3 { trade_row.deck.push(ship::imperial_fighter()); }
         for _n in 0..3 { trade_row.deck.push(ship::cutter()); }
+        for _n in 0..3 { trade_row.deck.push(ship::blob_fighter()); }
+        for _n in 0..1 { trade_row.deck.push(ship::mothership()); }
 
         thread_rng().shuffle(&mut trade_row.deck);
 

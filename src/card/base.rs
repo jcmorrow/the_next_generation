@@ -21,14 +21,15 @@ pub fn blob_world() -> Card {
     }
 }
 
-// pub fn the_hive() -> Card {
-//     Card {
-//         card_type: CardType::Base,
-//         cost: 5,
-//         faction: Faction::Blob,
-//         health: 5,
-//         name: String::from("The Hive"),
-//         base_type: BaseType::TheHive,
-//         ..Default::default()
-//     }
-// }
+pub fn the_hive() -> Card {
+    Card {
+        ally_effects: vec!(Effect::Draw),
+        card_type: CardType::Base,
+        cost: 5,
+        faction: Faction::Blob,
+        health: 5,
+        name: String::from("The Hive"),
+        base_type: BaseType::TheHive,
+        ..Default::default()
+    }
+}
