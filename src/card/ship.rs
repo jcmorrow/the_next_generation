@@ -7,7 +7,6 @@ use effect::Effect;
 
 pub fn battle_blob() -> Card {
     Card {
-        // ally_abilities: vec!(Choice::Draw),
         card_type: CardType::Ship,
         cost: 6,
         effects: vec!(Effect::GainCombat(8)),
