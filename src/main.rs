@@ -4,10 +4,11 @@ use choice::Choice;
 use player::Player;
 use trade_row::TradeRow;
 
-mod choice;
 mod card;
+mod choice;
 mod effect;
 mod player;
+mod strategy;
 mod trade_row;
 
 fn main() {
@@ -21,11 +22,11 @@ fn main() {
     players.push(&mut player_2);
     while !players.iter().any(|ref p| p.authority < 1)
     {
-        print!("Turn {}\n", turn_count);
+        println!("Turn {}", turn_count);
         players.rotate_left(1);
         let (current_player, opponents)  = &mut players.split_at_mut(1);
         current_player[0].begin_turn();
-        print!("{:#}", current_player[0]);
+        println!("{:#}", current_player[0]);
         loop {
             let choice = current_player[0].make_choice(&trade_row, opponents);
             match choice {
@@ -35,6 +36,6 @@ fn main() {
         }
         current_player[0].end_turn();
         turn_count = turn_count + 1;
-        print!("\n{:#}", trade_row);
+        println!("{:#}\n", trade_row);
     }
 }
