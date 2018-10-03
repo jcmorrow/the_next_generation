@@ -52,8 +52,10 @@ pub enum ShipType {
     ImperialFighter,
     Mothership,
     NoShipType,
+    Ram,
     Scout,
     TradeBot,
+    TradePod,
     Viper,
 }
 
@@ -76,6 +78,8 @@ impl Default for OutpostType {
 #[derive(Clone)]
 #[derive(Debug)]
 pub enum BaseType {
+    BlobWheel,
+    BlobWorld,
     TheHive,
     NoBaseType,
 }
