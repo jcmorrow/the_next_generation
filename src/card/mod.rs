@@ -43,6 +43,7 @@ impl Default for CardType {
 #[derive(Debug)]
 pub enum ShipType {
     BattleBlob,
+    BattleMech,
     BattlePod,
     BlobCarrier,
     BlobDestroyer,
@@ -50,10 +51,14 @@ pub enum ShipType {
     Cutter,
     Explorer,
     ImperialFighter,
+    MissleBot,
+    MissleMech,
     Mothership,
     NoShipType,
+    PatrolMech,
     Ram,
     Scout,
+    SupplyBot,
     TradeBot,
     TradePod,
     Viper,
@@ -65,8 +70,13 @@ impl Default for ShipType {
 
 #[derive(Clone)]
 #[derive(Debug)]
+#[derive(PartialEq)]
 pub enum OutpostType {
     BattleStation,
+    // BrainWorld,
+    Junkyard,
+    // MachineBase,
+    MechWorld,
     TradingPost,
     NoOutpostType,
 }
@@ -142,7 +152,8 @@ impl Card {
         player.choices.extend(self.abilities.clone());
         player.effects.extend(self.effects.clone());
         for card in &mut player.in_play {
-            if card.faction == self.faction && !card.has_used_ally_ability
+            if (card.faction == self.faction || card.outpost_type == OutpostType::MechWorld)
+                && !card.has_used_ally_ability
             {
                 card.has_used_ally_ability = true;
                 player.choices.extend(card.ally_abilities.clone());

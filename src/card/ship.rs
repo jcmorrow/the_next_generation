@@ -18,6 +18,24 @@ pub fn battle_blob() -> Card {
     }
 }
 
+pub fn battle_mech() -> Card {
+    Card {
+        abilities: vec!(Choice::Or(
+            Box::new(Choice::ScrapHand(0)),
+            Box::new(Choice::ScrapDiscard(0)),
+            true
+        )),
+        ally_effects: vec!(Effect::Draw),
+        card_type: CardType::Ship,
+        cost: 5,
+        effects: vec!(Effect::GainCombat(4)),
+        faction: Faction::MachineCult,
+        name: String::from("Battle Mech"),
+        ship_type: ShipType::BattleMech,
+        ..Default::default()
+    }
+}
+
 pub fn battle_pod() -> Card {
     Card {
         abilities: vec!(Choice::ScrapFromTradeRow(0)),
@@ -116,6 +134,39 @@ pub fn imperial_fighter() -> Card {
     }
 }
 
+pub fn missle_bot() -> Card {
+    Card {
+        abilities: vec!(
+            Choice::Or(
+                Box::new(Choice::ScrapHand(0)),
+                Box::new(Choice::ScrapDiscard(0)),
+                true
+            )),
+        ally_effects: vec!(Effect::GainCombat(2)),
+        card_type: CardType::Ship,
+        cost: 2,
+        effects: vec!(Effect::GainCombat(2)),
+        faction: Faction::MachineCult,
+        name: String::from("Missle Bot"),
+        ship_type: ShipType::MissleBot,
+        ..Default::default()
+    }
+}
+
+pub fn missle_mech() -> Card {
+    Card {
+        abilities: vec!(Choice::DestroyBase(0, 0)),
+        ally_effects: vec!(Effect::Draw),
+        card_type: CardType::Ship,
+        cost: 6,
+        effects: vec!(Effect::GainCombat(6)),
+        faction: Faction::MachineCult,
+        name: String::from("Missle Mech"),
+        ship_type: ShipType::MissleMech,
+        ..Default::default()
+    }
+}
+
 pub fn mothership() -> Card {
     Card {
         ally_effects: vec!(Effect::Draw),
@@ -125,6 +176,30 @@ pub fn mothership() -> Card {
         faction: Faction::Blob,
         name: String::from("Mothership"),
         ship_type: ShipType::Mothership,
+        ..Default::default()
+    }
+}
+
+pub fn patrol_mech() -> Card {
+    Card {
+        abilities: vec!(
+            Choice::Or(
+                Box::new(Choice::GainTrade(3)),
+                Box::new(Choice::GainCombat(5)),
+                true
+            )),
+        ally_abilities: vec!(
+            Choice::Or(
+                Box::new(Choice::ScrapHand(0)),
+                Box::new(Choice::ScrapDiscard(0)),
+                true
+            )
+        ),
+        card_type: CardType::Ship,
+        cost: 4,
+        faction: Faction::MachineCult,
+        name: String::from("Patrol Mech"),
+        ship_type: ShipType::PatrolMech,
         ..Default::default()
     }
 }
@@ -152,6 +227,30 @@ pub fn scout() -> Card {
         ..Default::default()
     }
 }
+
+pub fn supply_bot() -> Card {
+    Card {
+        abilities: vec!(
+            Choice::Or(
+                Box::new(Choice::ScrapHand(0)),
+                Box::new(Choice::ScrapDiscard(0)),
+                true
+            )
+        ),
+        ally_effects: vec!(Effect::GainCombat(2)),
+        card_type: CardType::Ship,
+        cost: 3,
+        effects: vec!(Effect::GainTrade(2)),
+        faction: Faction::MachineCult,
+        name: String::from("Supply Bot"),
+        ship_type: ShipType::SupplyBot,
+        ..Default::default()
+    }
+}
+
+// pub fn stealth_needle() -> Card {
+//      TODO
+// }
 
 pub fn trade_pod() -> Card {
     Card {

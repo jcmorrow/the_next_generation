@@ -18,6 +18,43 @@ pub fn battle_station() -> Card {
     }
 }
 
+// pub fn brain_world() -> Card {
+//      TODO
+// }
+
+pub fn junkyard() -> Card {
+    Card {
+        abilities: vec!(Choice::Or(
+            Box::new(Choice::ScrapHand(0)),
+            Box::new(Choice::ScrapDiscard(0)),
+            true
+        )),
+        card_type: CardType::Outpost,
+        cost: 6,
+        faction: Faction::MachineCult,
+        health: 5,
+        name: String::from("Junkyard"),
+        outpost_type: OutpostType::Junkyard,
+        ..Default::default()
+    }
+}
+
+pub fn mech_world() -> Card {
+    Card {
+        card_type: CardType::Outpost,
+        cost: 5,
+        faction: Faction::MachineCult,
+        health: 6,
+        name: String::from("Mech World"),
+        outpost_type: OutpostType::MechWorld,
+        ..Default::default()
+    }
+}
+
+// pub fn machine_base() -> Card {
+//      TODO
+// }
+
 pub fn trading_post() -> Card {
     Card {
         card_type: CardType::Outpost,
