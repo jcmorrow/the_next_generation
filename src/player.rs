@@ -2,6 +2,7 @@ use choice::Choice;
 use card::Card;
 use card::CardType;
 use card::Faction;
+use card::OutpostType;
 use card::ship;
 use effect::Effect;
 use trade_row::TradeRow;
@@ -73,6 +74,10 @@ impl Player {
         for card in &self.in_play {
             if card.faction == *faction {
                 return true
+            }
+            match card.outpost_type {
+                OutpostType::MechWorld => return true,
+                _ => ()
             }
         }
         false
