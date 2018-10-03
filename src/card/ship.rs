@@ -129,12 +129,39 @@ pub fn mothership() -> Card {
     }
 }
 
+pub fn ram() -> Card {
+    Card {
+        ally_effects: vec!(Effect::GainCombat(2)),
+        card_type: CardType::Ship,
+        cost: 3,
+        effects: vec!(Effect::GainCombat(5)),
+        faction: Faction::Blob,
+        name: String::from("Ram"),
+        scrap_effects: vec!(Effect::GainTrade(3)),
+        ship_type: ShipType::Ram,
+        ..Default::default()
+    }
+}
+
 pub fn scout() -> Card {
     Card {
         card_type: CardType::Ship,
         effects: vec!(Effect::GainTrade(1)),
         name: String::from("Scout"),
         ship_type: ShipType::Scout,
+        ..Default::default()
+    }
+}
+
+pub fn trade_pod() -> Card {
+    Card {
+        ally_effects: vec!(Effect::GainCombat(2)),
+        card_type: CardType::Ship,
+        cost: 2,
+        effects: vec!(Effect::GainTrade(3)),
+        faction: Faction::Blob,
+        name: String::from("Trade Pod"),
+        ship_type: ShipType::TradePod,
         ..Default::default()
     }
 }

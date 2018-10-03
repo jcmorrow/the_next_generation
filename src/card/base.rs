@@ -5,6 +5,19 @@ use card::BaseType;
 use choice::Choice;
 use effect::Effect;
 
+pub fn blob_wheel() -> Card {
+    Card {
+        card_type: CardType::Base,
+        cost: 3,
+        faction: Faction::Blob,
+        health: 5,
+        name: String::from("Blob Wheel"),
+        scrap_effects: vec!(Effect::GainTrade(3)),
+        base_type: BaseType::BlobWheel,
+        ..Default::default()
+    }
+}
+
 pub fn blob_world() -> Card {
     Card {
         abilities: vec!(Choice::Or(
@@ -17,7 +30,7 @@ pub fn blob_world() -> Card {
         faction: Faction::Blob,
         health: 7,
         name: String::from("Blob World"),
-        base_type: BaseType::TheHive,
+        base_type: BaseType::BlobWorld,
         ..Default::default()
     }
 }
