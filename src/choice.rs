@@ -11,6 +11,7 @@ pub enum Choice {
     Attack(usize),
     BlobDraw(usize),
     Buy(usize),
+    BuyTopDeck(usize),
     Decline,
     DestroyBase(usize, usize),
     DiscardCard(usize),
@@ -70,6 +71,12 @@ impl Choice {
                 println!("{} buys {}", player.name, card.name);
                 player.trade -= card.cost;
                 player.discard.push(card);
+            },
+            Choice::BuyTopDeck(i) => {
+                let card = trade_row.get_card(i);
+                println!("{} buys {} and places it on top of deck", player.name, card.name);
+                player.trade -= card.cost;
+                player.deck.insert(0, card);
             },
             Choice::Attack(i) => {
                 let combat = player.combat;

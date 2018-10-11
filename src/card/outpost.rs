@@ -22,6 +22,26 @@ pub fn battle_station() -> Card {
 //      TODO
 // }
 
+pub fn defense_center() -> Card {
+    Card {
+        abilities: vec!(
+            Choice::Or(
+                Box::new(Choice::GainAuthority(3)),
+                Box::new(Choice::GainCombat(2)),
+                true
+            )
+        ),
+        ally_effects: vec!(Effect::GainCombat(2)),
+        card_type: CardType::Outpost,
+        cost: 5,
+        faction: Faction::TradeFederation,
+        health: 5,
+        name: String::from("Defense Center"),
+        outpost_type: OutpostType::DefenseCenter,
+        ..Default::default()
+    }
+}
+
 pub fn junkyard() -> Card {
     Card {
         abilities: vec!(Choice::Or(
