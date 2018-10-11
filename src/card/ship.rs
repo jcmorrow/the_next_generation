@@ -5,6 +5,21 @@ use card::ShipType;
 use choice::Choice;
 use effect::Effect;
 
+pub fn battlecruiser() -> Card {
+    Card {
+        ally_effects: vec!(Effect::DiscardAttack(0)),
+        card_type: CardType::Ship,
+        cost: 6,
+        effects: vec!(Effect::GainCombat(5), Effect::Draw),
+        faction: Faction::StarEmpire,
+        name: String::from("Battlecruiser"),
+        scrap_abilities: vec!(Choice::DestroyBase(0, 0)),
+        scrap_effects: vec!(Effect::Draw),
+        ship_type: ShipType::Battlecruiser,
+        ..Default::default()
+    }
+}
+
 pub fn battle_blob() -> Card {
     Card {
         card_type: CardType::Ship,
@@ -96,6 +111,32 @@ pub fn blob_fighter() -> Card {
     }
 }
 
+pub fn corvette() -> Card {
+    Card {
+        ally_effects: vec!(Effect::GainCombat(2)),
+        card_type: CardType::Ship,
+        cost: 2,
+        effects: vec!(Effect::GainCombat(1), Effect::Draw),
+        faction: Faction::StarEmpire,
+        name: String::from("Corvette"),
+        ship_type: ShipType::Corvette,
+        ..Default::default()
+    }
+}
+
+pub fn dreadnaught() -> Card {
+    Card {
+        card_type: CardType::Ship,
+        cost: 7,
+        effects: vec!(Effect::GainCombat(7), Effect::Draw),
+        faction: Faction::StarEmpire,
+        name: String::from("Dreadnaught"),
+        scrap_effects: vec!(Effect::GainCombat(5)),
+        ship_type: ShipType::Dreadnaught,
+        ..Default::default()
+    }
+}
+
 pub fn cutter() -> Card {
     Card {
         ally_effects: vec!(Effect::GainCombat(4)),
@@ -130,6 +171,20 @@ pub fn imperial_fighter() -> Card {
         faction: Faction::StarEmpire,
         name: String::from("Imperial Fighter"),
         ship_type: ShipType::ImperialFighter,
+        ..Default::default()
+    }
+}
+
+pub fn imperial_frigate() -> Card {
+    Card {
+        ally_effects: vec!(Effect::GainCombat(2)),
+        card_type: CardType::Ship,
+        cost: 3,
+        effects: vec!(Effect::GainCombat(4), Effect::DiscardAttack(0)),
+        faction: Faction::StarEmpire,
+        name: String::from("Imperial Frigate"),
+        scrap_effects: vec!(Effect::Draw),
+        ship_type: ShipType::ImperialFrigate,
         ..Default::default()
     }
 }
@@ -244,6 +299,20 @@ pub fn supply_bot() -> Card {
         faction: Faction::MachineCult,
         name: String::from("Supply Bot"),
         ship_type: ShipType::SupplyBot,
+        ..Default::default()
+    }
+}
+
+pub fn survey_ship() -> Card {
+    Card {
+        ally_effects: vec!(Effect::GainCombat(2)),
+        card_type: CardType::Ship,
+        cost: 3,
+        effects: vec!(Effect::GainTrade(1), Effect::Draw),
+        faction: Faction::StarEmpire,
+        name: String::from("Imperial Fighter"),
+        scrap_effects: vec!(Effect::DiscardAttack(0)),
+        ship_type: ShipType::ImperialFighter,
         ..Default::default()
     }
 }
