@@ -150,6 +150,17 @@ pub fn cutter() -> Card {
     }
 }
 
+pub fn embassy_yacht() -> Card {
+    Card {
+        card_type: CardType::Ship,
+        cost: 3,
+        effects: vec!(Effect::GainAuthority(3), Effect::GainTrade(2)),
+        name: String::from("Embassy Yacht"),
+        ship_type: ShipType::EmbassyYacht,
+        ..Default::default()
+    }
+}
+
 pub fn explorer() -> Card {
     Card {
         card_type: CardType::Ship,

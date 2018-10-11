@@ -61,8 +61,13 @@ impl TradeRow {
         for _n in 0..3 { trade_row.deck.push(ship::supply_bot()); }
 
         // Trade Federation
+        for _n in 0..2 { trade_row.deck.push(base::barter_world()); }
+        for _n in 0..1 { trade_row.deck.push(base::central_office()); }
         for _n in 0..3 { trade_row.deck.push(ship::cutter()); }
+        for _n in 0..1 { trade_row.deck.push(outpost::defense_center()); }
+        for _n in 0..2 { trade_row.deck.push(ship::embassy_yacht()); }
         for _n in 0..2 { trade_row.deck.push(outpost::trading_post()); }
+
 
         // Star Empire
         for _n in 0..1 { trade_row.deck.push(ship::battlecruiser()); }

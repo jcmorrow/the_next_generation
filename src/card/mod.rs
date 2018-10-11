@@ -52,6 +52,7 @@ pub enum ShipType {
     Corvette,
     Cutter,
     Dreadnaught,
+    EmbassyYacht,
     Explorer,
     ImperialFighter,
     ImperialFrigate,
@@ -78,12 +79,14 @@ impl Default for ShipType {
 pub enum OutpostType {
     BattleStation,
     // BrainWorld,
+    DefenseCenter,
     Junkyard,
     // MachineBase,
     MechWorld,
     RoyalRedoubt,
     SpaceStation,
     TradingPost,
+    WarWorld,
     NoOutpostType,
 }
 
@@ -94,8 +97,10 @@ impl Default for OutpostType {
 #[derive(Clone)]
 #[derive(Debug)]
 pub enum BaseType {
+    BarterWorld,
     BlobWheel,
     BlobWorld,
+    CentralOffice,
     TheHive,
     NoBaseType,
 }
@@ -157,6 +162,21 @@ impl Card {
                trade_row: &mut TradeRow) {
         player.choices.extend(self.abilities.clone());
         player.effects.extend(self.effects.clone());
+
+        // Conditional ability triggers
+        match self.ship_type {
+            ShipType::EmbassyYacht => {
+                if player.in_play.iter()
+                                 .filter(
+                                     |c| c.card_type == CardType::Base ||
+                                     c.card_type == CardType::Outpost
+                                 ).count() >= 2 {
+                    player.effects.extend(vec!(Effect::Draw, Effect::Draw));
+                }
+            },
+            _ => ()
+        }
+
         for card in &mut player.in_play {
             if (card.faction == self.faction || card.outpost_type == OutpostType::MechWorld)
                 && !card.has_used_ally_ability

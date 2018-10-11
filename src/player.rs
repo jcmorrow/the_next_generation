@@ -151,6 +151,25 @@ impl Player {
         }
     }
 
+    fn index_buy_ship_from_trade_row(&self, trade_row: &TradeRow) -> Option<usize> {
+        let mut buy_anything = false;
+        let mut highest_cost = 0;
+        let mut highest_cost_index = 0;
+        for (index, card) in trade_row.face_up.iter().enumerate() {
+            if card.cost >= highest_cost &&
+                self.trade >= card.cost &&
+                card.card_type == CardType::Ship {
+                    highest_cost = card.cost;
+                    highest_cost_index = index;
+                    buy_anything = true;
+            }
+        }
+        match buy_anything {
+            true => Some(highest_cost_index),
+            false => None,
+        }
+    }
+
     fn index_scrap_from_trade_row(&self, trade_row: &TradeRow) -> Option<usize> {
         match trade_row.face_up.len() {
             0 => None,
@@ -184,6 +203,12 @@ impl Player {
                             match self.index_acquire_from_trade_row(trade_row) {
                                 Some(i) => Choice::AcquireFromTradeRow(i),
                                 None => Choice::Decline,
+                            }
+                        },
+                        Choice::BuyTopDeck(_) => {
+                            match self.index_buy_ship_from_trade_row(trade_row) {
+                                Some(i) => Choice::BuyTopDeck(i),
+                                None => Choice::Decline
                             }
                         },
                         Choice::DestroyBase(_, _) => {
