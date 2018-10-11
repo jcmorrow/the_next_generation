@@ -42,15 +42,19 @@ impl Default for CardType {
 #[derive(Clone)]
 #[derive(Debug)]
 pub enum ShipType {
+    Battlecruiser,
     BattleBlob,
     BattleMech,
     BattlePod,
     BlobCarrier,
     BlobDestroyer,
     BlobFighter,
+    Corvette,
     Cutter,
+    Dreadnaught,
     Explorer,
     ImperialFighter,
+    ImperialFrigate,
     MissleBot,
     MissleMech,
     Mothership,
@@ -77,6 +81,8 @@ pub enum OutpostType {
     Junkyard,
     // MachineBase,
     MechWorld,
+    RoyalRedoubt,
+    SpaceStation,
     TradingPost,
     NoOutpostType,
 }
