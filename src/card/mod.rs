@@ -64,6 +64,7 @@ pub enum ShipType {
     Ram,
     Scout,
     SupplyBot,
+    SurveyShip,
     TradeBot,
     TradePod,
     Viper,

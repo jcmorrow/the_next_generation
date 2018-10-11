@@ -321,9 +321,9 @@ pub fn survey_ship() -> Card {
         cost: 3,
         effects: vec!(Effect::GainTrade(1), Effect::Draw),
         faction: Faction::StarEmpire,
-        name: String::from("Imperial Fighter"),
+        name: String::from("Survey Ship"),
         scrap_effects: vec!(Effect::DiscardAttack(0)),
-        ship_type: ShipType::ImperialFighter,
+        ship_type: ShipType::SurveyShip,
         ..Default::default()
     }
 }
