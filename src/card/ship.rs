@@ -266,7 +266,7 @@ pub fn imperial_frigate() -> Card {
     }
 }
 
-pub fn missle_bot() -> Card {
+pub fn missile_bot() -> Card {
     Card {
         abilities: vec!(
             Choice::Or(
@@ -279,13 +279,13 @@ pub fn missle_bot() -> Card {
         cost: 2,
         effects: vec!(Effect::GainCombat(2)),
         faction: Faction::MachineCult,
-        name: String::from("Missle Bot"),
-        ship_type: ShipType::MissleBot,
+        name: String::from("Missile Bot"),
+        ship_type: ShipType::MissileBot,
         ..Default::default()
     }
 }
 
-pub fn missle_mech() -> Card {
+pub fn missile_mech() -> Card {
     Card {
         abilities: vec!(Choice::DestroyBase(0, 0)),
         ally_effects: vec!(Effect::Draw),
@@ -293,8 +293,8 @@ pub fn missle_mech() -> Card {
         cost: 6,
         effects: vec!(Effect::GainCombat(6)),
         faction: Faction::MachineCult,
-        name: String::from("Missle Mech"),
-        ship_type: ShipType::MissleMech,
+        name: String::from("Missile Mech"),
+        ship_type: ShipType::MissileMech,
         ..Default::default()
     }
 }
