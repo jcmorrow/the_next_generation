@@ -82,7 +82,7 @@ impl Default for ShipType {
 #[derive(PartialEq)]
 pub enum OutpostType {
     BattleStation,
-    // BrainWorld,
+    BrainWorld,
     DefenseCenter,
     Junkyard,
     MachineBase,
