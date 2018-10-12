@@ -62,21 +62,6 @@ impl TradeRow {
         for _n in 0..3 { trade_row.deck.push(ship::supply_bot()); }
         for _n in 0..3 { trade_row.deck.push(ship::trade_bot()); }
 
-        // Trade Federation
-        for _n in 0..2 { trade_row.deck.push(base::barter_world()); }
-        for _n in 0..1 { trade_row.deck.push(base::central_office()); }
-        for _n in 0..1 { trade_row.deck.push(ship::command_ship()); }
-        for _n in 0..3 { trade_row.deck.push(ship::cutter()); }
-        for _n in 0..1 { trade_row.deck.push(outpost::defense_center()); }
-        for _n in 0..2 { trade_row.deck.push(ship::embassy_yacht()); }
-        for _n in 0..3 { trade_row.deck.push(ship::federation_shuttle()); }
-        for _n in 0..1 { trade_row.deck.push(ship::flagship()); }
-        for _n in 0..2 { trade_row.deck.push(ship::freighter()); }
-        for _n in 0..1 { trade_row.deck.push(outpost::port_of_call()); }
-        for _n in 0..1 { trade_row.deck.push(ship::trade_escort()); }
-        for _n in 0..2 { trade_row.deck.push(outpost::trading_post()); }
-
-
         // Star Empire
         for _n in 0..1 { trade_row.deck.push(ship::battlecruiser()); }
         for _n in 0..2 { trade_row.deck.push(ship::corvette()); }
@@ -90,6 +75,19 @@ impl TradeRow {
         for _n in 0..3 { trade_row.deck.push(ship::survey_ship()); }
         for _n in 0..1 { trade_row.deck.push(outpost::war_world()); }
 
+        // Trade Federation
+        for _n in 0..2 { trade_row.deck.push(base::barter_world()); }
+        for _n in 0..1 { trade_row.deck.push(base::central_office()); }
+        for _n in 0..1 { trade_row.deck.push(ship::command_ship()); }
+        for _n in 0..3 { trade_row.deck.push(ship::cutter()); }
+        for _n in 0..1 { trade_row.deck.push(outpost::defense_center()); }
+        for _n in 0..2 { trade_row.deck.push(ship::embassy_yacht()); }
+        for _n in 0..3 { trade_row.deck.push(ship::federation_shuttle()); }
+        for _n in 0..1 { trade_row.deck.push(ship::flagship()); }
+        for _n in 0..2 { trade_row.deck.push(ship::freighter()); }
+        for _n in 0..1 { trade_row.deck.push(outpost::port_of_call()); }
+        for _n in 0..1 { trade_row.deck.push(ship::trade_escort()); }
+        for _n in 0..2 { trade_row.deck.push(outpost::trading_post()); }
 
         thread_rng().shuffle(&mut trade_row.deck);
 
