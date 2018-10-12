@@ -82,6 +82,7 @@ impl TradeRow {
         for _n in 0..1 { trade_row.deck.push(base::fleet_hq()); }
         for _n in 0..3 { trade_row.deck.push(ship::imperial_fighter()); }
         for _n in 0..3 { trade_row.deck.push(ship::imperial_frigate()); }
+        for _n in 0..1 { trade_row.deck.push(outpost::recycling_station()); }
         for _n in 0..1 { trade_row.deck.push(outpost::royal_redoubt()); }
         for _n in 0..2 { trade_row.deck.push(outpost::space_station()); }
         for _n in 0..3 { trade_row.deck.push(ship::survey_ship()); }
