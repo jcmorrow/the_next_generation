@@ -170,23 +170,15 @@ impl Choice {
                 }
             },
             Choice::CopyShip(i) => {
-                let mut card_to_copy = player.in_play[i].clone();
-
-                for mut card in &mut player.in_play {
-                    match card.ship_type {
-                        ShipType::StealthNeedle => {
-                            player.choices.extend(card_to_copy.abilities.clone());
-                            player.choices.extend(card_to_copy.ally_abilities.clone());
-                            card.scrap_abilities.extend(card_to_copy.scrap_abilities.clone());
-                        },
-                        _ => ()
-                    }
-                }
-                println!("{}'s Stealth Needle copies {}", player.name, card_to_copy.name);
-                if card_to_copy.faction == Faction::Blob {
+                let mut ship_to_copy = player.in_play[i].clone();
+                println!("{}'s Stealth Needle copies {}", player.name, ship_to_copy.name);
+                if ship_to_copy.faction == Faction::Blob {
                     player.blobs_played_this_turn += 1;
                 }
-                card_to_copy.run(player, opponents, trade_row);
+                if ship_to_copy.scrap_abilities.len() > 0 || ship_to_copy.scrap_effects.len() > 0 {
+                    player.perrenial_choices.push(Choice::ScrapSelf(i));
+                }
+                ship_to_copy.run(player, opponents, trade_row);
             },
             // Draw then scrap. Used by Machine Base.
             Choice::DrawScrap(i) => {
