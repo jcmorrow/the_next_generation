@@ -1,5 +1,6 @@
 use std::fmt;
 
+use effect::Effect;
 use player::Player;
 use trade_row::TradeRow;
 use choice::Choice;
@@ -42,16 +43,37 @@ impl Default for CardType {
 #[derive(PartialEq)]
 #[derive(Debug)]
 pub enum ShipType {
+    Battlecruiser,
     BattleBlob,
+    BattleMech,
     BattlePod,
     BlobCarrier,
     BlobDestroyer,
+    BlobFighter,
+    CommandShip,
+    Corvette,
+    Cutter,
+    Dreadnaught,
+    EmbassyYacht,
     Explorer,
+    FederationShuttle,
+    Flagship,
+    Freighter,
     ImperialFighter,
+    ImperialFrigate,
+    MissleBot,
+    MissleMech,
+    Mothership,
     NoShipType,
+    PatrolMech,
+    Ram,
     Scout,
     StealthNeedle,
+    SupplyBot,
+    SurveyShip,
     TradeBot,
+    TradeEscort,
+    TradePod,
     Viper,
 }
 
@@ -61,9 +83,20 @@ impl Default for ShipType {
 
 #[derive(Clone)]
 #[derive(Debug)]
+#[derive(PartialEq)]
 pub enum OutpostType {
     BattleStation,
+    BrainWorld,
+    DefenseCenter,
+    Junkyard,
+    MachineBase,
+    MechWorld,
+    PortOfCall,
+    RecyclingStation,
+    RoyalRedoubt,
+    SpaceStation,
     TradingPost,
+    WarWorld,
     NoOutpostType,
 }
 
@@ -73,7 +106,13 @@ impl Default for OutpostType {
 
 #[derive(Clone)]
 #[derive(Debug)]
+#[derive(PartialEq)]
 pub enum BaseType {
+    BarterWorld,
+    BlobWheel,
+    BlobWorld,
+    CentralOffice,
+    FleetHQ,
     TheHive,
     NoBaseType,
 }
@@ -113,16 +152,19 @@ impl fmt::Display for CardType {
 pub struct Card {
     pub abilities: Vec<Choice>,
     pub ally_abilities: Vec<Choice>,
+    pub ally_effects: Vec<Effect>,
     pub base_type: BaseType,
     pub card_type: CardType,
     pub cost: i32,
-    pub ephemeral: bool, // Stealth Needle shenanigans
+
+    pub effects: Vec<Effect>,
     pub faction: Faction,
     pub has_used_ally_ability: bool,
     pub health: i32,
     pub name: String,
     pub outpost_type: OutpostType,
     pub scrap_abilities: Vec<Choice>,
+    pub scrap_effects: Vec<Effect>,
     pub ship_type: ShipType,
 }
 
@@ -131,23 +173,45 @@ impl Card {
                player: &mut Player,
                opponents: &[&mut Player],
                trade_row: &mut TradeRow) {
-        for ability in self.abilities.clone() {
-            match ability {
-                Choice::GainAttack(_) => player.turn_start_choices.push(ability),
-                Choice::GainTrade(_) => player.turn_start_choices.push(ability),
-                _ => player.choices.push(ability)
+        player.choices.extend(self.abilities.clone());
+        player.effects.extend(self.effects.clone());
+
+        let fleet_hq_played = player.in_play.iter().any(|c| c.base_type == BaseType::FleetHQ);
+        // Conditional ability triggers
+        if fleet_hq_played {
+            match self.card_type {
+                CardType::Ship => {
+                    player.effects.push(Effect::GainCombat(1));
+                },
+                _ => ()
             }
         }
+        match self.ship_type {
+            ShipType::EmbassyYacht => {
+                if player.in_play.iter()
+                                 .filter(
+                                     |c| c.card_type == CardType::Base ||
+                                     c.card_type == CardType::Outpost
+                                 ).count() >= 2 {
+                    player.effects.extend(vec!(Effect::Draw, Effect::Draw));
+                }
+            },
+            _ => ()
+        }
+
         for card in &mut player.in_play {
-            if card.faction == self.faction && !card.has_used_ally_ability
+            if (card.faction == self.faction || card.outpost_type == OutpostType::MechWorld)
+                && !card.has_used_ally_ability
             {
                 card.has_used_ally_ability = true;
-                player.choices.extend(card.ally_abilities.clone())
+                player.choices.extend(card.ally_abilities.clone());
+                player.effects.extend(card.ally_effects.clone());
             }
         }
         if player.has_ally_in_play(&self.faction) {
             self.has_used_ally_ability = true;
             player.choices.extend(self.ally_abilities.clone());
+            player.effects.extend(self.ally_effects.clone());
         }
     }
 }

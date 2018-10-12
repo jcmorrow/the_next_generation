@@ -6,6 +6,7 @@ use trade_row::TradeRow;
 
 mod choice;
 mod card;
+mod effect;
 mod player;
 mod trade_row;
 
@@ -18,7 +19,6 @@ fn main() {
 
     players.push(&mut player_1);
     players.push(&mut player_2);
-
     while !players.iter().any(|ref p| p.authority < 1)
     {
         print!("Turn {}\n", turn_count);

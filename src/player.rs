@@ -2,8 +2,11 @@ use choice::Choice;
 use card::Card;
 use card::CardType;
 use card::Faction;
+use card::OutpostType;
 use card::ShipType;
+
 use card::ship;
+use effect::Effect;
 use trade_row::TradeRow;
 
 use rand::{random, thread_rng, Rng};
@@ -20,6 +23,7 @@ pub struct Player {
     pub combat: i32,
     pub deck: Vec<Card>,
     pub discard: Vec<Card>,
+    pub effects: Vec<Effect>,
     pub hand: Vec<Card>,
     pub in_play: Vec<Card>,
     pub name: String,
@@ -45,6 +49,7 @@ impl Player {
             combat: 0,
             discard: Vec::new(),
             deck: Vec::new(),
+            effects: Vec::new(),
             hand: Vec::new(),
             in_play: Vec::new(),
             name: name.to_string(),
@@ -71,6 +76,10 @@ impl Player {
         for card in &self.in_play {
             if card.faction == *faction {
                 return true
+            }
+            match card.outpost_type {
+                OutpostType::MechWorld => return true,
+                _ => ()
             }
         }
         false
@@ -164,6 +173,25 @@ impl Player {
         }
     }
 
+    fn index_buy_ship_from_trade_row(&self, trade_row: &TradeRow) -> Option<usize> {
+        let mut buy_anything = false;
+        let mut highest_cost = 0;
+        let mut highest_cost_index = 0;
+        for (index, card) in trade_row.face_up.iter().enumerate() {
+            if card.cost >= highest_cost &&
+                self.trade >= card.cost &&
+                card.card_type == CardType::Ship {
+                    highest_cost = card.cost;
+                    highest_cost_index = index;
+                    buy_anything = true;
+            }
+        }
+        match buy_anything {
+            true => Some(highest_cost_index),
+            false => None,
+        }
+    }
+
     fn index_scrap_from_trade_row(&self, trade_row: &TradeRow) -> Option<usize> {
         match trade_row.face_up.len() {
             0 => None,
@@ -199,9 +227,9 @@ impl Player {
                                 None => Choice::Decline,
                             }
                         },
-                        Choice::DiscardAttack(_) => {
-                            match self.index_discard_opponents(opponents) {
-                                Some(i) => Choice::DiscardAttack(i),
+                        Choice::BuyTopDeck(_) => {
+                            match self.index_buy_ship_from_trade_row(trade_row) {
+                                Some(i) => Choice::BuyTopDeck(i),
                                 None => Choice::Decline
                             }
                         },
@@ -234,6 +262,18 @@ impl Player {
                                 None => Choice::Decline
                             }
                         },
+                        Choice::ScrapDiscardDraw(_) => {
+                            match self.index_from(CardPile::Discard) {
+                                Some(i) => Choice::ScrapDiscardDraw(i),
+                                None => Choice::Decline
+                            }
+                        },
+                        Choice::ScrapHandDraw(_) => {
+                            match self.index_from(CardPile::Hand) {
+                                Some(i) => Choice::ScrapHandDraw(i),
+                                None => Choice::Decline
+                            }
+                        },
                         Choice::Or(a, b, _) => {
                             // Stupid robot choices
                             Choice::Or(a, b, random())
@@ -254,6 +294,23 @@ impl Player {
                                 Some(n) => Choice::CopyShip(n)
                             }
                         },
+                        Choice::ScrapDraw(_) => {
+                            // For now, always opt to scrap and draw 2 cards
+                            Choice::ScrapDraw(2)
+                        },
+                        Choice::DiscardDraw(_) => {
+                            match self.hand.len() {
+                                0 => Choice::Decline,
+                                1 => Choice::DiscardDraw(1),
+                                _ => Choice::DiscardDraw(2)
+                            }
+                        },
+                        Choice::DiscardCardDraw(_) => {
+                            match self.index_from(CardPile::Hand) {
+                                Some(i) => Choice::DiscardCardDraw(i),
+                                None => Choice::Decline
+                            }
+                        },
                         c => c
                     },
                     None => Choice::EndTurn
@@ -262,12 +319,34 @@ impl Player {
         }
     }
 
+    pub fn process_effects(&mut self,
+                           trade_row: &TradeRow,
+                           opponents: &mut [&mut Player]) {
+        let mut effects = Vec::new();
+        effects.extend(self.effects.drain(0..));
+
+        for effect in &effects {
+            match effect {
+                Effect::DiscardAttack(_) => {
+                    let e = match self.index_discard_opponents(opponents) {
+                        Some(i) => Effect::DiscardAttack(i),
+                        None => Effect::Empty
+                    };
+                    e.process(self, opponents, trade_row)
+                },
+                e => e.process(self, opponents, trade_row)
+            }
+        }
+    }
+
+
     pub fn make_choice(&mut self,
                        trade_row: &TradeRow,
                        opponents: &[&mut Player]) -> Choice {
         if self.turn_start_choices.len() > 0 {
             return self.turn_start_choices.pop().unwrap()
         }
+
         self.perrenial_choices.clear();
         match self.index_attack_opponents(opponents) {
             Some(i) => self.perrenial_choices.push(Choice::Attack(i)),
@@ -285,7 +364,7 @@ impl Player {
         }
 
         for (index, card) in self.in_play.iter().enumerate() {
-            if card.scrap_abilities.len() > 0 {
+            if card.scrap_abilities.len() > 0 || card.scrap_effects.len() > 0 {
                 self.perrenial_choices.push(Choice::ScrapSelf(index));
             }
         }
@@ -298,7 +377,13 @@ impl Player {
                         None => self.make_perennial_choice(trade_row, opponents)
                     }
                 },
-                // Note: this should never happen, since only DiscardCard choices are at turn start
+                // Added from Machine Base (Choice::DrawScrap)
+                Choice::ScrapHand(_) => {
+                    match self.index_from(CardPile::Hand) {
+                        Some(i) => Choice::ScrapHand(i),
+                        None => self.make_perennial_choice(trade_row, opponents)
+                    }
+                },
                 c => c
             },
             None => self.make_perennial_choice(trade_row, opponents)

@@ -1,5 +1,6 @@
 use card::Faction;
 use card::ShipType;
+use effect::Effect;
 use trade_row::TradeRow;
 use player::Player;
 
@@ -7,24 +8,30 @@ use player::Player;
 #[derive(Clone)]
 pub enum Choice {
     AcquireFromTradeRow(usize),
+    AndOr(Box<Choice>, Box<Choice>, bool, bool),
     Attack(usize),
     BlobDraw(usize),
     Buy(usize),
+    BuyTopDeck(usize),
     CopyShip(usize),
     Decline,
     DestroyBase(usize, usize),
-    DiscardAttack(usize),
     DiscardCard(usize),
-    AndOr(Box<Choice>, Box<Choice>, bool, bool),
+    DiscardCardDraw(usize),
+    DiscardDraw(i32),
+    DrawScrap(usize),
     EndTurn,
-    GainAttack(i32),
     GainAuthority(i32),
+    GainCombat(i32),
     GainTrade(i32),
     Or(Box<Choice>, Box<Choice>, bool),
     Play(usize),
     ScrapDiscard(usize),
+    ScrapDiscardDraw(usize),
+    ScrapDraw(i32),
     ScrapFromTradeRow(usize),
     ScrapHand(usize),
+    ScrapHandDraw(usize),
     ScrapSelf(usize),
 }
 
@@ -57,6 +64,17 @@ impl Choice {
                 println!("{} discards {}", player.name, card.name);
                 player.discard.push(card);
             },
+            Choice::DiscardDraw(n) => {
+                for _ in 0..n {
+                    player.choices.push(Choice::DiscardCardDraw(0));
+                }
+            },
+            Choice::DiscardCardDraw(i) => {
+                let mut card = player.hand.remove(i);
+                println!("{} discards {} and draws a card", player.name, card.name);
+                player.discard.push(card);
+                player.effects.push(Effect::Draw);
+            },
             Choice::AcquireFromTradeRow(i) => {
                 let card = trade_row.get_card(i);
                 println!("{} acquires {} to the top of the deck", player.name, card.name);
@@ -73,6 +91,12 @@ impl Choice {
                 player.trade -= card.cost;
                 player.discard.push(card);
             },
+            Choice::BuyTopDeck(i) => {
+                let card = trade_row.get_card(i);
+                println!("{} buys {} and places it on top of deck", player.name, card.name);
+                player.trade -= card.cost;
+                player.deck.insert(0, card);
+            },
             Choice::Attack(i) => {
                 let combat = player.combat;
                 println!("{} attacks {} for {}",
@@ -81,23 +105,6 @@ impl Choice {
                          combat);
                 opponents[i].authority -= combat;
                 player.combat = 0;
-            },
-            Choice::DiscardAttack(opponent_index) => {
-                println!("{} makes {} discard!", player.name, opponents[opponent_index].name);
-                opponents[opponent_index].turn_start_choices.push(
-                    Choice::DiscardCard(0))
-            },
-            Choice::GainAttack(n) => {
-                println!("{} gains {} attack", player.name, n);
-                player.combat += n;
-            },
-            Choice::GainAuthority(n) => {
-                println!("{} gains {} authority", player.name, n);
-                player.authority += n;
-            },
-            Choice::GainTrade(n) => {
-                println!("{} gains {} trade", player.name, n);
-                player.trade += n;
             },
             Choice::Or(a, b, first) => {
                 let choice = match first {
@@ -108,14 +115,26 @@ impl Choice {
                 player.choices.push(choice);
             },
             Choice::ScrapDiscard(i) => {
-                let card = player.discard.remove(i);
+                let card = &player.discard[i];
                 println!("{} scraps {} from discard", player.name, card.name);
-                player.scrapped.push(card);
+                player.effects.push(Effect::ScrapDiscard(i));
             },
             Choice::ScrapHand(i) => {
-                let card = player.hand.remove(i);
+                let card = &player.hand[i];
                 println!("{} scraps {} from hand", player.name, card.name);
-                player.scrapped.push(card);
+                player.effects.push(Effect::ScrapHand(i));
+            },
+            Choice::ScrapDiscardDraw(i) => {
+                let card = &player.discard[i];
+                println!("{} scraps {} from discard and draws a card", player.name, card.name);
+                player.effects.push(Effect::ScrapDiscard(i));
+                player.effects.push(Effect::Draw);
+            },
+            Choice::ScrapHandDraw(i) => {
+                let card = &player.hand[i];
+                println!("{} scraps {} from hand and draws a card", player.name, card.name);
+                player.effects.push(Effect::ScrapHand(i));
+                player.effects.push(Effect::Draw);
             },
             Choice::AndOr(a, b, first, second) => {
                 if first {
@@ -126,15 +145,28 @@ impl Choice {
                 }
             },
             Choice::ScrapSelf(i) => {
-                let card = player.in_play.remove(i);
-                println!("{}'s {} scraps itself", player.name, card.name);
+                let card = &player.in_play[i];
+                println!("{} chooses to scrap {}", player.name, card.name);
                 player.choices.extend(card.scrap_abilities.clone());
-                player.scrapped.push(card);
+                player.effects.extend(card.scrap_effects.clone());
+                player.effects.push(Effect::ScrapSelf(i));
             },
             Choice::BlobDraw(n) => {
                 println!("{} draws {} cards from Blob World", player.name, n);
                 for _ in 0..n {
-                    player.draw();
+                    player.effects.push(Effect::Draw);
+                }
+            },
+            // Scrap then draw. Used by Brain World.
+            Choice::ScrapDraw(n) => {
+                for _ in 0..n {
+                    player.choices.push(
+                        Choice::Or(
+                            Box::new(Choice::ScrapDiscardDraw(0)),
+                            Box::new(Choice::ScrapHandDraw(0)),
+                            true
+                        )
+                    );
                 }
             },
             Choice::CopyShip(i) => {
@@ -155,8 +187,23 @@ impl Choice {
                     player.blobs_played_this_turn += 1;
                 }
                 card_to_copy.run(player, opponents, trade_row);
-            }
+            },
+            // Draw then scrap. Used by Machine Base.
+            Choice::DrawScrap(i) => {
+                player.effects.push(Effect::Draw);
+                player.turn_start_choices.push(Choice::ScrapHand(i));
+            },
+            Choice::GainAuthority(n) => {
+                player.effects.push(Effect::GainAuthority(n));
+            },
+            Choice::GainCombat(n) => {
+                player.effects.push(Effect::GainCombat(n));
+            },
+            Choice::GainTrade(n) => {
+                player.effects.push(Effect::GainTrade(n));
+            },
             _ => (),
         }
+        player.process_effects(&trade_row, opponents);
     }
 }
