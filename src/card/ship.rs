@@ -141,7 +141,7 @@ pub fn cutter() -> Card {
     Card {
         ally_effects: vec!(Effect::GainCombat(4)),
         card_type: CardType::Ship,
-        cost: 1,
+        cost: 2,
         effects: vec!(Effect::GainTrade(2), Effect::GainAuthority(4)),
         faction: Faction::TradeFederation,
         name: String::from("Cutter"),
@@ -155,8 +155,48 @@ pub fn embassy_yacht() -> Card {
         card_type: CardType::Ship,
         cost: 3,
         effects: vec!(Effect::GainAuthority(3), Effect::GainTrade(2)),
+        faction: Faction::TradeFederation,
         name: String::from("Embassy Yacht"),
         ship_type: ShipType::EmbassyYacht,
+        ..Default::default()
+    }
+}
+
+pub fn flagship() -> Card {
+    Card {
+        ally_effects: vec!(Effect::GainAuthority(5)),
+        card_type: CardType::Ship,
+        cost: 6,
+        effects: vec!(Effect::GainCombat(5), Effect::Draw),
+        faction: Faction::TradeFederation,
+        name: String::from("Flagship"),
+        ship_type: ShipType::Flagship,
+        ..Default::default()
+    }
+}
+
+pub fn freighter() -> Card {
+    Card {
+        ally_abilities: vec!(Choice::BuyTopDeck(0)),
+        card_type: CardType::Ship,
+        cost: 4,
+        effects: vec!(Effect::GainTrade(4)),
+        faction: Faction::TradeFederation,
+        name: String::from("Freighter"),
+        ship_type: ShipType::Freighter,
+        ..Default::default()
+    }
+}
+
+pub fn trade_escort() -> Card {
+    Card {
+        ally_effects: vec!(Effect::Draw),
+        card_type: CardType::Ship,
+        cost: 5,
+        effects: vec!(Effect::GainAuthority(4), Effect::GainCombat(4)),
+        faction: Faction::TradeFederation,
+        name: String::from("Trade Escort"),
+        ship_type: ShipType::TradeEscort,
         ..Default::default()
     }
 }
