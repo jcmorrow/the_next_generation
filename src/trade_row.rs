@@ -58,9 +58,9 @@ impl TradeRow {
         for _n in 0..1 { trade_row.deck.push(outpost::mech_world()); }
         for _n in 0..3 { trade_row.deck.push(ship::missle_bot()); }
         for _n in 0..1 { trade_row.deck.push(ship::missle_mech()); }
-        for _n in 0..3 { trade_row.deck.push(ship::trade_bot()); }
         for _n in 0..2 { trade_row.deck.push(ship::patrol_mech()); }
         for _n in 0..3 { trade_row.deck.push(ship::supply_bot()); }
+        for _n in 0..3 { trade_row.deck.push(ship::trade_bot()); }
 
         // Trade Federation
         for _n in 0..2 { trade_row.deck.push(base::barter_world()); }
@@ -79,6 +79,7 @@ impl TradeRow {
         for _n in 0..1 { trade_row.deck.push(ship::battlecruiser()); }
         for _n in 0..2 { trade_row.deck.push(ship::corvette()); }
         for _n in 0..1 { trade_row.deck.push(ship::dreadnaught()); }
+        for _n in 0..1 { trade_row.deck.push(base::fleet_hq()); }
         for _n in 0..3 { trade_row.deck.push(ship::imperial_fighter()); }
         for _n in 0..3 { trade_row.deck.push(ship::imperial_frigate()); }
         for _n in 0..1 { trade_row.deck.push(outpost::royal_redoubt()); }
