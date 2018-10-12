@@ -161,7 +161,7 @@ pub fn recycling_station() -> Card {
         abilities: vec!(Choice::Or(
             Box::new(Choice::GainTrade(1)),
             Box::new(Choice::DiscardDraw(0)),
-            true
+            false
         )),
         card_type: CardType::Outpost,
         cost: 4,
