@@ -156,6 +156,23 @@ pub fn port_of_call() -> Card {
     }
 }
 
+pub fn recycling_station() -> Card {
+    Card {
+        abilities: vec!(Choice::Or(
+            Box::new(Choice::GainTrade(1)),
+            Box::new(Choice::DiscardDraw(0)),
+            true
+        )),
+        card_type: CardType::Outpost,
+        cost: 4,
+        faction: Faction::StarEmpire,
+        health: 4,
+        name: String::from("Recycling Station"),
+        outpost_type: OutpostType::RecyclingStation,
+        ..Default::default()
+    }
+}
+
 
 pub fn war_world() -> Card {
     Card {

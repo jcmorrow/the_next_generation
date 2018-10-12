@@ -88,6 +88,7 @@ pub enum OutpostType {
     MachineBase,
     MechWorld,
     PortOfCall,
+    RecyclingStation,
     RoyalRedoubt,
     SpaceStation,
     TradingPost,

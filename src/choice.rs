@@ -15,6 +15,8 @@ pub enum Choice {
     Decline,
     DestroyBase(usize, usize),
     DiscardCard(usize),
+    DiscardCardDraw(usize),
+    DiscardDraw(i32),
     DrawScrap(usize),
     EndTurn,
     GainAuthority(i32),
@@ -59,6 +61,17 @@ impl Choice {
                 let mut card = player.hand.remove(i);
                 println!("{} discards {}", player.name, card.name);
                 player.discard.push(card);
+            },
+            Choice::DiscardDraw(n) => {
+                for _ in 0..n {
+                    player.choices.push(Choice::DiscardCardDraw(0));
+                }
+            },
+            Choice::DiscardCardDraw(i) => {
+                let mut card = player.hand.remove(i);
+                println!("{} discards {} and draws a card", player.name, card.name);
+                player.discard.push(card);
+                player.effects.push(Effect::Draw);
             },
             Choice::AcquireFromTradeRow(i) => {
                 let card = trade_row.get_card(i);
@@ -142,6 +155,7 @@ impl Choice {
                     player.effects.push(Effect::Draw);
                 }
             },
+            // Scrap then draw. Used by Brain World.
             Choice::ScrapDraw(n) => {
                 for _ in 0..n {
                     player.choices.push(
@@ -153,6 +167,7 @@ impl Choice {
                     );
                 }
             },
+            // Draw then scrap. Used by Machine Base.
             Choice::DrawScrap(i) => {
                 player.effects.push(Effect::Draw);
                 player.turn_start_choices.push(Choice::ScrapHand(i));

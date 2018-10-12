@@ -270,6 +270,19 @@ impl Player {
                             // For now, always opt to scrap and draw 2 cards
                             Choice::ScrapDraw(2)
                         },
+                        Choice::DiscardDraw(_) => {
+                            match self.hand.len() {
+                                0 => Choice::Decline,
+                                1 => Choice::DiscardDraw(1),
+                                _ => Choice::DiscardDraw(2)
+                            }
+                        },
+                        Choice::DiscardCardDraw(_) => {
+                            match self.index_from(CardPile::Hand) {
+                                Some(i) => Choice::DiscardCardDraw(i),
+                                None => Choice::Decline
+                            }
+                        },
                         c => c
                     },
                     None => Choice::EndTurn
