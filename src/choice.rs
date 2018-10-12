@@ -23,8 +23,11 @@ pub enum Choice {
     Or(Box<Choice>, Box<Choice>, bool),
     Play(usize),
     ScrapDiscard(usize),
+    ScrapDiscardDraw(usize),
+    ScrapDraw(i32),
     ScrapFromTradeRow(usize),
     ScrapHand(usize),
+    ScrapHandDraw(usize),
     ScrapSelf(usize),
 }
 
@@ -106,6 +109,18 @@ impl Choice {
                 println!("{} scraps {} from hand", player.name, card.name);
                 player.effects.push(Effect::ScrapHand(i));
             },
+            Choice::ScrapDiscardDraw(i) => {
+                let card = &player.discard[i];
+                println!("{} scraps {} from discard and draws a card", player.name, card.name);
+                player.effects.push(Effect::ScrapDiscard(i));
+                player.effects.push(Effect::Draw);
+            },
+            Choice::ScrapHandDraw(i) => {
+                let card = &player.hand[i];
+                println!("{} scraps {} from hand and draws a card", player.name, card.name);
+                player.effects.push(Effect::ScrapHand(i));
+                player.effects.push(Effect::Draw);
+            },
             Choice::AndOr(a, b, first, second) => {
                 if first {
                     player.choices.push(*a);
@@ -125,6 +140,17 @@ impl Choice {
                 println!("{} draws {} cards from Blob World", player.name, n);
                 for _ in 0..n {
                     player.effects.push(Effect::Draw);
+                }
+            },
+            Choice::ScrapDraw(n) => {
+                for _ in 0..n {
+                    player.choices.push(
+                        Choice::Or(
+                            Box::new(Choice::ScrapDiscardDraw(0)),
+                            Box::new(Choice::ScrapHandDraw(0)),
+                            true
+                        )
+                    );
                 }
             },
             Choice::DrawScrap(i) => {

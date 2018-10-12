@@ -18,9 +18,18 @@ pub fn battle_station() -> Card {
     }
 }
 
-// pub fn brain_world() -> Card {
-//      TODO
-// }
+pub fn brain_world() -> Card {
+    Card {
+        abilities: vec!(Choice::ScrapDraw(0)),
+        card_type: CardType::Outpost,
+        cost: 8,
+        faction: Faction::MachineCult,
+        health: 6,
+        name: String::from("Brain World"),
+        outpost_type: OutpostType::BrainWorld,
+        ..Default::default()
+    }
+}
 
 pub fn defense_center() -> Card {
     Card {

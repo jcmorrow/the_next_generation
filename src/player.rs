@@ -240,6 +240,18 @@ impl Player {
                                 None => Choice::Decline
                             }
                         },
+                        Choice::ScrapDiscardDraw(_) => {
+                            match self.index_from(CardPile::Discard) {
+                                Some(i) => Choice::ScrapDiscardDraw(i),
+                                None => Choice::Decline
+                            }
+                        },
+                        Choice::ScrapHandDraw(_) => {
+                            match self.index_from(CardPile::Hand) {
+                                Some(i) => Choice::ScrapHandDraw(i),
+                                None => Choice::Decline
+                            }
+                        },
                         Choice::Or(a, b, _) => {
                             // Stupid robot choices
                             Choice::Or(a, b, random())
@@ -253,6 +265,10 @@ impl Player {
                                 Some(i) => Choice::ScrapFromTradeRow(i),
                                 None => Choice::Decline
                             }
+                        },
+                        Choice::ScrapDraw(_) => {
+                            // For now, always opt to scrap and draw 2 cards
+                            Choice::ScrapDraw(2)
                         },
                         c => c
                     },
