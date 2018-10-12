@@ -72,9 +72,17 @@ pub fn central_office() -> Card {
 }
 
 
-// pub fn fleet_hq() -> Card {
-//      TODO
-// }
+pub fn fleet_hq() -> Card {
+    Card {
+        base_type: BaseType::FleetHQ,
+        card_type: CardType::Base,
+        cost: 8,
+        faction: Faction::StarEmpire,
+        health: 8,
+        name: String::from("Fleet HQ"),
+        ..Default::default()
+    }
+}
 
 pub fn the_hive() -> Card {
     Card {

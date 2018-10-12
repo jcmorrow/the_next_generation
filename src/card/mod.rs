@@ -101,11 +101,13 @@ impl Default for OutpostType {
 
 #[derive(Clone)]
 #[derive(Debug)]
+#[derive(PartialEq)]
 pub enum BaseType {
     BarterWorld,
     BlobWheel,
     BlobWorld,
     CentralOffice,
+    FleetHQ,
     TheHive,
     NoBaseType,
 }
@@ -168,7 +170,16 @@ impl Card {
         player.choices.extend(self.abilities.clone());
         player.effects.extend(self.effects.clone());
 
+        let fleet_hq_played = player.in_play.iter().any(|c| c.base_type == BaseType::FleetHQ);
         // Conditional ability triggers
+        if fleet_hq_played {
+            match self.card_type {
+                CardType::Ship => {
+                    player.effects.push(Effect::GainCombat(1));
+                },
+                _ => ()
+            }
+        }
         match self.ship_type {
             ShipType::EmbassyYacht => {
                 if player.in_play.iter()
