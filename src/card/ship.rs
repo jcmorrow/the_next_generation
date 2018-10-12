@@ -150,6 +150,19 @@ pub fn cutter() -> Card {
     }
 }
 
+pub fn command_ship() -> Card {
+    Card {
+        ally_abilities: vec!(Choice::DestroyBase(0, 0)),
+        card_type: CardType::Ship,
+        cost: 8,
+        effects: vec!(Effect::GainCombat(5), Effect::GainAuthority(4), Effect::Draw, Effect::Draw),
+        faction: Faction::TradeFederation,
+        name: String::from("Command Ship"),
+        ship_type: ShipType::CommandShip,
+        ..Default::default()
+    }
+}
+
 pub fn embassy_yacht() -> Card {
     Card {
         card_type: CardType::Ship,
@@ -158,6 +171,19 @@ pub fn embassy_yacht() -> Card {
         faction: Faction::TradeFederation,
         name: String::from("Embassy Yacht"),
         ship_type: ShipType::EmbassyYacht,
+        ..Default::default()
+    }
+}
+
+pub fn federation_shuttle() -> Card {
+    Card {
+        ally_effects: vec!(Effect::GainAuthority(4)),
+        card_type: CardType::Ship,
+        cost: 1,
+        effects: vec!(Effect::GainTrade(2)),
+        faction: Faction::TradeFederation,
+        name: String::from("Federation Shuttle"),
+        ship_type: ShipType::FederationShuttle,
         ..Default::default()
     }
 }
