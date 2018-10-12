@@ -123,6 +123,22 @@ pub fn trading_post() -> Card {
     }
 }
 
+pub fn port_of_call() -> Card {
+    Card {
+        card_type: CardType::Outpost,
+        cost: 7,
+        effects: vec!(Effect::GainTrade(3)),
+        faction: Faction::TradeFederation,
+        health: 6,
+        name: String::from("Port of Call"),
+        outpost_type: OutpostType::PortOfCall,
+        scrap_abilities: vec!(Choice::DestroyBase(0, 0)),
+        scrap_effects: vec!(Effect::Draw),
+        ..Default::default()
+    }
+}
+
+
 pub fn war_world() -> Card {
     Card {
         ally_effects: vec!(Effect::GainCombat(4)),
