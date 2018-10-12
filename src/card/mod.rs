@@ -85,7 +85,7 @@ pub enum OutpostType {
     // BrainWorld,
     DefenseCenter,
     Junkyard,
-    // MachineBase,
+    MachineBase,
     MechWorld,
     PortOfCall,
     RoyalRedoubt,

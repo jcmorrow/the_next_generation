@@ -53,6 +53,7 @@ impl TradeRow {
         for _n in 0..1 { trade_row.deck.push(ship::battle_mech()); }
         for _n in 0..2 { trade_row.deck.push(outpost::battle_station()); }
         for _n in 0..1 { trade_row.deck.push(outpost::junkyard()); }
+        for _n in 0..1 { trade_row.deck.push(outpost::machine_base()); }
         for _n in 0..1 { trade_row.deck.push(outpost::mech_world()); }
         for _n in 0..3 { trade_row.deck.push(ship::missle_bot()); }
         for _n in 0..1 { trade_row.deck.push(ship::missle_mech()); }

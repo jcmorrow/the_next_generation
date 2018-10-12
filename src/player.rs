@@ -320,7 +320,13 @@ impl Player {
                         None => self.make_perennial_choice(trade_row, opponents)
                     }
                 },
-                // Note: this should never happen, since only DiscardCard choices are at turn start
+                // Added from Machine Base (Choice::DrawScrap)
+                Choice::ScrapHand(_) => {
+                    match self.index_from(CardPile::Hand) {
+                        Some(i) => Choice::ScrapHand(i),
+                        None => self.make_perennial_choice(trade_row, opponents)
+                    }
+                },
                 c => c
             },
             None => self.make_perennial_choice(trade_row, opponents)
