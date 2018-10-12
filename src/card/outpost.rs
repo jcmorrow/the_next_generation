@@ -71,9 +71,18 @@ pub fn mech_world() -> Card {
     }
 }
 
-// pub fn machine_base() -> Card {
-//      TODO
-// }
+pub fn machine_base() -> Card {
+    Card {
+        abilities: vec!(Choice::DrawScrap(0)),
+        card_type: CardType::Outpost,
+        cost: 7,
+        faction: Faction::MachineCult,
+        health: 6,
+        name: String::from("Machine Base"),
+        outpost_type: OutpostType::MachineBase,
+        ..Default::default()
+    }
+}
 
 pub fn royal_redoubt() -> Card {
     Card {

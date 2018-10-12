@@ -15,6 +15,7 @@ pub enum Choice {
     Decline,
     DestroyBase(usize, usize),
     DiscardCard(usize),
+    DrawScrap(usize),
     EndTurn,
     GainAuthority(i32),
     GainCombat(i32),
@@ -125,6 +126,10 @@ impl Choice {
                 for _ in 0..n {
                     player.effects.push(Effect::Draw);
                 }
+            },
+            Choice::DrawScrap(i) => {
+                player.effects.push(Effect::Draw);
+                player.turn_start_choices.push(Choice::ScrapHand(i));
             },
             Choice::GainAuthority(n) => {
                 player.effects.push(Effect::GainAuthority(n));
