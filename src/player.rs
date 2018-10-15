@@ -31,11 +31,10 @@ pub struct Player {
     pub turn_start_choices: Vec<Choice>,
 }
 
+// Add `InPlay` and `Deck` as needed
 pub enum CardPile {
     Discard,
-    Deck,
     Hand,
-    InPlay
 }
 
 impl Player {
@@ -180,9 +179,7 @@ impl Player {
     pub fn index_from(&self, card_pile: CardPile) -> Option<usize> {
         let card_pile = match card_pile {
             CardPile::Discard => &self.discard,
-            CardPile::Deck => &self.deck,
-            CardPile::Hand => &self.hand,
-            CardPile::InPlay => &self.in_play
+            CardPile::Hand => &self.hand
         };
 
         match card_pile.len() {
