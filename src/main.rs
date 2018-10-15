@@ -21,7 +21,7 @@ fn main() {
     players.push(&mut player_2);
     while !players.iter().any(|ref p| p.authority < 1)
     {
-        print!("Turn {}\n", turn_count);
+        println!("Turn {}", turn_count);
         players.rotate_left(1);
         let (current_player, opponents)  = &mut players.split_at_mut(1);
         current_player[0].begin_turn();
@@ -34,7 +34,7 @@ fn main() {
             };
         }
         current_player[0].end_turn();
-        turn_count = turn_count + 1;
+        turn_count += 1;
         print!("\n{:#}", trade_row);
     }
 }

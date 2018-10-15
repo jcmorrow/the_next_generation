@@ -105,9 +105,10 @@ impl Choice {
                 player.combat = 0;
             },
             Choice::Or(a, b, first) => {
-                let choice = match first {
-                    true => { *a },
-                    false => { *b }
+                let choice =  if first {
+                    *a
+                } else {
+                    *b
                 };
                 println!("{} chooses {:?}", player.name, choice);
                 player.choices.push(choice);

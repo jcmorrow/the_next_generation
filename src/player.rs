@@ -66,7 +66,7 @@ impl Player {
 
         thread_rng().shuffle(&mut player.deck);
 
-        return player;
+        player
     }
 
     pub fn has_ally_in_play(&self, faction: &Faction) -> bool {
@@ -74,9 +74,8 @@ impl Player {
             if card.faction == *faction {
                 return true
             }
-            match card.outpost_type {
-                OutpostType::MechWorld => return true,
-                _ => ()
+            if let OutpostType::MechWorld = card.outpost_type {
+                return true
             }
         }
         false
@@ -106,7 +105,7 @@ impl Player {
 
     fn indices_destroy_base(&self, opponents: &[&mut Player]) -> Option<(usize, usize)> {
         for (index, opponent) in opponents.iter().enumerate() {
-            if opponent.bases().len() > 0 {
+            if !opponent.bases().is_empty() {
                 return Some((index, 0));
             }
         }
@@ -144,9 +143,10 @@ impl Player {
                 buy_anything = true;
             }
         }
-        match buy_anything {
-            true => Some(highest_cost_index),
-            false => None,
+        if buy_anything {
+            Some(highest_cost_index)
+        } else {
+            None
         }
     }
 
@@ -163,9 +163,11 @@ impl Player {
                     buy_anything = true;
             }
         }
-        match buy_anything {
-            true => Some(highest_cost_index),
-            false => None,
+        if buy_anything {
+            Some(highest_cost_index)
+        }
+        else {
+            None
         }
     }
 
@@ -176,7 +178,7 @@ impl Player {
         }
     }
 
-    pub fn index_from(&self, card_pile: CardPile) -> Option<usize> {
+    pub fn index_from(&self, card_pile: &CardPile) -> Option<usize> {
         let card_pile = match card_pile {
             CardPile::Discard => &self.discard,
             CardPile::Hand => &self.hand
@@ -226,25 +228,25 @@ impl Player {
                             }
                         },
                         Choice::ScrapDiscard(_) => {
-                            match self.index_from(CardPile::Discard) {
+                            match self.index_from(&CardPile::Discard) {
                                 Some(i) => Choice::ScrapDiscard(i),
                                 None => Choice::Decline
                             }
                         },
                         Choice::ScrapHand(_) => {
-                            match self.index_from(CardPile::Hand) {
+                            match self.index_from(&CardPile::Hand) {
                                 Some(i) => Choice::ScrapHand(i),
                                 None => Choice::Decline
                             }
                         },
                         Choice::ScrapDiscardDraw(_) => {
-                            match self.index_from(CardPile::Discard) {
+                            match self.index_from(&CardPile::Discard) {
                                 Some(i) => Choice::ScrapDiscardDraw(i),
                                 None => Choice::Decline
                             }
                         },
                         Choice::ScrapHandDraw(_) => {
-                            match self.index_from(CardPile::Hand) {
+                            match self.index_from(&CardPile::Hand) {
                                 Some(i) => Choice::ScrapHandDraw(i),
                                 None => Choice::Decline
                             }
@@ -275,7 +277,7 @@ impl Player {
                             }
                         },
                         Choice::DiscardCardDraw(_) => {
-                            match self.index_from(CardPile::Hand) {
+                            match self.index_from(&CardPile::Hand) {
                                 Some(i) => Choice::DiscardCardDraw(i),
                                 None => Choice::Decline
                             }
@@ -312,28 +314,25 @@ impl Player {
     pub fn make_choice(&mut self,
                        trade_row: &TradeRow,
                        opponents: &[&mut Player]) -> Choice {
-        if self.turn_start_choices.len() > 0 {
+        if !self.turn_start_choices.is_empty() {
             return self.turn_start_choices.pop().unwrap()
         }
 
         self.perrenial_choices.clear();
-        match self.index_attack_opponents(opponents) {
-            Some(i) => self.perrenial_choices.push(Choice::Attack(i)),
-            None => ()
+        if let Some(i) = self.index_attack_opponents(opponents) {
+            self.perrenial_choices.push(Choice::Attack(i));
         }
 
-        match self.index_buy_from_trade_row(trade_row) {
-            Some(i) => self.perrenial_choices.push(Choice::Buy(i)),
-            None => ()
+        if let Some(i) = self.index_buy_from_trade_row(trade_row) {
+            self.perrenial_choices.push(Choice::Buy(i));
         }
 
-        match self.index_from(CardPile::Hand) {
-            Some(i) => self.perrenial_choices.push(Choice::Play(i)),
-            None => ()
+        if let Some(i) = self.index_from(&CardPile::Hand) {
+            self.perrenial_choices.push(Choice::Play(i));
         }
 
         for (index, card) in self.in_play.iter().enumerate() {
-            if card.scrap_abilities.len() > 0 || card.scrap_effects.len() > 0 {
+            if !card.scrap_abilities.is_empty() || !card.scrap_effects.is_empty() {
                 self.perrenial_choices.push(Choice::ScrapSelf(index));
             }
         }
@@ -341,14 +340,14 @@ impl Player {
         match self.turn_start_choices.pop() {
             Some(c) => match c {
                 Choice::DiscardCard(_) => {
-                    match self.index_from(CardPile::Hand) {
+                    match self.index_from(&CardPile::Hand) {
                         Some(i) => Choice::DiscardCard(i),
                         None => self.make_perennial_choice(trade_row, opponents)
                     }
                 },
                 // Added from Machine Base (Choice::DrawScrap)
                 Choice::ScrapHand(_) => {
-                    match self.index_from(CardPile::Hand) {
+                    match self.index_from(&CardPile::Hand) {
                         Some(i) => Choice::ScrapHand(i),
                         None => self.make_perennial_choice(trade_row, opponents)
                     }
@@ -365,9 +364,8 @@ impl Player {
             None => {
                 self.deck.extend(self.discard.drain(0..));
                 thread_rng().shuffle(&mut self.deck);
-                match self.deck.pop() {
-                    Some(x) => self.hand.push(x),
-                    None => (),
+                if let Some(x) = self.deck.pop() {
+                    self.hand.push(x)
                 };
             }
         };
@@ -415,23 +413,23 @@ impl Player {
 
 impl fmt::Display for Player {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Name: {}\n", self.name).unwrap();
-        write!(f, "Authority: {}\n", self.authority).unwrap();
-        write!(f, "Trade: {}\n", self.trade).unwrap();
-        write!(f, "Combat: {}\n", self.combat).unwrap();
-        for card in self.in_play.iter() {
+        writeln!(f, "Name: {}", self.name).unwrap();
+        writeln!(f, "Authority: {}", self.authority).unwrap();
+        writeln!(f, "Trade: {}", self.trade).unwrap();
+        writeln!(f, "Combat: {}", self.combat).unwrap();
+        for card in &self.in_play {
             write!(f, "In play: {}", card).unwrap();
         }
-        for card in self.hand.iter() {
+        for card in &self.hand {
             write!(f, "Hand:  {}", card).unwrap();
         }
-        for card in self.deck.iter() {
+        for card in &self.deck {
             write!(f, "Deck:  {}", card).unwrap();
         }
-        for card in self.discard.iter() {
+        for card in &self.discard {
             write!(f, "Discard:  {}", card).unwrap();
         }
-        write!(f, "\n")
+        writeln!(f)
     }
 }
 
