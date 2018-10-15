@@ -19,9 +19,8 @@ impl TradeRow {
             // TODO: panic central if the trade row deck runs out
             5 => self.face_up.insert(5, ship::explorer()),
             i => {
-                match self.deck.pop() {
-                    Some(card) => self.face_up.insert(i, card),
-                    None => (),
+                if let Some(card) = self.deck.pop() {
+                    self.face_up.insert(i, card)
                 }
             }
         }
@@ -101,10 +100,10 @@ impl TradeRow {
 
 impl fmt::Display for TradeRow {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Trade Row:\n").unwrap();
-        for card in self.face_up.iter() {
+        writeln!(f, "Trade Row:").unwrap();
+        for card in &self.face_up {
             write!(f, "  {}", card).unwrap();
         }
-        write!(f, "\n")
+        writeln!(f)
     }
 }

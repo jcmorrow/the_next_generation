@@ -168,32 +168,24 @@ pub struct Card {
 impl Card {
     pub fn run(&mut self,
                player: &mut Player,
-               opponents: &[&mut Player],
-               trade_row: &mut TradeRow) {
+               _opponents: &[&mut Player],
+               _trade_row: &mut TradeRow) {
         player.choices.extend(self.abilities.clone());
         player.effects.extend(self.effects.clone());
 
         let fleet_hq_played = player.in_play.iter().any(|c| c.base_type == BaseType::FleetHQ);
         // Conditional ability triggers
-        if fleet_hq_played {
-            match self.card_type {
-                CardType::Ship => {
-                    player.effects.push(Effect::GainCombat(1));
-                },
-                _ => ()
-            }
+        if fleet_hq_played && self.card_type == CardType::Ship {
+            player.effects.push(Effect::GainCombat(1));
         }
-        match self.ship_type {
-            ShipType::EmbassyYacht => {
-                if player.in_play.iter()
-                                 .filter(
-                                     |c| c.card_type == CardType::Base ||
-                                     c.card_type == CardType::Outpost
-                                 ).count() >= 2 {
-                    player.effects.extend(vec!(Effect::Draw, Effect::Draw));
-                }
-            },
-            _ => ()
+        if let ShipType::EmbassyYacht = self.ship_type {
+            if player.in_play.iter()
+                             .filter(
+                                 |c| c.card_type == CardType::Base ||
+                                 c.card_type == CardType::Outpost
+                             ).count() >= 2 {
+                player.effects.extend(vec!(Effect::Draw, Effect::Draw));
+            }
         }
 
         for card in &mut player.in_play {
@@ -215,6 +207,6 @@ impl Card {
 
 impl fmt::Display for Card {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "<{}: {}>\n", self.card_type, self.name)
+        writeln!(f, "<{}: {}>", self.card_type, self.name)
     }
 }

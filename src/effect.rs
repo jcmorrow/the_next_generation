@@ -20,7 +20,7 @@ impl Effect {
     pub fn process(&self,
                    player: &mut Player,
                    opponents: &mut [&mut Player],
-                   trade_row: &TradeRow) {
+                   _trade_row: &TradeRow) {
 
         match self {
             Effect::GainAuthority(n) => {
