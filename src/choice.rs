@@ -18,7 +18,7 @@ pub enum Choice {
     DiscardCard(usize),
     DiscardCardDraw(usize),
     DiscardThenDraw(usize),
-    DrawScrap(usize),
+    DrawThenScrap,
     EndTurn,
     GainAuthority(i32),
     GainCombat(i32),
@@ -49,7 +49,7 @@ pub enum Ability {
     DiscardCard,
     DiscardCardDraw,
     DiscardThenDraw,
-    DrawScrap,
+    DrawThenScrap,
     EndTurn,
     GainAuthority(i32),
     GainCombat(i32),
@@ -93,7 +93,7 @@ impl Choice {
                 let mut card = player.hand.remove(i);
                 println!("{} discards {}", player.name, card.name);
                 player.discard.push(card);
-                player.lose_ability(Ability::DiscardCard);
+                player.mandatory_abilities.pop().unwrap();
             },
             Choice::DiscardThenDraw(n) => {
                 for _ in 0..n {
@@ -165,7 +165,7 @@ impl Choice {
                 let card = player.hand.remove(i);
                 println!("{} scraps {} from hand", player.name, card.name);
                 player.scrapped.push(card);
-                player.lose_ability(Ability::ScrapHand);
+                player.mandatory_abilities.pop().unwrap();
             },
             Choice::ScrapDiscardDraw(i) => {
                 let scrapped = player.discard.remove(i);
@@ -223,10 +223,11 @@ impl Choice {
                 }
             },
             // Draw then scrap. Used by Machine Base.
-            Choice::DrawScrap(i) => {
+            Choice::DrawThenScrap => {
+                println!("{} chooses to draw and then scrap from hand", player.name);
                 player.effects.push(Effect::Draw);
-                // This needs to be fixed.
-                // player.turn_start_choices.push(Choice::ScrapHand(i));
+                player.mandatory_abilities.push(Ability::ScrapHand);
+                player.lose_ability(Ability::DrawThenScrap);
             },
             Choice::GainAuthority(n) => {
                 player.effects.push(Effect::GainAuthority(n));
@@ -272,7 +273,7 @@ impl Choice {
             Choice::DiscardCard(_) => Ability::DiscardCard,
             Choice::DiscardCardDraw(_) => Ability::DiscardCardDraw,
             Choice::DiscardThenDraw(_) => Ability::DiscardThenDraw,
-            Choice::DrawScrap(_) => Ability::DrawScrap,
+            Choice::DrawThenScrap => Ability::DrawThenScrap,
             Choice::EndTurn => Ability::EndTurn,
             Choice::GainAuthority(n) => Ability::GainAuthority(*n),
             Choice::GainCombat(n) => Ability::GainCombat(*n),
@@ -312,7 +313,7 @@ impl Ability {
             Ability::DiscardCard => Choice::DiscardCard(0),
             Ability::DiscardCardDraw => Choice::DiscardCardDraw(0),
             Ability::DiscardThenDraw => Choice::DiscardThenDraw(0),
-            Ability::DrawScrap => Choice::DrawScrap(0),
+            Ability::DrawThenScrap => Choice::DrawThenScrap,
             Ability::EndTurn => Choice::EndTurn,
             Ability::GainAuthority(n) => Choice::GainAuthority(*n),
             Ability::GainCombat(n) => Choice::GainCombat(*n),
@@ -395,10 +396,8 @@ impl Ability {
                 }
             }
             Ability::DiscardCard => {
-                for (i, card) in player.hand.iter().enumerate() {
-                    if player.trade > card.cost {
-                        choices.push(Choice::DiscardCard(i));
-                    }
+                for (i, _card) in player.hand.iter().enumerate() {
+                    choices.push(Choice::DiscardCard(i));
                 }
             }
             Ability::GainAuthority(n) => {
@@ -440,10 +439,8 @@ impl Ability {
                     choices.push(Choice::ScrapDiscard(i));
                 }
             }
-            Ability::DrawScrap => {
-                for (i, _card) in player.hand.iter().enumerate() {
-                    choices.push(Choice::DrawScrap(i));
-                }
+            Ability::DrawThenScrap => {
+                choices.push(Choice::DrawThenScrap);
             }
             Ability::ScrapDraw => {
                 for (i, _card) in player.hand.iter().enumerate() {

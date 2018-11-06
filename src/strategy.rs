@@ -50,6 +50,10 @@ impl HeuristicStrategy {
         choice
     }
 
+    pub fn mandatory_choose(player: &Player, trade_row: &TradeRow, opponents: &[&mut Player]) -> usize {
+        thread_rng().gen_range(0, player.mandatory_choices.len())
+    }
+
     pub fn buy_choice(player: &Player, trade_row: &TradeRow) -> isize {
         let mut average_card_cost = 0;
         let mut card_count = 0;

@@ -80,7 +80,7 @@ pub fn mech_world() -> Card {
 
 pub fn machine_base() -> Card {
     Card {
-        abilities: vec!(Ability::DrawScrap),
+        abilities: vec!(Ability::DrawThenScrap),
         card_type: CardType::Outpost,
         cost: 7,
         faction: Faction::MachineCult,

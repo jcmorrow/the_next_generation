@@ -25,7 +25,8 @@ pub struct Player {
     pub abilities: HashMap<Ability, usize>,
     pub choices: Vec<Choice>,
     pub effects: Vec<Effect>,
-    pub turn_start_choices: Vec<Choice>,
+    pub mandatory_abilities: Vec<Ability>,
+    pub mandatory_choices: Vec<Choice>,
 
     pub authority: i32,
     pub combat: i32,
@@ -63,7 +64,8 @@ impl Player {
             name: name.to_string(),
             scrapped: Vec::new(),
             trade: 0,
-            turn_start_choices: Vec::new()
+            mandatory_abilities: Vec::new(),
+            mandatory_choices: Vec::new(),
         };
 
         player.reset_abilities();
@@ -247,9 +249,12 @@ impl Player {
                        trade_row: &TradeRow,
                        opponents: &[&mut Player]) -> Choice {
 
-        match self.turn_start_choices.pop() {
-            Some(c) => return c,
-            None => self.make_strategy_choice(trade_row, opponents),
+        if self.mandatory_abilities.len() > 0 {
+            println!("I HAVE MANDATORY ABILITES");
+            let choice = self.make_mandatory_choice(trade_row, opponents);
+            choice
+        } else {
+            self.make_strategy_choice(trade_row, opponents)
         }
     }
 
@@ -273,7 +278,29 @@ impl Player {
         // println!("{:?}", self.abilities);
         // println!("{} loses the ability: {:?}", self.name, ability);
         let ability_count = self.abilities.entry(ability).or_insert(0);
-        *ability_count -= 1;
+        if *ability_count > 0 {
+            *ability_count -= 1;
+        }
+    }
+
+    pub fn make_mandatory_choice(&mut self,
+                                 trade_row: &TradeRow,
+                                 opponents: &[&mut Player]) -> Choice {
+        self.mandatory_choices.clear();
+
+        for ability in &self.mandatory_abilities {
+            let choices = ability.expand(self, opponents, trade_row);
+            println!("{:?}", choices);
+            self.mandatory_choices.extend(choices);
+            println!("{:?}", self.mandatory_choices);
+        }
+        println!("{:?}", self.mandatory_abilities);
+        println!("{:?}", self.mandatory_choices);
+
+        let choice_index = HeuristicStrategy::mandatory_choose(self, trade_row, opponents);
+        let choice = self.mandatory_choices.remove(choice_index);
+
+        choice
     }
 
     pub fn make_strategy_choice(&mut self,
@@ -354,12 +381,13 @@ impl Player {
             }
         }
         self.discard.extend(self.hand.drain(0..));
+
         for card in &mut self.discard { card.has_used_ally_ability = false; }
         for card in &mut self.deck { card.has_used_ally_ability = false; }
         for card in &mut self.hand { card.has_used_ally_ability = false; }
         for card in &mut self.in_play { card.has_used_ally_ability = false; }
         for card in &mut self.scrapped { card.has_used_ally_ability = false; }
-        self.turn_start_choices.clear();
+
         self.blobs_played_this_turn = 0;
     }
 }

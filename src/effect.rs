@@ -1,6 +1,6 @@
-use choice::Choice;
-use trade_row::TradeRow;
+use choice::Ability;
 use player::Player;
+use trade_row::TradeRow;
 
 #[derive(Debug)]
 #[derive(Clone)]
@@ -35,7 +35,7 @@ impl Effect {
             },
             Effect::DiscardAttack(opponent_index) => {
                 println!("{} makes {} discard!", player.name, opponents[*opponent_index].name);
-                // opponents[*opponent_index].turn_start_choices.push(Choice::DiscardCard(0))
+                opponents[*opponent_index].mandatory_abilities.push(Ability::DiscardCard)
             },
             Effect::Draw => {
                 println!("{} draws a card", player.name);
