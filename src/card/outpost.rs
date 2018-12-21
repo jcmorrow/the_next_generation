@@ -2,7 +2,7 @@ use card::Card;
 use card::CardType;
 use card::Faction;
 use card::OutpostType;
-use choice::Choice;
+use choice::Ability;
 use effect::Effect;
 
 pub fn battle_station() -> Card {
@@ -20,7 +20,7 @@ pub fn battle_station() -> Card {
 
 pub fn brain_world() -> Card {
     Card {
-        abilities: vec!(Choice::ScrapDraw(0)),
+        abilities: vec!(Ability::ScrapDraw),
         card_type: CardType::Outpost,
         cost: 8,
         faction: Faction::MachineCult,
@@ -34,10 +34,9 @@ pub fn brain_world() -> Card {
 pub fn defense_center() -> Card {
     Card {
         abilities: vec!(
-            Choice::Or(
-                Box::new(Choice::GainAuthority(3)),
-                Box::new(Choice::GainCombat(2)),
-                true
+            Ability::Or(
+                Box::new(Ability::GainAuthority(3)),
+                Box::new(Ability::GainCombat(2)),
             )
         ),
         ally_effects: vec!(Effect::GainCombat(2)),
@@ -53,10 +52,9 @@ pub fn defense_center() -> Card {
 
 pub fn junkyard() -> Card {
     Card {
-        abilities: vec!(Choice::Or(
-            Box::new(Choice::ScrapHand(0)),
-            Box::new(Choice::ScrapDiscard(0)),
-            true
+        abilities: vec!(Ability::Or(
+            Box::new(Ability::ScrapHand),
+            Box::new(Ability::ScrapDiscard),
         )),
         card_type: CardType::Outpost,
         cost: 6,
@@ -82,7 +80,7 @@ pub fn mech_world() -> Card {
 
 pub fn machine_base() -> Card {
     Card {
-        abilities: vec!(Choice::DrawScrap(0)),
+        abilities: vec!(Ability::DrawThenScrap),
         card_type: CardType::Outpost,
         cost: 7,
         faction: Faction::MachineCult,
@@ -124,16 +122,15 @@ pub fn space_station() -> Card {
 
 pub fn trading_post() -> Card {
     Card {
+        abilities: vec!(
+            Ability::Or(
+                Box::new(Ability::GainAuthority(1)),
+                Box::new(Ability::GainTrade(1)),
+            )
+        ),
         card_type: CardType::Outpost,
         cost: 3,
         faction: Faction::TradeFederation,
-        abilities: vec!(
-            Choice::Or(
-                Box::new(Choice::GainAuthority(1)),
-                Box::new(Choice::GainTrade(1)),
-                true
-            )
-        ),
         health: 4,
         name: String::from("Trading Post"),
         outpost_type: OutpostType::TradingPost,
@@ -150,7 +147,7 @@ pub fn port_of_call() -> Card {
         health: 6,
         name: String::from("Port of Call"),
         outpost_type: OutpostType::PortOfCall,
-        scrap_abilities: vec!(Choice::DestroyBase(0, 0)),
+        scrap_abilities: vec!(Ability::DestroyBase),
         scrap_effects: vec!(Effect::Draw),
         ..Default::default()
     }
@@ -158,10 +155,9 @@ pub fn port_of_call() -> Card {
 
 pub fn recycling_station() -> Card {
     Card {
-        abilities: vec!(Choice::Or(
-            Box::new(Choice::GainTrade(1)),
-            Box::new(Choice::DiscardDraw(0)),
-            false
+        abilities: vec!(Ability::Or(
+            Box::new(Ability::GainTrade(1)),
+            Box::new(Ability::DiscardThenDraw),
         )),
         card_type: CardType::Outpost,
         cost: 4,

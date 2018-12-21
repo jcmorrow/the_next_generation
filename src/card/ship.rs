@@ -2,7 +2,7 @@ use card::Card;
 use card::CardType;
 use card::Faction;
 use card::ShipType;
-use choice::Choice;
+use choice::Ability;
 use effect::Effect;
 
 pub fn battlecruiser() -> Card {
@@ -13,7 +13,7 @@ pub fn battlecruiser() -> Card {
         effects: vec!(Effect::GainCombat(5), Effect::Draw),
         faction: Faction::StarEmpire,
         name: String::from("Battlecruiser"),
-        scrap_abilities: vec!(Choice::DestroyBase(0, 0)),
+        scrap_abilities: vec!(Ability::DestroyBase),
         scrap_effects: vec!(Effect::Draw),
         ship_type: ShipType::Battlecruiser,
         ..Default::default()
@@ -35,10 +35,9 @@ pub fn battle_blob() -> Card {
 
 pub fn battle_mech() -> Card {
     Card {
-        abilities: vec!(Choice::Or(
-            Box::new(Choice::ScrapHand(0)),
-            Box::new(Choice::ScrapDiscard(0)),
-            true
+        abilities: vec!(Ability::Or(
+            Box::new(Ability::ScrapHand),
+            Box::new(Ability::ScrapDiscard),
         )),
         ally_effects: vec!(Effect::Draw),
         card_type: CardType::Ship,
@@ -53,7 +52,7 @@ pub fn battle_mech() -> Card {
 
 pub fn battle_pod() -> Card {
     Card {
-        abilities: vec!(Choice::ScrapFromTradeRow(0)),
+        abilities: vec!(Ability::ScrapFromTradeRow),
         ally_effects: vec!(Effect::GainCombat(2)),
         card_type: CardType::Ship,
         cost: 2,
@@ -67,7 +66,7 @@ pub fn battle_pod() -> Card {
 
 pub fn blob_carrier() -> Card {
     Card {
-        ally_abilities: vec!(Choice::AcquireFromTradeRow(0)),
+        ally_abilities: vec!(Ability::AcquireFromTradeRow),
         card_type: CardType::Ship,
         cost: 6,
         effects: vec!(Effect::GainCombat(7)),
@@ -80,14 +79,10 @@ pub fn blob_carrier() -> Card {
 
 pub fn blob_destroyer() -> Card {
     Card {
-        ally_abilities: vec!(
-                            Choice::AndOr(
-                                Box::new(Choice::DestroyBase(0, 0)),
-                                Box::new(Choice::ScrapFromTradeRow(0)),
-                                false,
-                                false
-                            )
-                        ),
+        ally_abilities: vec!(Ability::AndOr(
+                                Box::new(Ability::DestroyBase),
+                                Box::new(Ability::ScrapFromTradeRow),
+                            )),
         card_type: CardType::Ship,
         cost: 4,
         effects: vec!(Effect::GainCombat(6)),
@@ -152,7 +147,7 @@ pub fn cutter() -> Card {
 
 pub fn command_ship() -> Card {
     Card {
-        ally_abilities: vec!(Choice::DestroyBase(0, 0)),
+        ally_abilities: vec!(Ability::DestroyBase),
         card_type: CardType::Ship,
         cost: 8,
         effects: vec!(Effect::GainCombat(5), Effect::GainAuthority(4), Effect::Draw, Effect::Draw),
@@ -203,7 +198,7 @@ pub fn flagship() -> Card {
 
 pub fn freighter() -> Card {
     Card {
-        ally_abilities: vec!(Choice::BuyTopDeck(0)),
+        ally_abilities: vec!(Ability::BuyTopDeck),
         card_type: CardType::Ship,
         cost: 4,
         effects: vec!(Effect::GainTrade(4)),
@@ -269,10 +264,9 @@ pub fn imperial_frigate() -> Card {
 pub fn missile_bot() -> Card {
     Card {
         abilities: vec!(
-            Choice::Or(
-                Box::new(Choice::ScrapHand(0)),
-                Box::new(Choice::ScrapDiscard(0)),
-                true
+            Ability::Or(
+                Box::new(Ability::ScrapHand),
+                Box::new(Ability::ScrapDiscard),
             )),
         ally_effects: vec!(Effect::GainCombat(2)),
         card_type: CardType::Ship,
@@ -287,7 +281,7 @@ pub fn missile_bot() -> Card {
 
 pub fn missile_mech() -> Card {
     Card {
-        abilities: vec!(Choice::DestroyBase(0, 0)),
+        abilities: vec!(Ability::DestroyBase),
         ally_effects: vec!(Effect::Draw),
         card_type: CardType::Ship,
         cost: 6,
@@ -315,16 +309,14 @@ pub fn mothership() -> Card {
 pub fn patrol_mech() -> Card {
     Card {
         abilities: vec!(
-            Choice::Or(
-                Box::new(Choice::GainTrade(3)),
-                Box::new(Choice::GainCombat(5)),
-                true
+            Ability::Or(
+                Box::new(Ability::GainTrade(3)),
+                Box::new(Ability::GainCombat(5)),
             )),
         ally_abilities: vec!(
-            Choice::Or(
-                Box::new(Choice::ScrapHand(0)),
-                Box::new(Choice::ScrapDiscard(0)),
-                true
+            Ability::Or(
+                Box::new(Ability::ScrapHand),
+                Box::new(Ability::ScrapDiscard),
             )
         ),
         card_type: CardType::Ship,
@@ -352,6 +344,7 @@ pub fn ram() -> Card {
 
 pub fn scout() -> Card {
     Card {
+        cost: 1,
         card_type: CardType::Ship,
         effects: vec!(Effect::GainTrade(1)),
         name: String::from("Scout"),
@@ -362,7 +355,7 @@ pub fn scout() -> Card {
 
 pub fn stealth_needle() -> Card {
     Card {
-        abilities: vec!(Choice::CopyShip(0)),
+        abilities: vec!(Ability::CopyShip),
         card_type: CardType::Ship,
         cost: 4,
         faction: Faction::MachineCult,
@@ -375,10 +368,9 @@ pub fn stealth_needle() -> Card {
 pub fn supply_bot() -> Card {
     Card {
         abilities: vec!(
-            Choice::Or(
-                Box::new(Choice::ScrapHand(0)),
-                Box::new(Choice::ScrapDiscard(0)),
-                true
+            Ability::Or(
+                Box::new(Ability::ScrapHand),
+                Box::new(Ability::ScrapDiscard),
             )
         ),
         ally_effects: vec!(Effect::GainCombat(2)),
@@ -422,10 +414,9 @@ pub fn trade_pod() -> Card {
 pub fn trade_bot() -> Card {
     Card {
         abilities: vec!(
-            Choice::Or(
-                Box::new(Choice::ScrapHand(0)),
-                Box::new(Choice::ScrapDiscard(0)),
-                true
+            Ability::Or(
+                Box::new(Ability::ScrapHand),
+                Box::new(Ability::ScrapDiscard),
             )),
         ally_effects: vec!(Effect::GainCombat(2)),
         card_type: CardType::Ship,
@@ -440,6 +431,7 @@ pub fn trade_bot() -> Card {
 
 pub fn viper() -> Card {
     Card {
+        cost: 1,
         card_type: CardType::Ship,
         effects: vec!(Effect::GainCombat(1)),
         name: String::from("Viper"),

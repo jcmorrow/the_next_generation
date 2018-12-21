@@ -1,14 +1,18 @@
-use choice::Choice;
 use card::Card;
 use card::CardType;
 use card::Faction;
 use card::OutpostType;
 use card::ShipType;
 use card::ship;
+use choice::Choice;
+use choice::Ability;
 use effect::Effect;
+use strategy::RandomStrategy;
+use strategy::HeuristicStrategy;
 use trade_row::TradeRow;
 
-use rand::{random, thread_rng, Rng};
+use rand::{thread_rng, Rng};
+use std::collections::HashMap;
 use std::fmt;
 
 const HAND_SIZE: usize = 5;
@@ -16,20 +20,25 @@ const STARTING_AUTHORITY: i32 = 50;
 
 #[derive(Debug)]
 pub struct Player {
-    pub authority: i32,
-    pub blobs_played_this_turn: usize,
+    pub name: String,
+
+    pub abilities: HashMap<Ability, usize>,
     pub choices: Vec<Choice>,
+    pub effects: Vec<Effect>,
+    pub mandatory_abilities: Vec<Ability>,
+    pub mandatory_choices: Vec<Choice>,
+
+    pub authority: i32,
     pub combat: i32,
+    pub trade:  i32,
+
     pub deck: Vec<Card>,
     pub discard: Vec<Card>,
-    pub effects: Vec<Effect>,
     pub hand: Vec<Card>,
     pub in_play: Vec<Card>,
-    pub name: String,
-    pub perrenial_choices: Vec<Choice>,
     pub scrapped: Vec<Card>,
-    pub trade:  i32,
-    pub turn_start_choices: Vec<Choice>,
+
+    pub blobs_played_this_turn: usize,
 }
 
 pub enum CardPile {
@@ -42,6 +51,7 @@ pub enum CardPile {
 impl Player {
     pub fn new(name: &str) -> Player {
         let mut player = Player {
+            abilities: HashMap::new(),
             authority: STARTING_AUTHORITY,
             blobs_played_this_turn: 0,
             choices: Vec::new(),
@@ -52,11 +62,13 @@ impl Player {
             hand: Vec::new(),
             in_play: Vec::new(),
             name: name.to_string(),
-            perrenial_choices: Vec::new(),
             scrapped: Vec::new(),
             trade: 0,
-            turn_start_choices: Vec::new()
+            mandatory_abilities: Vec::new(),
+            mandatory_choices: Vec::new(),
         };
+
+        player.reset_abilities();
 
         for _n in 0..8 {
             player.deck.push(ship::scout());
@@ -212,112 +224,6 @@ impl Player {
         }
     }
 
-    fn make_perennial_choice(&mut self,
-                             trade_row: &TradeRow,
-                             opponents: &[&mut Player]) -> Choice {
-        match self.perrenial_choices.pop() {
-            Some(c) => c,
-            None => {
-                match self.choices.pop() {
-                    Some(c) => match c {
-                        Choice::AcquireFromTradeRow(_) => {
-                            match self.index_of_most_expensive_card(&trade_row.face_up) {
-                                Some(i) => Choice::AcquireFromTradeRow(i),
-                                None => Choice::Decline,
-                            }
-                        },
-                        Choice::BuyTopDeck(_) => {
-                            match self.index_buy_ship_from_trade_row(trade_row) {
-                                Some(i) => Choice::BuyTopDeck(i),
-                                None => Choice::Decline
-                            }
-                        },
-                        Choice::DestroyBase(_, _) => {
-                            match self.indices_destroy_base(opponents) {
-                                Some(opponent_base) => Choice::DestroyBase(
-                                    // opponnent index
-                                    opponent_base.0,
-                                    // base index
-                                    opponent_base.1,
-                                ),
-                                None => Choice::Decline,
-                            }
-                        },
-                        Choice::BlobDraw(_) => {
-                            match self.blobs_played_this_turn {
-                                0 => Choice::Decline,
-                                n => Choice::BlobDraw(n),
-                            }
-                        },
-                        Choice::ScrapDiscard(_) => {
-                            match self.index_from(CardPile::Discard) {
-                                Some(i) => Choice::ScrapDiscard(i),
-                                None => Choice::Decline
-                            }
-                        },
-                        Choice::ScrapHand(_) => {
-                            match self.index_from(CardPile::Hand) {
-                                Some(i) => Choice::ScrapHand(i),
-                                None => Choice::Decline
-                            }
-                        },
-                        Choice::ScrapDiscardDraw(_) => {
-                            match self.index_from(CardPile::Discard) {
-                                Some(i) => Choice::ScrapDiscardDraw(i),
-                                None => Choice::Decline
-                            }
-                        },
-                        Choice::ScrapHandDraw(_) => {
-                            match self.index_from(CardPile::Hand) {
-                                Some(i) => Choice::ScrapHandDraw(i),
-                                None => Choice::Decline
-                            }
-                        },
-                        Choice::Or(a, b, _) => {
-                            // Stupid robot choices
-                            Choice::Or(a, b, random())
-                        },
-                        Choice::AndOr(a, b, _, _) => {
-                            // Stupid robot choices
-                            Choice::AndOr(a, b, random(), random())
-                        },
-                        Choice::ScrapFromTradeRow(_) => {
-                            match self.index_scrap_from_trade_row(trade_row) {
-                                Some(i) => Choice::ScrapFromTradeRow(i),
-                                None => Choice::Decline
-                            }
-                        },
-                        Choice::ScrapDraw(_) => {
-                            // For now, always opt to scrap and draw 2 cards
-                            Choice::ScrapDraw(2)
-                        },
-                        Choice::DiscardDraw(_) => {
-                            match self.hand.len() {
-                                0 => Choice::Decline,
-                                1 => Choice::DiscardDraw(1),
-                                _ => Choice::DiscardDraw(2)
-                            }
-                        },
-                        Choice::DiscardCardDraw(_) => {
-                            match self.index_from(CardPile::Hand) {
-                                Some(i) => Choice::DiscardCardDraw(i),
-                                None => Choice::Decline
-                            }
-                        },
-                        Choice::CopyShip(_) => {
-                            match self.ships_to_copy() {
-                                None => Choice::Decline,
-                                Some(n) => Choice::CopyShip(n)
-                            }
-                        },
-                        c => c
-                    },
-                    None => Choice::EndTurn
-                }
-            }
-        }
-    }
-
     pub fn process_effects(&mut self,
                            trade_row: &TradeRow,
                            opponents: &mut [&mut Player]) {
@@ -342,51 +248,77 @@ impl Player {
     pub fn make_choice(&mut self,
                        trade_row: &TradeRow,
                        opponents: &[&mut Player]) -> Choice {
-        if self.turn_start_choices.len() > 0 {
-            return self.turn_start_choices.pop().unwrap()
-        }
 
-        self.perrenial_choices.clear();
-        match self.index_attack_opponents(opponents) {
-            Some(i) => self.perrenial_choices.push(Choice::Attack(i)),
-            None => ()
+        if self.mandatory_abilities.len() > 0 {
+            println!("I HAVE MANDATORY ABILITES");
+            let choice = self.make_mandatory_choice(trade_row, opponents);
+            choice
+        } else {
+            self.make_strategy_choice(trade_row, opponents)
         }
+    }
 
-        match self.index_buy_from_trade_row(trade_row) {
-            Some(i) => self.perrenial_choices.push(Choice::Buy(i)),
-            None => ()
+    pub fn gain_ability(&mut self, ability: Ability) {
+        // println!("{} gains the ability: {:?}", self.name, ability);
+        let ability_count = self.abilities.entry(ability).or_insert(0);
+        *ability_count += 1;
+    }
+
+
+    pub fn reset_abilities(&mut self) {
+        self.abilities.clear();
+        self.gain_ability(Ability::Attack);
+        self.gain_ability(Ability::Buy);
+        self.gain_ability(Ability::EndTurn);
+        self.gain_ability(Ability::Play);
+        self.gain_ability(Ability::ScrapSelf);
+    }
+
+    pub fn lose_ability(&mut self, ability: Ability) {
+        // println!("{:?}", self.abilities);
+        // println!("{} loses the ability: {:?}", self.name, ability);
+        let ability_count = self.abilities.entry(ability).or_insert(0);
+        if *ability_count > 0 {
+            *ability_count -= 1;
         }
+    }
 
-        match self.index_from(CardPile::Hand) {
-            Some(i) => self.perrenial_choices.push(Choice::Play(i)),
-            None => ()
+    pub fn make_mandatory_choice(&mut self,
+                                 trade_row: &TradeRow,
+                                 opponents: &[&mut Player]) -> Choice {
+        self.mandatory_choices.clear();
+
+        for ability in &self.mandatory_abilities {
+            let choices = ability.expand(self, opponents, trade_row);
+            println!("{:?}", choices);
+            self.mandatory_choices.extend(choices);
+            println!("{:?}", self.mandatory_choices);
         }
+        println!("{:?}", self.mandatory_abilities);
+        println!("{:?}", self.mandatory_choices);
 
-        for (index, card) in self.in_play.iter().enumerate() {
-            if card.scrap_abilities.len() > 0 || card.scrap_effects.len() > 0 {
-                self.perrenial_choices.push(Choice::ScrapSelf(index));
+        let choice_index = HeuristicStrategy::mandatory_choose(self, trade_row, opponents);
+        let choice = self.mandatory_choices.remove(choice_index);
+
+        choice
+    }
+
+    pub fn make_strategy_choice(&mut self,
+                                trade_row: &TradeRow,
+                                opponents: &[&mut Player]) -> Choice {
+        self.choices.clear();
+
+        for (ability, count) in &self.abilities {
+            if *count > 0 {
+                let choices = ability.expand(self, opponents, trade_row);
+                self.choices.extend(choices);
             }
         }
 
-        match self.turn_start_choices.pop() {
-            Some(c) => match c {
-                Choice::DiscardCard(_) => {
-                    match self.index_from(CardPile::Hand) {
-                        Some(i) => Choice::DiscardCard(i),
-                        None => self.make_perennial_choice(trade_row, opponents)
-                    }
-                },
-                // Added from Machine Base (Choice::DrawScrap)
-                Choice::ScrapHand(_) => {
-                    match self.index_from(CardPile::Hand) {
-                        Some(i) => Choice::ScrapHand(i),
-                        None => self.make_perennial_choice(trade_row, opponents)
-                    }
-                },
-                c => c
-            },
-            None => self.make_perennial_choice(trade_row, opponents)
-        }
+        let choice_index = HeuristicStrategy::choose(self, trade_row, opponents);
+        let choice = self.choices.remove(choice_index);
+
+        choice
     }
 
     pub fn draw(&mut self) {
@@ -418,8 +350,16 @@ impl Player {
             self.draw();
         }
 
+        self.reset_abilities();
+
+        let mut abilities_to_gain: Vec<Ability> = Vec::new();
         for base in &self.in_play {
-            self.choices.extend(base.abilities.clone());
+            for ability in &base.abilities {
+                abilities_to_gain.push(ability.clone());
+            }
+        }
+        for ability in abilities_to_gain {
+            self.gain_ability(ability);
         }
     }
 
@@ -440,12 +380,14 @@ impl Player {
                 _ => self.discard.push(card)
             }
         }
+        self.discard.extend(self.hand.drain(0..));
+
         for card in &mut self.discard { card.has_used_ally_ability = false; }
         for card in &mut self.deck { card.has_used_ally_ability = false; }
         for card in &mut self.hand { card.has_used_ally_ability = false; }
         for card in &mut self.in_play { card.has_used_ally_ability = false; }
         for card in &mut self.scrapped { card.has_used_ally_ability = false; }
-        self.turn_start_choices.clear();
+
         self.blobs_played_this_turn = 0;
     }
 }
@@ -456,12 +398,16 @@ impl fmt::Display for Player {
         write!(f, "Authority: {}\n", self.authority).unwrap();
         write!(f, "Trade: {}\n", self.trade).unwrap();
         write!(f, "Combat: {}\n", self.combat).unwrap();
+        writeln!(f, "Abilities: {:?}", self.abilities).unwrap();
+
         for card in self.in_play.iter() {
             write!(f, "In play: {}", card).unwrap();
         }
+        writeln!(f, "===========").unwrap();
         for card in self.hand.iter() {
             write!(f, "Hand:  {}", card).unwrap();
         }
+        writeln!(f, "===========").unwrap();
         for card in self.deck.iter() {
             write!(f, "Deck:  {}", card).unwrap();
         }

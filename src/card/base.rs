@@ -2,16 +2,15 @@ use card::Card;
 use card::CardType;
 use card::Faction;
 use card::BaseType;
-use choice::Choice;
+use choice::Ability;
 use effect::Effect;
 
 pub fn barter_world() -> Card {
     Card {
         abilities: vec!(
-            Choice::Or(
-                Box::new(Choice::GainTrade(2)),
-                Box::new(Choice::GainAuthority(2)),
-                true
+            Ability::Or(
+                Box::new(Ability::GainTrade(2)),
+                Box::new(Ability::GainAuthority(2)),
             )
         ),
         base_type: BaseType::BarterWorld,
@@ -40,10 +39,9 @@ pub fn blob_wheel() -> Card {
 
 pub fn blob_world() -> Card {
     Card {
-        abilities: vec!(Choice::Or(
-            Box::new(Choice::GainCombat(5)),
-            Box::new(Choice::BlobDraw(0)),
-            true
+        abilities: vec!(Ability::Or(
+            Box::new(Ability::GainCombat(5)),
+            Box::new(Ability::BlobDraw),
         )),
         base_type: BaseType::BlobWorld,
         card_type: CardType::Base,
@@ -57,7 +55,7 @@ pub fn blob_world() -> Card {
 
 pub fn central_office() -> Card {
     Card {
-        abilities: vec!(Choice::BuyTopDeck(0)),
+        abilities: vec!(Ability::BuyTopDeck),
         ally_effects: vec!(Effect::Draw),
         base_type: BaseType::CentralOffice,
         card_type: CardType::Base,

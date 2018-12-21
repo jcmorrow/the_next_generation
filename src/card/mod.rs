@@ -3,6 +3,7 @@ use std::fmt;
 use effect::Effect;
 use player::Player;
 use trade_row::TradeRow;
+use choice::Ability;
 use choice::Choice;
 
 pub mod base;
@@ -150,8 +151,8 @@ impl fmt::Display for CardType {
 #[derive(Debug)]
 #[derive(Default)]
 pub struct Card {
-    pub abilities: Vec<Choice>,
-    pub ally_abilities: Vec<Choice>,
+    pub abilities: Vec<Ability>,
+    pub ally_abilities: Vec<Ability>,
     pub ally_effects: Vec<Effect>,
     pub base_type: BaseType,
     pub card_type: CardType,
@@ -162,7 +163,7 @@ pub struct Card {
     pub health: i32,
     pub name: String,
     pub outpost_type: OutpostType,
-    pub scrap_abilities: Vec<Choice>,
+    pub scrap_abilities: Vec<Ability>,
     pub scrap_effects: Vec<Effect>,
     pub ship_type: ShipType,
 }
@@ -172,7 +173,9 @@ impl Card {
                player: &mut Player,
                opponents: &[&mut Player],
                trade_row: &mut TradeRow) {
-        player.choices.extend(self.abilities.clone());
+        for ability in &self.abilities {
+            player.gain_ability(ability.clone());
+        }
         player.effects.extend(self.effects.clone());
 
         let fleet_hq_played = player.in_play.iter().any(|c| c.base_type == BaseType::FleetHQ);
@@ -201,6 +204,7 @@ impl Card {
             _ => ()
         }
 
+        let mut abilities_to_gain: Vec<Ability> = Vec::new();
         for card in &mut player.in_play {
             if (
                 card.faction == self.faction ||
@@ -209,14 +213,17 @@ impl Card {
             ) && !card.has_used_ally_ability
             {
                 card.has_used_ally_ability = true;
-                player.choices.extend(card.ally_abilities.clone());
+                abilities_to_gain.extend(card.ally_abilities.clone());
                 player.effects.extend(card.ally_effects.clone());
             }
         }
         if player.has_ally_in_play(&self.faction) {
             self.has_used_ally_ability = true;
-            player.choices.extend(self.ally_abilities.clone());
+            abilities_to_gain.extend(self.ally_abilities.clone());
             player.effects.extend(self.ally_effects.clone());
+        }
+        for ability in abilities_to_gain {
+            player.gain_ability(ability);
         }
     }
 }

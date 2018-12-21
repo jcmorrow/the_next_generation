@@ -1,6 +1,6 @@
-use choice::Choice;
-use trade_row::TradeRow;
+use choice::Ability;
 use player::Player;
+use trade_row::TradeRow;
 
 #[derive(Debug)]
 #[derive(Clone)]
@@ -10,9 +10,7 @@ pub enum Effect {
     GainAuthority(i32),
     GainCombat(i32),
     GainTrade(i32),
-    ScrapDiscard(usize),
     ScrapHand(usize),
-    ScrapSelf(usize),
     Empty
 }
 
@@ -37,23 +35,14 @@ impl Effect {
             },
             Effect::DiscardAttack(opponent_index) => {
                 println!("{} makes {} discard!", player.name, opponents[*opponent_index].name);
-                opponents[*opponent_index].turn_start_choices.push(
-                    Choice::DiscardCard(0))
+                opponents[*opponent_index].mandatory_abilities.push(Ability::DiscardCard)
             },
             Effect::Draw => {
-                println!("{} draws a card.", player.name);
+                println!("{} draws a card", player.name);
                 player.draw();
-            },
-            Effect::ScrapDiscard(i) => {
-                let card = player.discard.remove(*i);
-                player.scrapped.push(card);
             },
             Effect::ScrapHand(i) => {
                 let card = player.hand.remove(*i);
-                player.scrapped.push(card);
-            },
-            Effect::ScrapSelf(i) => {
-                let card = player.in_play.remove(*i);
                 player.scrapped.push(card);
             },
             _ => ()
